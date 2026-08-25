@@ -124,6 +124,11 @@
   .feature-block.auto { border-left-color: var(--emerald); }
   .feature-block .origin { font-size: 0.62rem; color: var(--emerald); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-left: 0.4rem; font-family: 'Cinzel', serif; }
   
+  .mastery-block { margin-bottom: 0.5rem; padding: 0.6rem; background: rgba(62,107,74,0.1); border-left: 3px solid var(--emerald); border-radius: 2px; }
+  .mastery-block .m-title { font-family: 'Cinzel', serif; font-weight: 700; color: var(--emerald); font-size: 0.85rem; margin-bottom: 0.2rem; display: flex; justify-content: space-between; }
+  .mastery-block .m-weapons { font-size: 0.65rem; background: var(--emerald); color: var(--parchment-light); padding: 0.1rem 0.4rem; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.05em; align-self: center; }
+  .mastery-block .m-desc { font-size: 0.8rem; color: var(--ink); line-height: 1.5; font-style: italic; }
+  
   .spell-slots { margin: 0.5rem 0 0.75rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 0.4rem; }
   .slot-box { text-align: center; background: rgba(122,34,34,0.1); border: 1px solid rgba(122,34,34,0.3); border-radius: 3px; padding: 0.3rem 0.2rem; }
   .slot-box .lvl { font-family: 'Cinzel', serif; font-size: 0.6rem; color: var(--crimson); text-transform: uppercase; letter-spacing: 0.08em; }
@@ -255,6 +260,11 @@
         <p style="font-size:0.7rem; color:var(--ink-soft); margin-top:0.5rem; font-style:italic;">
           Gli incantesimi con tiro per colpire compaiono qui automaticamente. Clicca sul "+" nella colonna Maestria per attivarla.
         </p>
+        
+        <hr class="ornate">
+        
+        <div style="margin-bottom:0.5rem;"><label>Maestrie Armi Attive</label></div>
+        <div id="masteryList"></div>
       </section>
 
       <section class="card" id="defenseCard">
@@ -351,7 +361,7 @@ const CLASSES = {
   'Monaco': { hd:8, primary:['DES','SAG'], saves:['FOR','DES'], caster:false, skills:{ count:2, list:['Acrobazia','Atletica','Furtività','Indagare','Intuito','Percezione','Religione','Storia'] }, armorProf:[], weaponProf:['Semplici','Spada Corto'], features:{ 1:['Maestria Arti Marziali','Difesa Senza Armatura'], 2:['Flusso di Ki'], 5:['Attacco Extra','Saggezza di Difesa'] } },
   'Paladino': { hd:10, primary:['FOR','CAR'], saves:['SAG','CAR'], caster:true, castingAb:'CAR', type:'half', prepMode:'prepared', cantrips:{}, preparedFormula:'metà livello (arrotondata su) + modCAR', skills:{ count:2, list:['Atletica','Indagare','Intimidire','Medicina','Persuasione','Religione','Storia','Intuito'] }, armorProf:['Leggera','Media','Pesante','Scudi'], weaponProf:['Semplici','Marziali'], features:{ 1:['Aura Sacra','Lay on Hands'], 2:['Stile di Combattimento','Incantesimi','Maestria Armi'], 5:['Attacco Extra'] } },
   'Ranger': { hd:10, primary:['DES','SAG'], saves:['FOR','SAG'], caster:true, castingAb:'SAG', type:'half', prepMode:'prepared', cantrips:{}, preparedFormula:'metà livello (arrotondata su) + modSAG', skills:{ count:3, list:['Addestrare Animali','Atletica','Furtività','Indagare','Natura','Percezione','Sopravvivenza','Intuito'] }, armorProf:['Leggera','Media','Scudi'], weaponProf:['Semplici','Marziali'], features:{ 1:['Nemico Prescelto','Esploratore Esperto','Maestria Armi'], 2:['Stile di Combattimento','Incantesimi'], 5:['Attacco Extra'] } },
-  'Ladro': { hd:8, primary:'DES', saves:['DES','INT'], caster:false, skills:{ count:4, list:['Acrobazia','Atletica','Furtività','Indagare','Inganno','Intimidire','Intuito','Medicina','Percezione','Persuasione','Rapidità di Mano','Sopravvivenza','Storia'] }, armorProf:['Leggera'], weaponProf:['Semplici','Balestra a Mano','Spada Corta','Rapiera'], features:{ 1:['Competenza Esperta','Azione Furtiva','Linguaggio dei Ladri','Maestria Armi'], 2:['Azione Astuta'], 5:['Attacco Furtivo Migliorato'] } },
+  'Ladro': { hd:8, primary:'DES', saves:['DES','INT'], caster:false, skills:{ count:4, list:['Acrobazia','Atletica','Furtività','Indagare','Inganno','Intimidire','Intuito','Medicina','Percezione','Persuasione','Rapidità di Mano','Sopravvivenza','Storia'] }, armorProf:['Leggera'], weaponProf:['Semplici','Balestra a Mano','Spada Corto','Rapiera'], features:{ 1:['Competenza Esperta','Azione Furtiva','Linguaggio dei Ladri','Maestria Armi'], 2:['Azione Astuta'], 5:['Attacco Furtivo Migliorato'] } },
   'Stregone': { hd:6, primary:'CAR', saves:['COS','CAR'], caster:true, castingAb:'CAR', type:'full', prepMode:'known', cantrips:{1:4,4:5,10:6}, spellsKnown:{1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:11,12:11,13:12,14:12,15:13,16:13,17:14,18:14,19:15,20:15}, skills:{ count:2, list:['Arcano','Inganno','Intimidire','Intuito','Persuasione','Religione'] }, armorProf:[], weaponProf:['Balestra Leggera','Daga','Mazza Leggera','Randello','Fionda'], features:{ 1:['Lancio Incantesimi','Origine Magica'], 2:['Fonte Magica'], 3:['Metamagia'], 5:['Punti Fonte Magica (5)'] } },
   'Warlock': { hd:8, primary:'CAR', saves:['SAG','CAR'], caster:true, castingAb:'CAR', type:'pact', prepMode:'known', cantrips:{1:2,4:3,10:4}, spellsKnown:{1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:10,11:11,12:11,13:12,14:12,15:13,16:13,17:14,18:14,19:15,20:15}, pactSlots:{ 1:[1,1], 2:[2,1], 3:[2,2], 5:[2,3], 7:[2,4], 9:[2,5] }, skills:{ count:2, list:['Arcano','Inganno','Furtività','Indagare','Intimidire','Storia','Natura','Religione'] }, armorProf:['Leggera','Media'], weaponProf:['Semplici'], features:{ 1:['Lancio Incantesimi','Patrono'], 2:['Invocazioni Mistiche (2)'], 3:['Dono del Patto'] } },
   'Mago': { hd:6, primary:'INT', saves:['INT','SAG'], caster:true, castingAb:'INT', type:'full', prepMode:'prepared', cantrips:{1:3,4:4,10:5}, preparedFormula:'modINT + livello', skills:{ count:2, list:['Arcano','Indagare','Religione','Storia','Intuito','Medicina','Percezione'] }, armorProf:[], weaponProf:['Daga','Balestra Leggera','Bastone','Mazza Leggera','Randello','Fionda'], features:{ 1:['Lancio Incantesimi','Recupero Arcano','Grimorio (6 incantesimi 1°)'], 2:['Tradizione Arcana'], 5:['Ritualista'] } }
@@ -503,7 +513,7 @@ const STATE = {
   abilities: { FOR:15, DES:14, COS:13, INT:12, SAG:10, CAR:8 },
   baseAbilities: { FOR:15, DES:14, COS:13, INT:12, SAG:10, CAR:8 },
   abilityBonus: { FOR:0, DES:0, COS:0, INT:0, SAG:0, CAR:0 },
-  abilityASI: { FOR:0, DES:0, COS:0, INT:0, SAG:0, CAR:0 }, // Track ASI checkbox clicks
+  abilityASI: { FOR:0, DES:0, COS:0, INT:0, SAG:0, CAR:0 },
   skills: {}, weapons: [], armor: 'Nessuna', shield: 'no',
   spells: [], cantrips: [], feats: [], equipment: [], weaponMastery: [],
   deathSaves: { success: 0, fail: 0 }
@@ -613,7 +623,7 @@ function updateFeatSelect() {
    ==================================================================== */
 function applySpecies() {
   const sp = SPECIES[STATE.species];
-  ABILITIES.forEach(a => STATE.abilityBonus[a] = 0); // Reset only species bonus, ASI is separate
+  ABILITIES.forEach(a => STATE.abilityBonus[a] = 0);
   if (sp.bonusStats) {
     const cd = CLASSES[STATE.class];
     const primary = Array.isArray(cd.primary) ? cd.primary[0] : cd.primary;
@@ -634,9 +644,7 @@ function applyClass() {
     cd.skills.list.slice(0, cd.skills.count).forEach(s => { if (STATE.skills[s] === 0) STATE.skills[s] = 1; });
   }
   
-  // Reset masteries. Let the user pick them manually using getMaxMasteries() limit.
   STATE.weaponMastery = [];
-  
   if (!cd.caster) { STATE.spells = []; STATE.cantrips = []; }
 }
 
@@ -649,7 +657,6 @@ function applyBackgroundSkills() {
 function applyBackground() {
   const bg = BACKGROUNDS[STATE.background];
   if (!bg) return;
-  // Map background equipment to editable object structure
   STATE.equipment = bg.equipment.map(item => ({ ...item, id: Date.now() + Math.random() }));
   if (bg.feat && !STATE.feats.includes(bg.feat)) {
     STATE.feats = STATE.feats.filter(f => !FEATS[f] || FEATS[f].type !== 'origin');
@@ -658,17 +665,12 @@ function applyBackground() {
   }
 }
 
-function applyFeatEffects(featName) {
-  const f = FEATS[featName];
-  if (!f) return;
-  // ASI Feats add to abilityBonus (managed by checkboxes instead to be more flexible)
-  // We leave ASI entirely to the checkboxes now, so feats don't hardcode stats.
-}
+function applyFeatEffects(featName) { /* ASI gestito via checkbox */ }
 
 function recomputeAbilities() {
   ABILITIES.forEach(ab => {
     let total = STATE.baseAbilities[ab] + (STATE.abilityBonus[ab] || 0) + (STATE.abilityASI[ab] || 0);
-    STATE.abilities[ab] = Math.min(20, total); // D&D cap at 20
+    STATE.abilities[ab] = Math.min(20, total);
   });
 }
 
@@ -824,7 +826,6 @@ function renderAbilities() {
       } else {
         STATE.abilityASI[ab] = step - 1;
       }
-      // Enforce sequential logic visually
       document.querySelectorAll(`.asi-cb[data-ab="${ab}"]`).forEach(c => {
         if (parseInt(c.dataset.step) <= STATE.abilityASI[ab]) c.checked = true; else c.checked = false;
       });
@@ -954,6 +955,42 @@ function renderWeapons() {
   html += '</tbody></table>';
   table.innerHTML = html;
   document.getElementById('weaponCount').textContent = STATE.weapons.length + countAttackSpells();
+}
+
+function renderMasteries() {
+  const list = document.getElementById('masteryList');
+  if (!list) return;
+  
+  if (STATE.weaponMastery.length === 0) {
+    list.innerHTML = '<div class="empty-state">Nessuna maestria selezionata. Clicca sul "+" nella tabella armi per attivarla.</div>';
+    return;
+  }
+  
+  // Raggruppa le armi per maestria
+  const activeMasteries = {};
+  STATE.weaponMastery.forEach(wName => {
+    const w = WEAPONS[wName];
+    if (w && w.mastery) {
+      if (!activeMasteries[w.mastery]) activeMasteries[w.mastery] = [];
+      activeMasteries[w.mastery].push(wName);
+    }
+  });
+  
+  let html = '';
+  Object.keys(activeMasteries).forEach(mName => {
+    const desc = MASTERY_DESC[mName] || 'Descrizione non disponibile.';
+    const weaponsWithThisMastery = activeMasteries[mName];
+    
+    html += `<div class="mastery-block">
+      <div class="m-title">
+        <span>${mName}</span>
+        <span class="m-weapons">${weaponsWithThisMastery.join(', ')}</span>
+      </div>
+      <div class="m-desc">${desc}</div>
+    </div>`;
+  });
+  
+  list.innerHTML = html;
 }
 
 function hasAttackSpells() { return STATE.cantrips.concat(STATE.spells).some(n => SPELLS[n] && SPELLS[n].type === 'attack'); }
@@ -1124,7 +1161,7 @@ function renderEquipment() {
       const idx = parseInt(e.target.dataset.idx);
       const field = e.target.dataset.field;
       STATE.equipment[idx][field] = e.target.value;
-      renderEquipment(); // Recalc totals
+      renderEquipment(); // Ricalcola i totali
     });
   });
 }
@@ -1135,6 +1172,7 @@ function renderAll() {
   renderSkills();
   renderCombatStats();
   renderWeapons();
+  renderMasteries(); // Aggiunto il render del riquadro maestrie
   renderSpellCard();
   renderFeatures();
   renderFeats();
@@ -1159,6 +1197,7 @@ function removeWeapon(idx) {
   STATE.weapons.splice(idx, 1);
   STATE.weaponMastery = STATE.weaponMastery.filter(x => x !== w);
   renderWeapons();
+  renderMasteries();
   renderCombatStats();
 }
 
@@ -1174,6 +1213,7 @@ function toggleMastery(w) {
     }
   }
   renderWeapons();
+  renderMasteries();
   renderCombatStats();
 }
 
