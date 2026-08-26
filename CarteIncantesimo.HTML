@@ -20,6 +20,8 @@
             --border-light: #d4bc94;
             --conc-bg: #a02828;
             --conc-light: #c0392b;
+            --ritual-bg: #1e8449;
+            --ritual-light: #2ecc71;
         }
 
         body {
@@ -301,12 +303,19 @@
             margin-bottom: 6px;
         }
 
-        .concentration-badge {
+        /* --- Contenitore per i Badge in alto a destra --- */
+        .badges-container {
             position: absolute;
             top: 2px;
             right: 0;
-            background: linear-gradient(135deg, var(--conc-bg), var(--conc-light));
-            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-end;
+            z-index: 4;
+        }
+
+        .conc-badge, .ritual-badge {
             font-family: 'Cinzel', serif;
             font-size: 0.45em;
             font-weight: 700;
@@ -314,8 +323,18 @@
             letter-spacing: 1px;
             padding: 3px 8px;
             border-radius: 3px;
-            box-shadow: 0 2px 6px rgba(192,57,43,0.4);
             white-space: nowrap;
+            color: #fff;
+        }
+
+        .conc-badge {
+            background: linear-gradient(135deg, var(--conc-bg), var(--conc-light));
+            box-shadow: 0 2px 6px rgba(192,57,43,0.4);
+        }
+
+        .ritual-badge {
+            background: linear-gradient(135deg, var(--ritual-bg), var(--ritual-light));
+            box-shadow: 0 2px 6px rgba(46,204,113,0.4);
         }
 
         .spell-meta {
@@ -401,20 +420,23 @@
             color: var(--ink-medium);
         }
 
+        /* --- Tabella Statistiche (Dimensioni ridotte per evitare sbordamenti) --- */
         .stats-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.76em;
+            font-size: 0.7em; /* Ridotto da 0.76em */
             border: 1.5px solid var(--border);
             border-radius: 4px;
             overflow: hidden;
             background: rgba(250,243,227,0.5);
+            table-layout: fixed; /* Forza il rispetto delle larghezze delle colonne */
         }
 
         .stats-table td {
-            padding: 5px 7px;
+            padding: 4px 6px; /* Padding leggermente ridotto */
             border: 1px solid var(--border-light);
             vertical-align: middle;
+            word-break: break-word; /* Previene il dilatarsi delle celle con testo lungo */
         }
 
         .stat-label {
@@ -422,10 +444,12 @@
             font-weight: 600;
             color: var(--ink-medium);
             background: rgba(196,168,130,0.18);
-            font-size: 0.82em;
+            font-size: 0.78em; /* Ridotto da 0.82em */
             white-space: nowrap;
             letter-spacing: 0.3px;
             width: 22%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .stat-value {
@@ -440,7 +464,7 @@
             font-weight: 600;
             font-style: normal;
             text-transform: uppercase;
-            font-size: 0.88em;
+            font-size: 0.85em; /* Ridotto da 0.88em */
             letter-spacing: 0.5px;
         }
 
@@ -448,7 +472,7 @@
         .save-stack, .components-list {
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centrato per stare in parallelo */
+            align-items: center;
             gap: 2px;
             line-height: 1.2;
             padding: 2px 0;
@@ -487,12 +511,12 @@
         .material-row td {
             text-align: left;
             padding: 5px 10px;
-            background: rgba(196,168,130,0.1); /* Leggero distacco cromatico */
+            background: rgba(196,168,130,0.1);
         }
 
         .material-row .comp-material-text {
             display: block;
-            font-size: 0.9em;
+            font-size: 0.85em; /* Ridotto da 0.9em */
             opacity: 0.8;
             font-style: italic;
             line-height: 1.2;
@@ -626,7 +650,8 @@
             ⚙️ <strong>Componenti:</strong> imposta <code>verbal</code>, <code>somatic</code>, <code>material</code> a <code>true/false</code>.<br>
             🛡️ <strong>Tiro Salvezza:</strong> inserisci la stat (es. "Destrezza") e l'<code>saveOutcome</code> (es. "Dimezza", "Annulla").<br>
             🎯 <strong>Tiro per colpire:</strong> imposta <code>toHit: true</code> per mostrare il bonus modificabile.<br>
-            📋 <strong>Classi:</strong> scrivile nel campo <code>classes</code> separandole da virgole.
+            📋 <strong>Classi:</strong> scrivile nel campo <code>classes</code> separandole da virgole.<br>
+            ✨ <strong>Rituale:</strong> imposta <code>ritual: true</code> per mostrare il badge verde in alto.
         </div>
     </div>
 
@@ -643,6 +668,7 @@
                 school: "Trasmutazione",
                 classes: "Bardo, Druido, Ranger",
                 concentration: false,
+                ritual: true, // Esempio con Rituale
                 description: "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
                 castingTime: "1 Azione",
                 savingThrow: "NO",
@@ -659,6 +685,7 @@
                 school: "Evocazione",
                 classes: "Mago, Stregone",
                 concentration: false,
+                ritual: false,
                 description: "Una brillante vampata si sprigiona da un punto a scelta entro gittata. Ogni creatura in un raggio di <b>6 metri</b> dal punto deve effettuare un tiro salvezza su Destrezza. Subisce <b>8d6 danni da fuoco</b> in caso di fallimento, o la metà in caso di successo. Il fuoco danneggia gli oggetti nell'area e incendia quelli infiammabili non indossati.",
                 castingTime: "1 Azione",
                 savingThrow: "Destrezza",
@@ -675,6 +702,7 @@
                 school: "Incantamento",
                 classes: "Bardo, Druido, Stregone",
                 concentration: true,
+                ritual: false,
                 description: "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza, fallendolo automaticamente se tu o i tuoi compagni state combattendo contro di esso. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso.",
                 castingTime: "1 Azione",
                 savingThrow: "Saggezza",
@@ -691,6 +719,7 @@
                 school: "Evocazione",
                 classes: "Mago, Stregone, Warlock",
                 concentration: false,
+                ritual: false,
                 description: "Lanci un <b>dardo di fuoco</b> verso una creatura o un oggetto a vista entro gittata. Effettua un <b>attacco con incantesimo a distanza</b> contro il bersaglio. In caso di colpo, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un oggetto infiammabile colpito dal dardo prende fuoco se non è indossato o trasportato.",
                 castingTime: "1 Azione",
                 savingThrow: "NO",
@@ -808,6 +837,12 @@
                 const vCD      = getCardValue(spellIndex, 'cd');
                 const vToHit   = getCardValue(spellIndex, 'toHit');
 
+                // Costruisce il blocco dei Badge in alto a destra
+                let badgesHTML = '<div class="badges-container">';
+                if (spell.concentration) badgesHTML += '<div class="conc-badge">Concentrazione</div>';
+                if (spell.ritual) badgesHTML += '<div class="ritual-badge">Rituale</div>';
+                badgesHTML += '</div>';
+
                 // Costruisce la lista componenti (verticale)
                 let compWordsHTML = '<div class="components-list">';
                 if (spell.components.verbal)  compWordsHTML += '<span class="comp-word">Verbale</span>';
@@ -815,7 +850,7 @@
                 if (spell.components.material) compWordsHTML += '<span class="comp-word">Materiale</span>';
                 compWordsHTML += '</div>';
 
-                // Costruisce la riga materiali (se presente, in una riga separata sotto)
+                // Costruisce la riga materiali (se presente)
                 let materialRowHTML = '';
                 if (spell.components.material && spell.material) {
                     materialRowHTML = `
@@ -855,8 +890,6 @@
                     `;
                 }
 
-                const concBadge = spell.concentration ? '<div class="concentration-badge">Concentrazione</div>' : '';
-
                 const card = document.createElement('div');
                 card.className = 'spell-card';
                 card.innerHTML = `
@@ -866,7 +899,7 @@
                     <span class="corner br"></span>
                     <div class="card-content">
                         <div class="card-header">
-                            ${concBadge}
+                            ${badgesHTML}
                             <div class="spell-meta">
                                 ${spell.level} • ${spell.school} • 
                                 <select class="stat-input-inline card-ability" data-spell="${spellIndex}" data-field="ability">
