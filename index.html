@@ -80,15 +80,19 @@
   .ability .save-label { font-size: 0.55rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.15rem; font-family: 'Cinzel', serif; }
   
   .asi-track { display: flex; justify-content: center; gap: 3px; margin-top: 0.3rem; }
-  .asi-cb { width: 12px; height: 12px; border: 1.5px solid var(--gold); border-radius: 2px; background: transparent; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all 0.2s; }
-  .asi-cb:checked { background: var(--gold); }
-  .asi-cb:hover { border-color: var(--gold-bright); }
+  .asi-box { width: 14px; height: 14px; border: 1.5px solid var(--ink-soft); border-radius: 2px; background: transparent; cursor: pointer; appearance: none; -webkit-appearance: none; transition: all 0.2s; display: inline-block; }
+  .asi-box:hover { border-color: var(--gold-bright); }
+  .asi-box.bg { background: var(--emerald); border-color: var(--emerald); }
+  .asi-box.asi { background: var(--gold-bright); border-color: var(--gold); }
+
+  .asi-legend { display: flex; gap: 1rem; justify-content: center; margin-top: 0.75rem; font-size: 0.65rem; color: var(--ink-soft); text-transform: uppercase; font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
+  .asi-legend span { display: flex; align-items: center; gap: 0.3rem; }
 
   .stat-box { text-align: center; padding: 0.6rem 0.4rem 0.7rem; background: rgba(255,255,255,0.3); border: 1px solid rgba(42,26,14,0.25); border-radius: 3px; transition: all 0.25s; }
   .stat-box:hover { background: rgba(255,255,255,0.5); }
   .stat-box .label { margin-bottom: 0.2rem; font-size: 0.58rem; }
   .stat-box .value { font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 700; color: var(--crimson); line-height: 1; text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
-  .stat-box .sub { font-size: 0.7rem; color: var(--ink-soft); font-style: italic; margin-top: 0.15rem; }
+  .stat-box .sub { font-size: 0.65rem; color: var(--ink-soft); font-style: italic; margin-top: 0.15rem; line-height: 1.3; }
   
   .skill-list, .saves-list { font-size: 0.83rem; }
   .skill-row, .save-row { display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 0.4rem; padding: 0.2rem 0.1rem; border-bottom: 1px dotted rgba(42,26,14,0.18); cursor: pointer; transition: background 0.15s; }
@@ -209,8 +213,12 @@
       <section class="card" id="abilitiesCard">
         <h2 class="card-title"><i class="fa-solid fa-dice-d20"></i> Caratteristiche</h2>
         <div class="ability-grid" id="abilityGrid"></div>
+        <div class="asi-legend">
+          <span><span class="asi-box bg" style="cursor:default;"></span> Background</span>
+          <span><span class="asi-box asi" style="cursor:default;"></span> Incremento (ASI)</span>
+        </div>
         <p style="font-size:0.7rem; color:var(--ink-soft); margin-top:0.5rem; font-style:italic; text-align:center;">
-          Le caselle sottostanti rappresentano gli Incrementi di Caratteristica (ASI). Spuntale per +1.
+          Clicca le caselle per assegnare i bonus: 1° clic Background (+1), 2° clic ASI (+1), 3° clic reset.
         </p>
       </section>
       <section class="card" id="savesCard">
@@ -368,7 +376,7 @@ const CLASSES = {
 };
 
 const BACKGROUNDS = {
-  'Acrolito': { abilityChoices:['INT','SAG','CAR'], skills:['Intuito','Religione'], tools:[], languages:2, feat:'Iniziato Magico (Chierico)', equipment:[{name:'Simbolo Sacro', qty:1, weight:1, bulk:'Minore', value:25}, {name:'Libro di Preghiere', qty:1, weight:5, bulk:'1', value:25}, {name:'Bastoncini di Incenso', qty:5, weight:1, bulk:'Minore', value:1}, {name:'Abiti Sacerdotali', qty:1, weight:4, bulk:'1', value:5}, {name:'Oro', qty:15, weight:0, bulk:'Minore', value:15}] },
+  'Acrolito': { abilityChoices:['INT','SAG','CAR'], skills:['Intuito','Religione'], tools:[], languages:2, feat:'Iniziato Magico (Chierico)', equipment:[{name:'Simbolo Sacro', qty:1, weight:1, bulk:'Minore', value:25}, {name:'Libro di Preghiere', qty:1, weight:5, bulk:'1', value:25}, {name:'Bastoncigli di Incenso', qty:5, weight:1, bulk:'Minore', value:1}, {name:'Abiti Sacerdotali', qty:1, weight:4, bulk:'1', value:5}, {name:'Oro', qty:15, weight:0, bulk:'Minore', value:15}] },
   'Criminale': { abilityChoices:['DES','INT','CAR'], skills:['Inganno','Furtività'], tools:['Attrezzi da Ladro'], languages:0, feat:'Allerta', equipment:[{name:'Zaino da Scassinatore', qty:1, weight:25, bulk:'1', value:15}, {name:'Leva', qty:1, weight:5, bulk:'1', value:2}, {name:'Abiti Scuri', qty:1, weight:4, bulk:'1', value:2}, {name:'Cappuccio', qty:1, weight:1, bulk:'Minore', value:1}, {name:'Oro', qty:15, weight:0, bulk:'Minore', value:15}] },
   'Saggio': { abilityChoices:['INT','SAG','CAR'], skills:['Arcano','Storia'], tools:[], languages:2, feat:'Iniziato Magico (Mago)', equipment:[{name:'Libro', qty:1, weight:5, bulk:'1', value:25}, {name:'Penna d\'Oca', qty:1, weight:0, bulk:'Minore', value:0}, {name:'Calamaio', qty:1, weight:1, bulk:'Minore', value:1}, {name:'Lettera di Presentazione', qty:1, weight:0, bulk:'Minore', value:0}, {name:'Abiti Comuni', qty:1, weight:3, bulk:'1', value:2}, {name:'Oro', qty:10, weight:0, bulk:'Minore', value:10}] },
   'Soldato': { abilityChoices:['FOR','DES','COS'], skills:['Atletica','Intimidire'], tools:['Veicoli Terrestri','Dadi'], languages:0, feat:'Attaccante Selvaggio', equipment:[{name:'Cotta di Maglia', qty:1, weight:40, bulk:'2', value:75}, {name:'Scudo', qty:1, weight:6, bulk:'1', value:10}, {name:'Spada Corta', qty:1, weight:3, bulk:'1', value:10}, {name:'Balestra Leggera e 20 quadrelli', qty:1, weight:5, bulk:'1', value:25}, {name:'Zaino da Sotterranei', qty:1, weight:25, bulk:'1', value:2}, {name:'Oro', qty:10, weight:0, bulk:'Minore', value:10}] }
@@ -513,7 +521,7 @@ const STATE = {
   abilities: { FOR:15, DES:14, COS:13, INT:12, SAG:10, CAR:8 },
   baseAbilities: { FOR:15, DES:14, COS:13, INT:12, SAG:10, CAR:8 },
   abilityBonus: { FOR:0, DES:0, COS:0, INT:0, SAG:0, CAR:0 },
-  abilityASI: { FOR:0, DES:0, COS:0, INT:0, SAG:0, CAR:0 },
+  abilityInc: { FOR:[0,0,0,0], DES:[0,0,0,0], COS:[0,0,0,0], INT:[0,0,0,0], SAG:[0,0,0,0], CAR:[0,0,0,0] },
   skills: {}, weapons: [], armor: 'Nessuna', shield: 'no',
   spells: [], cantrips: [], feats: [], equipment: [], weaponMastery: [],
   deathSaves: { success: 0, fail: 0 }
@@ -658,18 +666,22 @@ function applyBackground() {
   const bg = BACKGROUNDS[STATE.background];
   if (!bg) return;
   STATE.equipment = bg.equipment.map(item => ({ ...item, id: Date.now() + Math.random() }));
+  
+  ABILITIES.forEach(ab => {
+    STATE.abilityInc[ab] = STATE.abilityInc[ab].map(state => state === 1 ? 0 : state);
+  });
+  
   if (bg.feat && !STATE.feats.includes(bg.feat)) {
     STATE.feats = STATE.feats.filter(f => !FEATS[f] || FEATS[f].type !== 'origin');
     STATE.feats.push(bg.feat);
-    applyFeatEffects(bg.feat);
   }
 }
 
-function applyFeatEffects(featName) { /* ASI gestito via checkbox */ }
-
 function recomputeAbilities() {
   ABILITIES.forEach(ab => {
-    let total = STATE.baseAbilities[ab] + (STATE.abilityBonus[ab] || 0) + (STATE.abilityASI[ab] || 0);
+    let bgBonus = STATE.abilityInc[ab].filter(s => s === 1).length;
+    let asiBonus = STATE.abilityInc[ab].filter(s => s === 2).length;
+    let total = STATE.baseAbilities[ab] + (STATE.abilityBonus[ab] || 0) + bgBonus + asiBonus;
     STATE.abilities[ab] = Math.min(20, total);
   });
 }
@@ -698,13 +710,70 @@ function getMaxMasteries() {
 function calcAC() {
   const arm = ARMORS[STATE.armor];
   const dex = abilityMod('DES');
-  if (STATE.class === 'Barbaro' && arm.type === 'none' && !STATE.shield) return { ac: 10 + dex + abilityMod('COS'), sub: 'Difesa Senza Armatura (10+DES+COS)' };
-  if (STATE.class === 'Monaco' && arm.type === 'none' && !STATE.shield) return { ac: 10 + dex + abilityMod('SAG'), sub: 'Difesa Senza Armatura (10+DES+SAG)' };
-  let ac = arm.type === 'none' ? 10 + dex : arm.base + Math.min(dex, arm.maxDex);
-  if (STATE.shield === 'si') ac += 2;
-  let sub = arm.type === 'none' ? 'Senza armatura (10+DES)' : arm.type + ' (' + arm.base + (arm.maxDex < 99 ? ' + DES(max ' + arm.maxDex + ')' : ' + DES') + ')';
-  if (STATE.shield === 'si') sub += ' + Scudo';
-  return { ac, sub };
+  const con = abilityMod('COS');
+  const wis = abilityMod('SAG');
+  const hasMageArmor = STATE.spells.includes('Armatura Maga');
+  const hasShieldSpell = STATE.spells.includes('Scudo');
+
+  // Calcola sempre tutte le opzioni "Senza Armatura"
+  let unarmoredOptions = [];
+  let baseUnarmored = 10 + dex;
+  unarmoredOptions.push({ name: 'Base (10+DES)', val: baseUnarmored });
+
+  if (STATE.class === 'Barbaro') {
+    let barbAc = 10 + dex + con;
+    unarmoredOptions.push({ name: 'Barbaro (10+DES+COS)', val: barbAc });
+  }
+  if (STATE.class === 'Monaco') {
+    let monkAc = 10 + dex + wis;
+    unarmoredOptions.push({ name: 'Monaco (10+DES+SAG)', val: monkAc });
+  }
+  if (hasMageArmor) {
+    let mageAc = 13 + dex;
+    unarmoredOptions.push({ name: 'Armatura Maga (13+DES)', val: mageAc });
+  }
+
+  let ac = 0;
+  let mainSub = '';
+  let mods = [];
+
+  if (arm.type === 'none') {
+    // Trova l'opzione senza armatura migliore
+    let best = unarmoredOptions.reduce((max, opt) => opt.val > max.val ? opt : max, unarmoredOptions[0]);
+    ac = best.val;
+    mainSub = best.name;
+
+    // Aggiungi le altre opzioni come alternative
+    unarmoredOptions.forEach(opt => {
+      if (opt.name !== best.name) mods.push(opt.name + ' = ' + opt.val);
+    });
+  } else {
+    ac = arm.base + Math.min(dex, arm.maxDex);
+    mainSub = arm.type + ' (' + arm.base + (arm.maxDex < 99 ? ' + DES(max ' + arm.maxDex + ')' : ' + DES') + ')';
+    
+    // Se indossa armatura, le opzioni senza armatura sono alternative
+    unarmoredOptions.forEach(opt => {
+      mods.push(opt.name + ' = ' + opt.val);
+    });
+  }
+
+  // Scudo Fisico
+  if (STATE.shield === 'si') {
+    ac += 2;
+    mainSub += ' + Scudo Fisico (+2)';
+  }
+
+  // Incantesimo Scudo (Reazione)
+  if (hasShieldSpell) {
+    mods.push('Scudo (+5 come Reazione)');
+  }
+
+  let finalSub = mainSub;
+  if (mods.length > 0) {
+    finalSub += ' | Opzioni: ' + mods.join(', ');
+  }
+
+  return { ac, sub: finalSub };
 }
 
 function calcHP() {
@@ -793,9 +862,13 @@ function renderAbilities() {
     div.className = 'ability';
     const isSave = cd.saves.includes(ab);
     
-    let asiCheckboxes = '';
-    for(let i=1; i<=4; i++) {
-      asiCheckboxes += `<input type="checkbox" class="asi-cb" data-ab="${ab}" data-step="${i}" ${STATE.abilityASI[ab] >= i ? 'checked' : ''} title="Incremento +${i}">`;
+    let asiBoxes = '';
+    for(let i=0; i<4; i++) {
+      const state = STATE.abilityInc[ab][i];
+      let cls = 'asi-box';
+      if (state === 1) cls += ' bg';
+      if (state === 2) cls += ' asi';
+      asiBoxes += `<div class="${cls}" data-ab="${ab}" data-idx="${i}"></div>`;
     }
     
     div.innerHTML = `
@@ -804,7 +877,7 @@ function renderAbilities() {
       <div class="mod">${signed(mod(STATE.abilities[ab]))}</div>
       <div class="save-label">TS</div>
       <div class="save-dot ${isSave ? 'prof' : ''}" title="${isSave ? 'Competente' : 'Non competente'}"></div>
-      <div class="asi-track">${asiCheckboxes}</div>`;
+      <div class="asi-track">${asiBoxes}</div>`;
     grid.appendChild(div);
   });
   
@@ -817,18 +890,13 @@ function renderAbilities() {
     });
   });
   
-  grid.querySelectorAll('.asi-cb').forEach(cb => {
-    cb.addEventListener('change', e => {
+  grid.querySelectorAll('.asi-box').forEach(box => {
+    box.addEventListener('click', e => {
       const ab = e.target.dataset.ab;
-      const step = parseInt(e.target.dataset.step);
-      if (e.target.checked) {
-        STATE.abilityASI[ab] = step;
-      } else {
-        STATE.abilityASI[ab] = step - 1;
-      }
-      document.querySelectorAll(`.asi-cb[data-ab="${ab}"]`).forEach(c => {
-        if (parseInt(c.dataset.step) <= STATE.abilityASI[ab]) c.checked = true; else c.checked = false;
-      });
+      const idx = parseInt(e.target.dataset.idx);
+      let current = STATE.abilityInc[ab][idx];
+      current = (current + 1) % 3;
+      STATE.abilityInc[ab][idx] = current;
       recomputeAbilities();
       renderAll();
     });
@@ -881,7 +949,7 @@ function renderCombatStats() {
   const cd = CLASSES[STATE.class];
   
   document.getElementById('acValue').textContent = ac.ac;
-  document.getElementById('acSub').textContent = ac.sub;
+  document.getElementById('acSub').innerHTML = ac.sub;
   document.getElementById('hpValue').textContent = hp.hp;
   document.getElementById('hpSub').textContent = `${hp.hd} + COS (${hp.count} ${hp.count === 1 ? 'dado' : 'dadi'})`;
   document.getElementById('initValue').textContent = signed(init);
@@ -966,7 +1034,6 @@ function renderMasteries() {
     return;
   }
   
-  // Raggruppa le armi per maestria
   const activeMasteries = {};
   STATE.weaponMastery.forEach(wName => {
     const w = WEAPONS[wName];
@@ -1161,7 +1228,7 @@ function renderEquipment() {
       const idx = parseInt(e.target.dataset.idx);
       const field = e.target.dataset.field;
       STATE.equipment[idx][field] = e.target.value;
-      renderEquipment(); // Ricalcola i totali
+      renderEquipment();
     });
   });
 }
@@ -1172,7 +1239,7 @@ function renderAll() {
   renderSkills();
   renderCombatStats();
   renderWeapons();
-  renderMasteries(); // Aggiunto il render del riquadro maestrie
+  renderMasteries();
   renderSpellCard();
   renderFeatures();
   renderFeats();
@@ -1231,6 +1298,7 @@ function addSpell(forceLevel) {
   }
   renderSpellCard();
   renderWeapons();
+  renderCombatStats(); // Aggiorna la CA se si aggiungono incantesimi difensivi
   highlight(document.getElementById('spellCard'));
   if (hasAttackSpells()) highlight(document.getElementById('weaponsCard'));
 }
@@ -1241,6 +1309,7 @@ function removeSpellByName(name, isCantrip) {
   if (idx !== -1) arr.splice(idx, 1);
   renderSpellCard();
   renderWeapons();
+  renderCombatStats(); // Aggiorna la CA se si rimuovono incantesimi difensivi
 }
 
 function removeAttackSpell(name, isCantrip) {
@@ -1252,7 +1321,6 @@ function addFeat() {
   const name = document.getElementById('featSelect').value;
   if (!name || STATE.feats.includes(name)) return;
   STATE.feats.push(name);
-  applyFeatEffects(name);
   recomputeAbilities();
   renderAll();
   highlight(document.getElementById('featsCard'));
@@ -1307,6 +1375,7 @@ function setupListeners() {
     highlight(document.getElementById('skillsCard'));
     highlight(document.getElementById('equipmentCard'));
     highlight(document.getElementById('featsCard'));
+    highlight(document.getElementById('abilitiesCard'));
   });
   
   document.getElementById('levelInput').addEventListener('change', e => {
