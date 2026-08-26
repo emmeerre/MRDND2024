@@ -49,526 +49,193 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
-        .controls-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .controls h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.6em;
-            color: var(--gold-light);
-            letter-spacing: 1px;
-        }
-
-        .controls-subtitle {
-            font-size: 0.85em;
-            color: #a08060;
-            margin-left: auto;
-        }
+        .controls-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .controls h1 { font-family: 'Cinzel', serif; font-size: 1.6em; color: var(--gold-light); letter-spacing: 1px; }
+        .controls-subtitle { font-size: 0.85em; color: #a08060; margin-left: auto; }
 
         .caster-global {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: flex-end;
-            margin-bottom: 20px;
-            padding: 16px 18px;
-            background: rgba(212,175,55,0.06);
-            border-radius: 10px;
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+            margin-bottom: 20px; padding: 16px 18px;
+            background: rgba(212,175,55,0.06); border-radius: 10px;
             border: 1px solid rgba(212,175,55,0.15);
         }
-
-        .caster-global h3 {
-            width: 100%;
-            font-family: 'Cinzel', serif;
-            font-size: 0.85em;
-            color: var(--gold-light);
-            margin-bottom: 8px;
-            letter-spacing: 1px;
+        .caster-global h3 { width: 100%; font-family: 'Cinzel', serif; font-size: 0.85em; color: var(--gold-light); margin-bottom: 8px; letter-spacing: 1px; }
+        .caster-field { display: flex; flex-direction: column; gap: 4px; }
+        .caster-field label { font-size: 0.7em; color: #a08060; text-transform: uppercase; letter-spacing: 0.5px; }
+        .caster-field input, .caster-field select, .filter-bar input, .filter-bar select {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2);
+            color: #e8d5b0; padding: 8px 12px; border-radius: 6px;
+            font-family: 'EB Garamond', serif; font-size: 1em; cursor: pointer;
         }
-
-        .caster-field {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .caster-field label {
-            font-size: 0.7em;
-            color: #a08060;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .caster-field input,
-        .caster-field select,
-        .filter-bar input,
-        .filter-bar select {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(212,175,55,0.2);
-            color: #e8d5b0;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-family: 'EB Garamond', serif;
-            font-size: 1em;
-            cursor: pointer;
-        }
-
         .caster-field select { width: 110px; }
-
-        .caster-field input:focus,
-        .caster-field select:focus,
-        .filter-bar input:focus,
-        .filter-bar select:focus {
-            outline: none;
-            border-color: var(--gold-light);
-            box-shadow: 0 0 8px rgba(212,175,55,0.2);
+        .caster-field input:focus, .caster-field select:focus, .filter-bar input:focus, .filter-bar select:focus {
+            outline: none; border-color: var(--gold-light); box-shadow: 0 0 8px rgba(212,175,55,0.2);
         }
 
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
-            align-items: center;
-        }
-
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
         .filter-bar input { flex: 1; min-width: 180px; }
         .filter-bar select { min-width: 140px; }
 
-        .spell-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 18px;
-        }
-
+        .spell-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
         .spell-checkbox {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,0.04);
-            padding: 7px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid rgba(212,175,55,0.1);
-            font-size: 0.92em;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.04); padding: 7px 14px;
+            border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            border: 1px solid rgba(212,175,55,0.1); font-size: 0.92em;
         }
-
-        .spell-checkbox:hover {
-            background: rgba(212,175,55,0.1);
-            border-color: rgba(212,175,55,0.3);
-        }
-
+        .spell-checkbox:hover { background: rgba(212,175,55,0.1); border-color: rgba(212,175,55,0.3); }
         .spell-checkbox input { accent-color: var(--gold-light); cursor: pointer; }
+        .spell-checkbox em { color: #a08060; font-size: 0.85em; font-style: italic; }
 
-        .spell-checkbox em {
-            color: #a08060;
-            font-size: 0.85em;
-            font-style: italic;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn {
-            background: var(--gold-light);
-            color: #1a1208;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 8px;
-            font-family: 'Cinzel', serif;
-            font-weight: 600;
-            font-size: 0.85em;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: var(--gold-light); color: #1a1208; border: none;
+            padding: 10px 22px; border-radius: 8px; font-family: 'Cinzel', serif;
+            font-weight: 600; font-size: 0.85em; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;
         }
-
-        .btn:hover {
-            background: #e6c558;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid rgba(212,175,55,0.4);
-            color: var(--gold-light);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(212,175,55,0.1);
-            border-color: var(--gold-light);
-        }
+        .btn:hover { background: #e6c558; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
+        .btn-secondary { background: transparent; border: 1px solid rgba(212,175,55,0.4); color: var(--gold-light); }
+        .btn-secondary:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-light); }
 
         .info-note {
-            margin-top: 14px;
-            padding: 12px 16px;
-            background: rgba(212,175,55,0.06);
-            border-left: 3px solid var(--gold);
-            border-radius: 4px;
-            font-size: 0.82em;
-            color: #b8a080;
-            line-height: 1.7;
+            margin-top: 14px; padding: 12px 16px; background: rgba(212,175,55,0.06);
+            border-left: 3px solid var(--gold); border-radius: 4px;
+            font-size: 0.82em; color: #b8a080; line-height: 1.7;
         }
-
-        .info-note code {
-            background: rgba(0,0,0,0.3);
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: var(--gold-light);
-            font-size: 0.9em;
-            font-family: 'Courier New', monospace;
-        }
+        .info-note code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; color: var(--gold-light); font-size: 0.9em; font-family: 'Courier New', monospace; }
 
         /* ===================== GRIGLIA CARDS ===================== */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            max-width: 210mm;
-            margin: 0 auto;
-        }
-
-        .empty-msg {
-            grid-column: 1 / -1;
-            text-align: center;
-            color: #88775a;
-            padding: 80px 20px;
-            font-size: 1.2em;
-            font-style: italic;
-        }
+        .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 210mm; margin: 0 auto; }
+        .empty-msg { grid-column: 1 / -1; text-align: center; color: #88775a; padding: 80px 20px; font-size: 1.2em; font-style: italic; }
 
         /* ===================== SINGOLA CARD ===================== */
         .spell-card {
-            background:
-                linear-gradient(135deg, var(--parchment-light) 0%, var(--parchment-bg) 40%, var(--parchment-dark) 100%);
+            background: linear-gradient(135deg, var(--parchment-light) 0%, var(--parchment-bg) 40%, var(--parchment-dark) 100%);
             border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 22px 20px 16px;
-            position: relative;
-            box-shadow:
-                0 6px 20px rgba(0,0,0,0.35),
-                inset 0 0 40px rgba(180,140,80,0.08);
-            page-break-inside: avoid;
-            break-inside: avoid;
-            overflow: hidden;
+            border-radius: 8px; padding: 22px 20px 16px;
+            position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.35), inset 0 0 40px rgba(180,140,80,0.08);
+            page-break-inside: avoid; break-inside: avoid; overflow: hidden;
         }
+        .spell-card::before { content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid rgba(196,168,130,0.35); border-radius: 5px; pointer-events: none; z-index: 1; }
+        .spell-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(ellipse at 15% 15%, rgba(160,120,60,0.07) 0%, transparent 40%), radial-gradient(ellipse at 85% 85%, rgba(160,120,60,0.07) 0%, transparent 40%); pointer-events: none; z-index: 0; }
 
-        .spell-card::before {
-            content: '';
-            position: absolute;
-            top: 5px; left: 5px; right: 5px; bottom: 5px;
-            border: 1px solid rgba(196,168,130,0.35);
-            border-radius: 5px;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .spell-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image:
-                radial-gradient(ellipse at 15% 15%, rgba(160,120,60,0.07) 0%, transparent 40%),
-                radial-gradient(ellipse at 85% 85%, rgba(160,120,60,0.07) 0%, transparent 40%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .corner {
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            z-index: 3;
-        }
+        .corner { position: absolute; width: 14px; height: 14px; z-index: 3; }
         .corner.tl { top: 9px; left: 9px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); border-top-left-radius: 3px; }
         .corner.tr { top: 9px; right: 9px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); border-top-right-radius: 3px; }
         .corner.bl { bottom: 9px; left: 9px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); border-bottom-left-radius: 3px; }
         .corner.br { bottom: 9px; right: 9px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); border-bottom-right-radius: 3px; }
 
         .card-content { position: relative; z-index: 2; }
+        .card-header { position: relative; margin-bottom: 6px; }
 
-        .card-header {
-            position: relative;
-            margin-bottom: 6px;
-        }
-
-        /* --- Contenitore per i Badge in alto a destra --- */
-        .badges-container {
-            position: absolute;
-            top: 2px;
-            right: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            align-items: flex-end;
-            z-index: 4;
-        }
-
-        .conc-badge, .ritual-badge {
-            font-family: 'Cinzel', serif;
-            font-size: 0.45em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 3px 8px;
-            border-radius: 3px;
-            white-space: nowrap;
-            color: #fff;
-        }
-
-        .conc-badge {
-            background: linear-gradient(135deg, var(--conc-bg), var(--conc-light));
-            box-shadow: 0 2px 6px rgba(192,57,43,0.4);
-        }
-
-        .ritual-badge {
-            background: linear-gradient(135deg, var(--ritual-bg), var(--ritual-light));
-            box-shadow: 0 2px 6px rgba(46,204,113,0.4);
-        }
-
-        .spell-meta {
-            font-family: 'Cinzel', serif;
-            font-size: 0.52em;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            margin-bottom: 3px;
-            font-weight: 600;
-            padding-right: 85px;
-            display: flex;
-            align-items: center;
-            flex-wrap: nowrap;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .spell-classes {
-            font-family: 'EB Garamond', serif;
-            font-size: 0.66em;
-            color: var(--ink-medium);
-            font-style: italic;
+        /* Selettore Tema Card */
+        .theme-selector-wrapper {
             margin-bottom: 5px;
             padding-right: 85px;
-            opacity: 0.75;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .spell-title {
-            font-family: 'Cinzel', serif;
-            font-size: 1.35em;
-            font-weight: 700;
-            color: var(--ink-medium);
-            line-height: 1.15;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 0 rgba(255,255,255,0.3);
-            padding-right: 85px;
-        }
-
-        .divider {
+            font-size: 0.6em;
+            opacity: 0.9;
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 7px 0 12px;
-            gap: 8px;
+            gap: 6px;
         }
-
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--border), transparent);
-            max-width: 65px;
+        .theme-selector-wrapper span {
+            font-family: 'Cinzel', serif;
+            color: var(--ink-medium);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+        .theme-selector {
+            font-family: 'EB Garamond', serif;
+            font-size: 1em;
+            border: 1px solid var(--border-light);
+            background: rgba(255,255,255,0.5);
+            color: var(--ink-medium);
+            border-radius: 4px;
+            padding: 2px 4px;
+            cursor: pointer;
+        }
+        .theme-selector:focus { outline: none; border-color: var(--gold); }
 
+        .badges-container { position: absolute; top: 2px; right: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; z-index: 4; }
+        .conc-badge, .ritual-badge { font-family: 'Cinzel', serif; font-size: 0.45em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 3px; white-space: nowrap; color: #fff; }
+        .conc-badge { background: linear-gradient(135deg, var(--conc-bg), var(--conc-light)); box-shadow: 0 2px 6px rgba(192,57,43,0.4); }
+        .ritual-badge { background: linear-gradient(135deg, var(--ritual-bg), var(--ritual-light)); box-shadow: 0 2px 6px rgba(46,204,113,0.4); }
+
+        .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; padding-right: 85px; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+        .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; padding-right: 85px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); padding-right: 85px; }
+
+        .divider { display: flex; align-items: center; justify-content: center; margin: 7px 0 12px; gap: 8px; }
+        .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); max-width: 65px; }
         .divider-icon { color: var(--gold); font-size: 0.7em; }
 
-        .spell-description {
-            font-size: 0.8em;
-            line-height: 1.55;
-            color: var(--ink-dark);
-            text-align: justify;
-            margin-bottom: 14px;
-            min-height: 50px;
-        }
+        .spell-description { font-size: 0.8em; line-height: 1.55; color: var(--ink-dark); text-align: justify; margin-bottom: 14px; min-height: 50px; }
+        .spell-description b, .spell-description strong { font-weight: 700; color: var(--ink-medium); }
+        .spell-description::first-letter { font-family: 'Cinzel', serif; font-size: 1.65em; font-weight: 700; float: left; line-height: 0.9; margin-right: 4px; margin-top: 3px; color: var(--ink-medium); }
 
-        .spell-description b,
-        .spell-description strong {
-            font-weight: 700;
-            color: var(--ink-medium);
-        }
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 0.7em; border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; background: rgba(250,243,227,0.5); table-layout: fixed; }
+        .stats-table td { padding: 4px 6px; border: 1px solid var(--border-light); vertical-align: middle; word-break: break-word; }
+        .stat-label { font-family: 'Cinzel', serif; font-weight: 600; color: var(--ink-medium); background: rgba(196,168,130,0.18); font-size: 0.78em; white-space: nowrap; letter-spacing: 0.3px; width: 22%; overflow: hidden; text-overflow: ellipsis; }
+        .stat-value { color: var(--ink-dark); font-style: italic; font-weight: 500; text-align: center; }
+        .stat-value.no { color: #9a7040; font-weight: 600; font-style: normal; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; }
 
-        .spell-description::first-letter {
-            font-family: 'Cinzel', serif;
-            font-size: 1.65em;
-            font-weight: 700;
-            float: left;
-            line-height: 0.9;
-            margin-right: 4px;
-            margin-top: 3px;
-            color: var(--ink-medium);
-        }
-
-        /* --- Tabella Statistiche (Dimensioni ridotte per evitare sbordamenti) --- */
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.7em; /* Ridotto da 0.76em */
-            border: 1.5px solid var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-            background: rgba(250,243,227,0.5);
-            table-layout: fixed; /* Forza il rispetto delle larghezze delle colonne */
-        }
-
-        .stats-table td {
-            padding: 4px 6px; /* Padding leggermente ridotto */
-            border: 1px solid var(--border-light);
-            vertical-align: middle;
-            word-break: break-word; /* Previene il dilatarsi delle celle con testo lungo */
-        }
-
-        .stat-label {
-            font-family: 'Cinzel', serif;
-            font-weight: 600;
-            color: var(--ink-medium);
-            background: rgba(196,168,130,0.18);
-            font-size: 0.78em; /* Ridotto da 0.82em */
-            white-space: nowrap;
-            letter-spacing: 0.3px;
-            width: 22%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .stat-value {
-            color: var(--ink-dark);
-            font-style: italic;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        .stat-value.no {
-            color: #9a7040;
-            font-weight: 600;
-            font-style: normal;
-            text-transform: uppercase;
-            font-size: 0.85em; /* Ridotto da 0.88em */
-            letter-spacing: 0.5px;
-        }
-
-        /* Tiro Salvezza e Componenti in verticale */
-        .save-stack, .components-list {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            line-height: 1.2;
-            padding: 2px 0;
-        }
-
+        .save-stack, .components-list { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; padding: 2px 0; }
         .save-stat { font-style: italic; font-weight: 600; color: var(--ink-dark); }
+        .save-cd { font-size: 0.95em; font-weight: 700; color: var(--ink-medium); display: flex; align-items: center; gap: 4px; }
+        .save-outcome { font-size: 0.85em; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: var(--gold); }
 
-        .save-cd {
-            font-size: 0.95em;
-            font-weight: 700;
-            color: var(--ink-medium);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .components-list .comp-word { display: block; font-style: italic; font-weight: 600; color: var(--ink-dark); line-height: 1.3; white-space: nowrap; }
+        .material-row td { text-align: left; padding: 5px 10px; background: rgba(196,168,130,0.1); }
+        .material-row .comp-material-text { display: block; font-size: 0.85em; opacity: 0.8; font-style: italic; line-height: 1.2; white-space: normal; color: var(--ink-medium); }
 
-        .save-outcome {
-            font-size: 0.85em;
-            opacity: 0.85;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-            color: var(--gold);
-        }
-
-        .components-list .comp-word {
-            display: block;
-            font-style: italic;
-            font-weight: 600;
-            color: var(--ink-dark);
-            line-height: 1.3;
-            white-space: nowrap;
-        }
-
-        /* Riga Materiali full-width */
-        .material-row td {
-            text-align: left;
-            padding: 5px 10px;
-            background: rgba(196,168,130,0.1);
-        }
-
-        .material-row .comp-material-text {
-            display: block;
-            font-size: 0.85em; /* Ridotto da 0.9em */
-            opacity: 0.8;
-            font-style: italic;
-            line-height: 1.2;
-            white-space: normal;
-            color: var(--ink-medium);
-        }
-
-        .stat-input {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--ink-dark);
-            font-family: 'EB Garamond', serif;
-            font-size: 0.95em;
-            font-weight: 700;
-            font-style: normal;
-            text-align: center;
-            width: 35px;
-            cursor: text;
-            padding: 2px 3px;
-            border-radius: 3px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-
+        .stat-input { background: transparent; border: 1px solid transparent; color: var(--ink-dark); font-family: 'EB Garamond', serif; font-size: 0.95em; font-weight: 700; font-style: normal; text-align: center; width: 35px; cursor: text; padding: 2px 3px; border-radius: 3px; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
         .stat-input:hover { border-color: var(--border-light); background: rgba(255,255,255,0.3); }
         .stat-input:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,0.45); }
 
-        .stat-input-inline {
-            background: transparent;
-            border: none;
-            border-bottom: 1px dotted var(--border);
-            color: var(--ink-medium);
-            font-family: 'Cinzel', serif;
-            font-size: 0.95em;
-            font-weight: 600;
-            text-align: center;
-            width: 25px;
-            cursor: pointer;
-            padding: 0 2px;
-        }
-
+        .stat-input-inline { background: transparent; border: none; border-bottom: 1px dotted var(--border); color: var(--ink-medium); font-family: 'Cinzel', serif; font-size: 0.95em; font-weight: 600; text-align: center; width: 25px; cursor: pointer; padding: 0 2px; }
         .stat-input-inline:hover { border-bottom-color: var(--gold); }
         .stat-input-inline:focus { outline: none; border-bottom-color: var(--gold-light); }
+        select.stat-input-inline { width: 38px; -webkit-appearance: none; -moz-appearance: none; appearance: none; background: transparent; cursor: pointer; }
 
-        select.stat-input-inline {
-            width: 38px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background: transparent;
-            cursor: pointer;
+        /* ===================== TEMI COLORI ===================== */
+        .theme-default { /* Eredita le variabili :root */ }
+
+        .theme-paladino {
+            --border: #D4AF37; --border-light: #E6C558; --ink-medium: #1a1a1a; --gold: #D4AF37;
+            --parchment-light: #fffcf5; --parchment-bg: #fff8e1; --parchment-dark: #f5ead0;
+        }
+        .theme-clerico {
+            --border: #9b59b6; --border-light: #bb8fce; --ink-medium: #4a235a; --gold: #9b59b6;
+            --parchment-light: #ffffff; --parchment-bg: #f9f0ff; --parchment-dark: #ece0f5;
+        }
+        .theme-ranger {
+            --border: #27ae60; --border-light: #52be80; --ink-medium: #145a32; --gold: #f1c40f;
+            --parchment-light: #fdfff9; --parchment-bg: #f0fff4; --parchment-dark: #d4f5d4;
+        }
+        .theme-druido {
+            --border: #1abc9c; --border-light: #48c9b0; --ink-medium: #0e6251; --gold: #3498db;
+            --parchment-light: #fdfffb; --parchment-bg: #f0fff8; --parchment-dark: #d4f5e0;
+        }
+        .theme-stregone {
+            --border: #e74c3c; --border-light: #ec7063; --ink-medium: #641e16; --gold: #e67e22;
+            --parchment-light: #fffdfb; --parchment-bg: #fff5f0; --parchment-dark: #f5e0d4;
+        }
+        .theme-mago {
+            --border: #2980b9; --border-light: #5499c7; --ink-medium: #154360; --gold: #2980b9;
+            --parchment-light: #fdfeff; --parchment-bg: #f0f8ff; --parchment-dark: #d4e6f5;
+        }
+        .theme-warlock {
+            --border: #922b21; --border-light: #c0392b; --ink-medium: #1a1a1a; --gold: #922b21;
+            --parchment-light: #fffdfb; --parchment-bg: #fff5f5; --parchment-dark: #f5e0e0;
+        }
+        .theme-bardo {
+            --border: #f1c40f; --border-light: #f7dc6f; --ink-medium: #7d6608; --gold: #5dade2;
+            --parchment-light: #fffdf0; --parchment-bg: #fffdf5; --parchment-dark: #f5f5d4;
+        }
+        .theme-artificiere {
+            --border: #95a5a6; --border-light: #bdc3c7; --ink-medium: #566573; --gold: #7f8c8d;
+            --parchment-light: #fdfdfd; --parchment-bg: #f9f9f9; --parchment-dark: #f0f0f0;
         }
 
         @media print {
@@ -576,21 +243,12 @@
             .controls { display: none !important; }
             .cards-grid { gap: 5mm; max-width: none; padding: 0; }
             .spell-card { box-shadow: none; page-break-inside: avoid; break-inside: avoid; }
-
-            .stat-input, .stat-input-inline {
-                border: none !important;
-                background: transparent !important;
-                -webkit-appearance: none !important;
-                -moz-appearance: none !important;
-                appearance: none !important;
-            }
-
+            .stat-input, .stat-input-inline { border: none !important; background: transparent !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; }
+            .theme-selector-wrapper { display: none !important; } /* Nasconde il selettore in stampa */
             @page { size: A4 portrait; margin: 12mm; }
         }
 
-        @media (max-width: 600px) {
-            .cards-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -651,7 +309,8 @@
             🛡️ <strong>Tiro Salvezza:</strong> inserisci la stat (es. "Destrezza") e l'<code>saveOutcome</code> (es. "Dimezza", "Annulla").<br>
             🎯 <strong>Tiro per colpire:</strong> imposta <code>toHit: true</code> per mostrare il bonus modificabile.<br>
             📋 <strong>Classi:</strong> scrivile nel campo <code>classes</code> separandole da virgole.<br>
-            ✨ <strong>Rituale:</strong> imposta <code>ritual: true</code> per mostrare il badge verde in alto.
+            ✨ <strong>Rituale:</strong> imposta <code>ritual: true</code> per mostrare il badge verde in alto.<br>
+            🎨 <strong>Temi:</strong> il colore si imposta automaticamente in base alla classe, ma puoi cambiarlo dal menu a tendina su ogni card.
         </div>
     </div>
 
@@ -666,9 +325,9 @@
                 name: "Bacche Benefiche",
                 level: "1° Livello",
                 school: "Trasmutazione",
-                classes: "Bardo, Druido, Ranger",
+                classes: "Druido, Ranger",
                 concentration: false,
-                ritual: true, // Esempio con Rituale
+                ritual: true,
                 description: "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
                 castingTime: "1 Azione",
                 savingThrow: "NO",
@@ -700,7 +359,7 @@
                 name: "Ammaliare Persone",
                 level: "1° Livello",
                 school: "Incantamento",
-                classes: "Bardo, Druido, Stregone",
+                classes: "Bardo, Stregone, Warlock",
                 concentration: true,
                 ritual: false,
                 description: "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza, fallendolo automaticamente se tu o i tuoi compagni state combattendo contro di esso. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso.",
@@ -744,10 +403,8 @@
 
             const schoolSel = document.getElementById('filterSchool');
             schools.forEach(s => { schoolSel.innerHTML += `<option value="${s}">${s}</option>`; });
-
             const levelSel = document.getElementById('filterLevel');
             levels.forEach(l => { levelSel.innerHTML += `<option value="${l}">${l}</option>`; });
-
             const classSel = document.getElementById('filterClass');
             classes.forEach(c => { classSel.innerHTML += `<option value="${c}">${c}</option>`; });
         }
@@ -773,18 +430,13 @@
                     visibleCount++;
                     const label = document.createElement('label');
                     label.className = 'spell-checkbox';
-                    label.innerHTML = `
-                        <input type="checkbox" data-index="${i}" checked>
-                        <span>${spell.name} <em>(${spell.level})</em></span>
-                    `;
+                    label.innerHTML = `<input type="checkbox" data-index="${i}" checked><span>${spell.name} <em>(${spell.level})</em></span>`;
                     label.querySelector('input').addEventListener('change', renderCards);
                     list.appendChild(label);
                 }
             });
 
-            if (visibleCount === 0) {
-                list.innerHTML = '<em style="color:#a08060; padding:10px;">Nessun incantesimo trovato con questi filtri.</em>';
-            }
+            if (visibleCount === 0) list.innerHTML = '<em style="color:#a08060; padding:10px;">Nessun incantesimo trovato con questi filtri.</em>';
         }
 
         function selectAll(checked) {
@@ -805,7 +457,8 @@
             if (cardOverrides[index] && cardOverrides[index][field] !== undefined) {
                 return cardOverrides[index][field];
             }
-            return getGlobalCaster()[field];
+            if (getGlobalCaster()[field] !== undefined) return getGlobalCaster()[field];
+            return undefined;
         }
 
         function setCardOverride(index, field, value) {
@@ -816,6 +469,21 @@
         function applyGlobalToAll() {
             cardOverrides = {};
             renderCards();
+        }
+
+        // Indovina il tema in base alla stringa delle classi
+        function guessDefaultTheme(spell) {
+            const c = spell.classes.toLowerCase();
+            if (c.includes("paladino")) return "theme-paladino";
+            if (c.includes("chierico")) return "theme-clerico";
+            if (c.includes("ranger")) return "theme-ranger";
+            if (c.includes("druido")) return "theme-druido";
+            if (c.includes("stregone")) return "theme-stregone";
+            if (c.includes("mago")) return "theme-mago";
+            if (c.includes("warlock")) return "theme-warlock";
+            if (c.includes("bardo")) return "theme-bardo";
+            if (c.includes("artificiere")) return "theme-artificiere";
+            return "theme-default";
         }
 
         function renderCards() {
@@ -836,123 +504,106 @@
                 const vBonus   = getCardValue(spellIndex, 'bonus');
                 const vCD      = getCardValue(spellIndex, 'cd');
                 const vToHit   = getCardValue(spellIndex, 'toHit');
+                
+                // Gestione Tema: usa l'override se presente, altrimenti indovina dalla classe
+                const vTheme = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
 
-                // Costruisce il blocco dei Badge in alto a destra
-                let badgesHTML = '<div class="badges-container">';
-                if (spell.concentration) badgesHTML += '<div class="conc-badge">Concentrazione</div>';
-                if (spell.ritual) badgesHTML += '<div class="ritual-badge">Rituale</div>';
-                badgesHTML += '</div>';
-
-                // Costruisce la lista componenti (verticale)
                 let compWordsHTML = '<div class="components-list">';
                 if (spell.components.verbal)  compWordsHTML += '<span class="comp-word">Verbale</span>';
                 if (spell.components.somatic) compWordsHTML += '<span class="comp-word">Somatica</span>';
                 if (spell.components.material) compWordsHTML += '<span class="comp-word">Materiale</span>';
                 compWordsHTML += '</div>';
 
-                // Costruisce la riga materiali (se presente)
                 let materialRowHTML = '';
                 if (spell.components.material && spell.material) {
-                    materialRowHTML = `
-                        <tr class="material-row">
-                            <td colspan="4">
-                                <span class="comp-material-text">${spell.material}</span>
-                            </td>
-                        </tr>
-                    `;
+                    materialRowHTML = `<tr class="material-row"><td colspan="4"><span class="comp-material-text">${spell.material}</span></td></tr>`;
                 }
 
-                // Costruisce la cella Tiro Salvezza
                 let saveCellHTML;
                 if (spell.savingThrow === "NO") {
                     saveCellHTML = '<td class="stat-value no">NO</td>';
                 } else {
-                    saveCellHTML = `
-                        <td class="stat-value">
-                            <div class="save-stack">
-                                <span class="save-stat">${spell.savingThrow}</span>
-                                <span class="save-cd">CD <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span>
-                                <span class="save-outcome">${spell.saveOutcome}</span>
-                            </div>
-                        </td>
-                    `;
+                    saveCellHTML = `<td class="stat-value"><div class="save-stack"><span class="save-stat">${spell.savingThrow}</span><span class="save-cd">CD <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span><span class="save-outcome">${spell.saveOutcome}</span></div></td>`;
                 }
 
-                // Costruisce la cella Tiro per colpire
                 let toHitCellHTML;
                 if (!spell.toHit) {
                     toHitCellHTML = '<td class="stat-value no">NO</td>';
                 } else {
-                    toHitCellHTML = `
-                        <td class="stat-value">
-                            <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}">
-                        </td>
-                    `;
+                    toHitCellHTML = `<td class="stat-value"><input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}"></td>`;
                 }
 
+                let badgesHTML = '<div class="badges-container">';
+                if (spell.concentration) badgesHTML += '<div class="conc-badge">Concentrazione</div>';
+                if (spell.ritual) badgesHTML += '<div class="ritual-badge">Rituale</div>';
+                badgesHTML += '</div>';
+
                 const card = document.createElement('div');
-                card.className = 'spell-card';
+                card.className = 'spell-card ' + vTheme; // Applica il tema alla card
                 card.innerHTML = `
-                    <span class="corner tl"></span>
-                    <span class="corner tr"></span>
-                    <span class="corner bl"></span>
-                    <span class="corner br"></span>
+                    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
                     <div class="card-content">
                         <div class="card-header">
                             ${badgesHTML}
+                            <div class="theme-selector-wrapper">
+                                <span>Tema:</span>
+                                <select class="theme-selector" data-spell="${spellIndex}" data-field="theme">
+                                    <option value="theme-default">Default</option>
+                                    <option value="theme-paladino">Oro/Nero</option>
+                                    <option value="theme-clerico">Bianco/Viola</option>
+                                    <option value="theme-ranger">Verde/Giallo</option>
+                                    <option value="theme-druido">Verde/Blu</option>
+                                    <option value="theme-stregone">Rosso/Arancio</option>
+                                    <option value="theme-mago">Blu/Nero</option>
+                                    <option value="theme-warlock">Rosso/Nero</option>
+                                    <option value="theme-bardo">Giallo/Azzurro</option>
+                                    <option value="theme-artificiere">Argento/Grigio</option>
+                                </select>
+                            </div>
                             <div class="spell-meta">
                                 ${spell.level} • ${spell.school} • 
                                 <select class="stat-input-inline card-ability" data-spell="${spellIndex}" data-field="ability">
-                                    <option value="FOR">FOR</option>
-                                    <option value="DES">DES</option>
-                                    <option value="COS">COS</option>
-                                    <option value="INT">INT</option>
-                                    <option value="SAG">SAG</option>
-                                    <option value="CAR">CAR</option>
+                                    <option value="FOR">FOR</option><option value="DES">DES</option><option value="COS">COS</option>
+                                    <option value="INT">INT</option><option value="SAG">SAG</option><option value="CAR">CAR</option>
                                 </select>
                                 (<input type="text" class="stat-input-inline card-bonus" data-spell="${spellIndex}" data-field="bonus" value="${vBonus}" size="2">)
                             </div>
                             <div class="spell-classes">${spell.classes}</div>
                             <div class="spell-title">${spell.name}</div>
                         </div>
-                        <div class="divider">
-                            <span class="divider-line"></span>
-                            <span class="divider-icon">✦</span>
-                            <span class="divider-line"></span>
-                        </div>
+                        <div class="divider"><span class="divider-line"></span><span class="divider-icon">✦</span><span class="divider-line"></span></div>
                         <div class="spell-description">${spell.description}</div>
                         <table class="stats-table">
                             <tr>
-                                <td class="stat-label">Tempo di Lancio</td>
-                                <td class="stat-value">${spell.castingTime}</td>
-                                <td class="stat-label">Durata</td>
-                                <td class="stat-value">${spell.duration}</td>
+                                <td class="stat-label">Tempo di Lancio</td><td class="stat-value">${spell.castingTime}</td>
+                                <td class="stat-label">Durata</td><td class="stat-value">${spell.duration}</td>
                             </tr>
                             <tr>
-                                <td class="stat-label">Tiro per colpire</td>
-                                ${toHitCellHTML}
-                                <td class="stat-label">Gittata</td>
-                                <td class="stat-value">${spell.range}</td>
+                                <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
+                                <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
                             </tr>
                             <tr>
-                                <td class="stat-label">Tiro Salvezza</td>
-                                ${saveCellHTML}
-                                <td class="stat-label">Componenti</td>
-                                <td class="stat-value">${compWordsHTML}</td>
+                                <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
+                                <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
                             </tr>
                             ${materialRowHTML}
                         </table>
                     </div>
                 `;
 
+                // Imposta i valori corretti per i select
                 card.querySelector('.card-ability').value = vAbility;
+                card.querySelector('.theme-selector').value = vTheme;
 
+                // Listener per salvare le modifiche
                 card.querySelectorAll('[data-field]').forEach(el => {
                     el.addEventListener('input', function() {
                         setCardOverride(parseInt(this.dataset.spell), this.dataset.field, this.value);
+                        if (this.dataset.field === 'theme') renderCards(); // Forza il re-render per applicare il CSS del tema
                     });
                     el.addEventListener('change', function() {
                         setCardOverride(parseInt(this.dataset.spell), this.dataset.field, this.value);
+                        if (this.dataset.field === 'theme') renderCards();
                     });
                 });
 
@@ -961,12 +612,10 @@
         }
 
         populateFilters();
-
         document.getElementById('searchName').addEventListener('input', renderControls);
         document.getElementById('filterSchool').addEventListener('change', renderControls);
         document.getElementById('filterLevel').addEventListener('change', renderControls);
         document.getElementById('filterClass').addEventListener('change', renderControls);
-
         document.getElementById('globalAbility').addEventListener('change', renderCards);
         document.getElementById('globalBonus').addEventListener('input', renderCards);
         document.getElementById('globalCD').addEventListener('input', renderCards);
