@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schede Incantesimi D&D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --parchment-bg: #f5ead0;
+            --parchment-light: #faf3e3;
+            --parchment-dark: #efe0c0;
+            --ink-dark: #3e2723;
+            --ink-medium: #5c3317;
+            --gold: #b8860b;
+            --gold-light: #d4af37;
+            --border: #c4a882;
+            --border-light: #d4bc94;
+            --conc-bg: #a02828;
+            --conc-light: #c0392b;
+        }
+
+        body {
+            font-family: 'EB Garamond', serif;
+            background: #1a1208;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(60,40,20,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(60,40,20,0.3) 0%, transparent 60%);
+            min-height: 100vh;
+            color: var(--ink-dark);
+            padding: 20px;
+        }
+
+        /* ===================== PANNELLO DI CONTROLLO ===================== */
+        .controls {
+            background: linear-gradient(135deg, #2a1d0e, #1f1408);
+            color: #e8d5b0;
+            padding: 25px 35px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid rgba(212,175,55,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .controls-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .controls h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6em;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+        }
+
+        .controls-subtitle {
+            font-size: 0.85em;
+            color: #a08060;
+            margin-left: auto;
+        }
+
+        .caster-global {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            padding: 16px 18px;
+            background: rgba(212,175,55,0.06);
+            border-radius: 10px;
+            border: 1px solid rgba(212,175,55,0.15);
+        }
+
+        .caster-global h3 {
+            width: 100%;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85em;
+            color: var(--gold-light);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .caster-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .caster-field label {
+            font-size: 0.7em;
+            color: #a08060;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .caster-field input,
+        .caster-field select,
+        .filter-bar input,
+        .filter-bar select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(212,175,55,0.2);
+            color: #e8d5b0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'EB Garamond', serif;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .caster-field select { width: 110px; }
+
+        .caster-field input:focus,
+        .caster-field select:focus,
+        .filter-bar input:focus,
+        .filter-bar select:focus {
+            outline: none;
+            border-color: var(--gold-light);
+            box-shadow: 0 0 8px rgba(212,175,55,0.2);
+        }
+
+        /* --- Barra Filtri --- */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            align-items: center;
+        }
+
+        .filter-bar input { flex: 1; min-width: 180px; }
+        .filter-bar select { min-width: 140px; }
+
+        .spell-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .spell-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.04);
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(212,175,55,0.1);
+            font-size: 0.92em;
+        }
+
+        .spell-checkbox:hover {
+            background: rgba(212,175,55,0.1);
+            border-color: rgba(212,175,55,0.3);
+        }
+
+        .spell-checkbox input { accent-color: var(--gold-light); cursor: pointer; }
+
+        .spell-checkbox em {
+            color: #a08060;
+            font-size: 0.85em;
+            font-style: italic;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--gold-light);
+            color: #1a1208;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #e6c558;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(212,175,55,0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(212,175,55,0.4);
+            color: var(--gold-light);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212,175,55,0.1);
+            border-color: var(--gold-light);
+        }
+
+        .info-note {
+            margin-top: 14px;
+            padding: 12px 16px;
+            background: rgba(212,175,55,0.06);
+            border-left: 3px solid var(--gold);
+            border-radius: 4px;
+            font-size: 0.82em;
+            color: #b8a080;
+            line-height: 1.7;
+        }
+
+        .info-note code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--gold-light);
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ===================== GRIGLIA CARDS ===================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+
+        .empty-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #88775a;
+            padding: 80px 20px;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        /* ===================== SINGOLA CARD ===================== */
+        .spell-card {
+            background:
+                linear-gradient(135deg, var(--parchment-light) 0%, var(--parchment-bg) 40%, var(--parchment-dark) 100%);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 22px 20px 16px;
+            position: relative;
+            box-shadow:
+                0 6px 20px rgba(0,0,0,0.35),
+                inset 0 0 40px rgba(180,140,80,0.08);
+            page-break-inside: avoid;
+            break-inside: avoid;
+            overflow: hidden;
+        }
+
+        .spell-card::before {
+            content: '';
+            position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 1px solid rgba(196,168,130,0.35);
+            border-radius: 5px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .spell-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                radial-gradient(ellipse at 15% 15%, rgba(160,120,60,0.07) 0%, transparent 40%),
+                radial-gradient(ellipse at 85% 85%, rgba(160,120,60,0.07) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .corner {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            z-index: 3;
+        }
+        .corner.tl { top: 9px; left: 9px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); border-top-left-radius: 3px; }
+        .corner.tr { top: 9px; right: 9px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); border-top-right-radius: 3px; }
+        .corner.bl { bottom: 9px; left: 9px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); border-bottom-left-radius: 3px; }
+        .corner.br { bottom: 9px; right: 9px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); border-bottom-right-radius: 3px; }
+
+        .card-content { position: relative; z-index: 2; }
+
+        .card-header {
+            position: relative;
+            margin-bottom: 6px;
+        }
+
+        .concentration-badge {
+            position: absolute;
+            top: 2px;
+            right: 0;
+            background: linear-gradient(135deg, var(--conc-bg), var(--conc-light));
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-size: 0.45em; /* Ridimensionato */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 3px 8px; /* Ridimensionato */
+            border-radius: 3px;
+            box-shadow: 0 2px 6px rgba(192,57,43,0.4);
+            white-space: nowrap;
+        }
+
+        .spell-meta {
+            font-family: 'Cinzel', serif;
+            font-size: 0.52em; /* Leggermente ridotto per stare su una riga */
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 3px;
+            font-weight: 600;
+            padding-right: 85px; /* Spazio per il badge */
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap; /* Impedisce il ritorno a capo */
+            white-space: nowrap; /* Impedisce il ritorno a capo */
+            overflow: hidden;
+        }
+
+        .spell-classes {
+            font-family: 'EB Garamond', serif;
+            font-size: 0.66em;
+            color: var(--ink-medium);
+            font-style: italic;
+            margin-bottom: 5px;
+            padding-right: 85px;
+            opacity: 0.75;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .spell-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.35em;
+            font-weight: 700;
+            color: var(--ink-medium);
+            line-height: 1.15;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+            padding-right: 85px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 7px 0 12px;
+            gap: 8px;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border), transparent);
+            max-width: 65px;
+        }
+
+        .divider-icon { color: var(--gold); font-size: 0.7em; }
+
+        .spell-description {
+            font-size: 0.8em;
+            line-height: 1.55;
+            color: var(--ink-dark);
+            text-align: justify;
+            margin-bottom: 14px;
+            min-height: 50px;
+        }
+
+        .spell-description b,
+        .spell-description strong {
+            font-weight: 700;
+            color: var(--ink-medium);
+        }
+
+        .spell-description::first-letter {
+            font-family: 'Cinzel', serif;
+            font-size: 1.65em;
+            font-weight: 700;
+            float: left;
+            line-height: 0.9;
+            margin-right: 4px;
+            margin-top: 3px;
+            color: var(--ink-medium);
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.76em;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            background: rgba(250,243,227,0.5);
+        }
+
+        .stats-table td {
+            padding: 5px 7px;
+            border: 1px solid var(--border-light);
+            vertical-align: middle;
+        }
+
+        .stat-label {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            color: var(--ink-medium);
+            background: rgba(196,168,130,0.18);
+            font-size: 0.82em;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            width: 22%;
+        }
+
+        .stat-value {
+            color: var(--ink-dark);
+            font-style: italic;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .stat-value.no {
+            color: #9a7040;
+            font-weight: 600;
+            font-style: normal;
+            text-transform: uppercase;
+            font-size: 0.88em;
+            letter-spacing: 0.5px;
+        }
+
+        .save-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            line-height: 1.2;
+        }
+
+        .save-stat { font-style: italic; font-weight: 600; color: var(--ink-dark); }
+
+        .save-cd {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: var(--ink-medium);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .save-outcome {
+            font-size: 0.85em;
+            opacity: 0.85;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: var(--gold);
+        }
+
+        .stat-input {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--ink-dark);
+            font-family: 'EB Garamond', serif;
+            font-size: 0.95em;
+            font-weight: 700;
+            font-style: normal;
+            text-align: center;
+            width: 35px;
+            cursor: text;
+            padding: 2px 3px;
+            border-radius: 3px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .stat-input:hover { border-color: var(--border-light); background: rgba(255,255,255,0.3); }
+        .stat-input:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,0.45); }
+
+        .stat-input-inline {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dotted var(--border);
+            color: var(--ink-medium);
+            font-family: 'Cinzel', serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            text-align: center;
+            width: 25px;
+            cursor: pointer;
+            padding: 0 2px;
+        }
+
+        .stat-input-inline:hover { border-bottom-color: var(--gold); }
+        .stat-input-inline:focus { outline: none; border-bottom-color: var(--gold-light); }
+
+        select.stat-input-inline {
+            width: 38px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .components-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .components-list .comp-word {
+            display: block;
+            font-style: italic;
+            color: var(--ink-dark);
+            line-height: 1.3;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .components-list .comp-material-text {
+            display: block;
+            font-size: 0.8em;
+            opacity: 0.7;
+            font-style: italic;
+            margin-left: 5px;
+            line-height: 1.25;
+            white-space: normal;
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .controls { display: none !important; }
+            .cards-grid { gap: 5mm; max-width: none; padding: 0; }
+            .spell-card { box-shadow: none; page-break-inside: avoid; break-inside: avoid; }
+
+            .stat-input, .stat-input-inline {
+                border: none !important;
+                background: transparent !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+            }
+
+            @page { size: A4 portrait; margin: 12mm; }
+        }
+
+        @media (max-width: 600px) {
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <div class="controls-header">
+            <h1>📜 Schede Incantesimi</h1>
+            <span class="controls-subtitle">D&D 5ª Edizione</span>
+        </div>
+
+        <div class="caster-global">
+            <h3>✦ Dati Incantatore — Valori predefiniti per tutte le card</h3>
+            <div class="caster-field">
+                <label>Caratteristica</label>
+                <select id="globalAbility">
+                    <option value="FOR">FOR</option>
+                    <option value="DES">DES</option>
+                    <option value="COS">COS</option>
+                    <option value="INT">INT</option>
+                    <option value="SAG" selected>SAG</option>
+                    <option value="CAR">CAR</option>
+                </select>
+            </div>
+            <div class="caster-field">
+                <label>Bonus Incantatore</label>
+                <input type="text" id="globalBonus" value="+2">
+            </div>
+            <div class="caster-field">
+                <label>CD Tiro Salvezza</label>
+                <input type="number" id="globalCD" value="12">
+            </div>
+            <div class="caster-field">
+                <label>Tiro per Colpire</label>
+                <input type="text" id="globalToHit" value="+4">
+            </div>
+        </div>
+
+        <!-- SISTEMA DI FILTRO -->
+        <div class="filter-bar">
+            <input type="text" id="searchName" placeholder="🔍 Cerca incantesimo per nome...">
+            <select id="filterSchool"><option value="">Tutte le Scuole</option></select>
+            <select id="filterLevel"><option value="">Tutti i Livelli</option></select>
+            <select id="filterClass"><option value="">Tutte le Classi</option></select>
+        </div>
+
+        <div class="spell-list" id="spellList"></div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="window.print()">🖨️ Stampa</button>
+            <button class="btn btn-secondary" onclick="selectAll(true)">Seleziona tutti</button>
+            <button class="btn btn-secondary" onclick="selectAll(false)">Deseleziona tutti</button>
+            <button class="btn btn-secondary" onclick="applyGlobalToAll()">↻ Ripristina valori globali sulle card</button>
+        </div>
+
+        <div class="info-note">
+            💡 <strong>Come aggiungere un incantesimo:</strong> modifica l'array <code>spells</code> nello script in fondo al file.<br>
+            📝 <strong>Grassetto:</strong> usa <code>&lt;b&gt;testo&lt;/b&gt;</code> nella descrizione.<br>
+            ⚙️ <strong>Componenti:</strong> imposta <code>verbal</code>, <code>somatic</code>, <code>material</code> a <code>true/false</code>.<br>
+            🛡️ <strong>Tiro Salvezza:</strong> inserisci la stat (es. "Destrezza") e l'<code>saveOutcome</code> (es. "Dimezza", "Annulla").<br>
+            🎯 <strong>Tiro per colpire:</strong> imposta <code>toHit: true</code> per mostrare il bonus modificabile.<br>
+            📋 <strong>Classi:</strong> scrivile nel campo <code>classes</code> separandole da virgole.
+        </div>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid"></div>
+
+    <script>
+        /* ================================================================
+           DATI DEGLI INCANTESIMI
+           ================================================================ */
+        const spells = [
+            {
+                name: "Bacche Benefiche",
+                level: "1° Livello",
+                school: "Trasmutazione",
+                classes: "Bardo, Druido, Ranger",
+                concentration: false,
+                description: "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
+                castingTime: "1 Azione",
+                savingThrow: "NO",
+                saveOutcome: "",
+                components: { verbal: true, somatic: true, material: true },
+                material: "un rametto di vischio",
+                toHit: false,
+                duration: "24 ore",
+                range: "Incantatore"
+            },
+            {
+                name: "Palla di Fuoco",
+                level: "3° Livello",
+                school: "Evocazione",
+                classes: "Mago, Stregone",
+                concentration: false,
+                description: "Una brillante vampata si sprigiona da un punto a scelta entro gittata. Ogni creatura in un raggio di <b>6 metri</b> dal punto deve effettuare un tiro salvezza su Destrezza. Subisce <b>8d6 danni da fuoco</b> in caso di fallimento, o la metà in caso di successo. Il fuoco danneggia gli oggetti nell'area e incendia quelli infiammabili non indossati.",
+                castingTime: "1 Azione",
+                savingThrow: "Destrezza",
+                saveOutcome: "Dimezza",
+                components: { verbal: true, somatic: true, material: true },
+                material: "guano di pipistrello e zolfo",
+                toHit: false,
+                duration: "Istantanea",
+                range: "45 metri"
+            },
+            {
+                name: "Ammaliare Persone",
+                level: "1° Livello",
+                school: "Incantamento",
+                classes: "Bardo, Druido, Stregone",
+                concentration: true,
+                description: "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza, fallendolo automaticamente se tu o i tuoi compagni state combattendo contro di esso. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso.",
+                castingTime: "1 Azione",
+                savingThrow: "Saggezza",
+                saveOutcome: "Annulla",
+                components: { verbal: true, somatic: true, material: true },
+                material: "un po' di rossetto o argilla bagnata",
+                toHit: false,
+                duration: "1 Ora",
+                range: "9 metri"
+            },
+            {
+                name: "Dardo Infuocato",
+                level: "Trucco",
+                school: "Evocazione",
+                classes: "Mago, Stregone, Warlock",
+                concentration: false,
+                description: "Lanci un <b>dardo di fuoco</b> verso una creatura o un oggetto a vista entro gittata. Effettua un <b>attacco con incantesimo a distanza</b> contro il bersaglio. In caso di colpo, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un oggetto infiammabile colpito dal dardo prende fuoco se non è indossato o trasportato.",
+                castingTime: "1 Azione",
+                savingThrow: "NO",
+                saveOutcome: "",
+                components: { verbal: true, somatic: true, material: false },
+                material: "",
+                toHit: true,
+                duration: "Istantanea",
+                range: "36 metri"
+            }
+
+            /* --- ESEMPIO: copia questo blocco per aggiungere un incantesimo ---
+            {
+                name: "Nome Incantesimo",
+                level: "1° Livello",
+                school: "Scuola",
+                classes: "Classe1, Classe2",
+                concentration: false,
+                description: "Descrizione... usa <b>grassetto</b> per evidenziare.",
+                castingTime: "1 Azione",
+                savingThrow: "NO",
+                saveOutcome: "",
+                components: { verbal: true, somatic: true, material: false },
+                material: "",
+                toHit: false,
+                duration: "Istantanea",
+                range: "Incantatore"
+            },
+            --- fine esempio --- */
+        ];
+
+        let cardOverrides = {};
+
+        /* ================================================================
+           LOGICA DI RENDERING E FILTRI
+           ================================================================ */
+        function populateFilters() {
+            const schools = [...new Set(spells.map(s => s.school))].sort();
+            const levels = [...new Set(spells.map(s => s.level))].sort();
+            // Estrai le classi separandole dalle virgole e rimuovendo spazi
+            const classes = [...new Set(spells.flatMap(s => s.classes.split(',').map(c => c.trim())))].sort();
+
+            const schoolSel = document.getElementById('filterSchool');
+            schools.forEach(s => { schoolSel.innerHTML += `<option value="${s}">${s}</option>`; });
+
+            const levelSel = document.getElementById('filterLevel');
+            levels.forEach(l => { levelSel.innerHTML += `<option value="${l}">${l}</option>`; });
+
+            const classSel = document.getElementById('filterClass');
+            classes.forEach(c => { classSel.innerHTML += `<option value="${c}">${c}</option>`; });
+        }
+
+        function renderControls() {
+            const list = document.getElementById('spellList');
+            list.innerHTML = '';
+
+            // Valori dei filtri
+            const nameQuery = document.getElementById('searchName').value.toLowerCase();
+            const schoolQuery = document.getElementById('filterSchool').value;
+            const levelQuery = document.getElementById('filterLevel').value;
+            const classQuery = document.getElementById('filterClass').value;
+
+            let visibleCount = 0;
+
+            spells.forEach((spell, i) => {
+                // Logica di filtro
+                const matchesName = spell.name.toLowerCase().includes(nameQuery);
+                const matchesSchool = schoolQuery === "" || spell.school === schoolQuery;
+                const matchesLevel = levelQuery === "" || spell.level === levelQuery;
+                const matchesClass = classQuery === "" || spell.classes.includes(classQuery);
+
+                if (matchesName && matchesSchool && matchesLevel && matchesClass) {
+                    visibleCount++;
+                    const label = document.createElement('label');
+                    label.className = 'spell-checkbox';
+                    label.innerHTML = `
+                        <input type="checkbox" data-index="${i}" checked>
+                        <span>${spell.name} <em>(${spell.level})</em></span>
+                    `;
+                    label.querySelector('input').addEventListener('change', renderCards);
+                    list.appendChild(label);
+                }
+            });
+
+            if (visibleCount === 0) {
+                list.innerHTML = '<em style="color:#a08060; padding:10px;">Nessun incantesimo trovato con questi filtri.</em>';
+            }
+        }
+
+        function selectAll(checked) {
+            document.querySelectorAll('.spell-checkbox input').forEach(cb => cb.checked = checked);
+            renderCards();
+        }
+
+        function getGlobalCaster() {
+            return {
+                ability: document.getElementById('globalAbility').value,
+                bonus:   document.getElementById('globalBonus').value,
+                cd:      document.getElementById('globalCD').value,
+                toHit:   document.getElementById('globalToHit').value
+            };
+        }
+
+        function getCardValue(index, field) {
+            if (cardOverrides[index] && cardOverrides[index][field] !== undefined) {
+                return cardOverrides[index][field];
+            }
+            return getGlobalCaster()[field];
+        }
+
+        function setCardOverride(index, field, value) {
+            if (!cardOverrides[index]) cardOverrides[index] = {};
+            cardOverrides[index][field] = value;
+        }
+
+        function applyGlobalToAll() {
+            cardOverrides = {};
+            renderCards();
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('cardsGrid');
+            grid.innerHTML = '';
+
+            const selected = document.querySelectorAll('.spell-checkbox input:checked');
+            if (selected.length === 0) {
+                grid.innerHTML = '<div class="empty-msg">Nessun incantesimo selezionato.<br>Seleziona almeno un incantesimo dalla lista in alto.</div>';
+                return;
+            }
+
+            selected.forEach(cb => {
+                const spellIndex = parseInt(cb.dataset.index);
+                const spell = spells[spellIndex];
+
+                const vAbility = getCardValue(spellIndex, 'ability');
+                const vBonus   = getCardValue(spellIndex, 'bonus');
+                const vCD      = getCardValue(spellIndex, 'cd');
+                const vToHit   = getCardValue(spellIndex, 'toHit');
+
+                let compHTML = '<div class="components-list">';
+                if (spell.components.verbal)  compHTML += '<span class="comp-word">Verbale</span>';
+                if (spell.components.somatic) compHTML += '<span class="comp-word">Somatica</span>';
+                if (spell.components.material) {
+                    compHTML += '<span class="comp-word">Materiale</span>';
+                    if (spell.material) compHTML += `<span class="comp-material-text">(${spell.material})</span>`;
+                }
+                compHTML += '</div>';
+
+                let saveCellHTML;
+                if (spell.savingThrow === "NO") {
+                    saveCellHTML = '<td class="stat-value no">NO</td>';
+                } else {
+                    saveCellHTML = `
+                        <td class="stat-value">
+                            <div class="save-stack">
+                                <span class="save-stat">${spell.savingThrow}</span>
+                                <span class="save-cd">CD <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span>
+                                <span class="save-outcome">${spell.saveOutcome}</span>
+                            </div>
+                        </td>
+                    `;
+                }
+
+                let toHitCellHTML;
+                if (!spell.toHit) {
+                    toHitCellHTML = '<td class="stat-value no">NO</td>';
+                } else {
+                    toHitCellHTML = `
+                        <td class="stat-value">
+                            <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}">
+                        </td>
+                    `;
+                }
+
+                const concBadge = spell.concentration ? '<div class="concentration-badge">Concentrazione</div>' : '';
+
+                const card = document.createElement('div');
+                card.className = 'spell-card';
+                card.innerHTML = `
+                    <span class="corner tl"></span>
+                    <span class="corner tr"></span>
+                    <span class="corner bl"></span>
+                    <span class="corner br"></span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            ${concBadge}
+                            <div class="spell-meta">
+                                ${spell.level} • ${spell.school} • 
+                                <select class="stat-input-inline card-ability" data-spell="${spellIndex}" data-field="ability">
+                                    <option value="FOR">FOR</option>
+                                    <option value="DES">DES</option>
+                                    <option value="COS">COS</option>
+                                    <option value="INT">INT</option>
+                                    <option value="SAG">SAG</option>
+                                    <option value="CAR">CAR</option>
+                                </select>
+                                (<input type="text" class="stat-input-inline card-bonus" data-spell="${spellIndex}" data-field="bonus" value="${vBonus}" size="2">)
+                            </div>
+                            <div class="spell-classes">${spell.classes}</div>
+                            <div class="spell-title">${spell.name}</div>
+                        </div>
+                        <div class="divider">
+                            <span class="divider-line"></span>
+                            <span class="divider-icon">✦</span>
+                            <span class="divider-line"></span>
+                        </div>
+                        <div class="spell-description">${spell.description}</div>
+                        <table class="stats-table">
+                            <tr>
+                                <td class="stat-label">Tempo di Lancio</td>
+                                <td class="stat-value">${spell.castingTime}</td>
+                                <td class="stat-label">Durata</td>
+                                <td class="stat-value">${spell.duration}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-label">Tiro per colpire</td>
+                                ${toHitCellHTML}
+                                <td class="stat-label">Gittata</td>
+                                <td class="stat-value">${spell.range}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-label">Tiro Salvezza</td>
+                                ${saveCellHTML}
+                                <td class="stat-label">Componenti</td>
+                                <td class="stat-value">${compHTML}</td>
+                            </tr>
+
+                        </table>
+                    </div>
+                `;
+
+                card.querySelector('.card-ability').value = vAbility;
+
+                card.querySelectorAll('[data-field]').forEach(el => {
+                    el.addEventListener('input', function() {
+                        setCardOverride(parseInt(this.dataset.spell), this.dataset.field, this.value);
+                    });
+                    el.addEventListener('change', function() {
+                        setCardOverride(parseInt(this.dataset.spell), this.dataset.field, this.value);
+                    });
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Inizializza i filtri la prima volta
+        populateFilters();
+
+        // Listener per i filtri (aggiornano solo la lista delle checkbox)
+        document.getElementById('searchName').addEventListener('input', renderControls);
+        document.getElementById('filterSchool').addEventListener('change', renderControls);
+        document.getElementById('filterLevel').addEventListener('change', renderControls);
+        document.getElementById('filterClass').addEventListener('change', renderControls);
+
+        // Listener globali per aggiornare le card in tempo reale
+        document.getElementById('globalAbility').addEventListener('change', renderCards);
+        document.getElementById('globalBonus').addEventListener('input', renderCards);
+        document.getElementById('globalCD').addEventListener('input', renderCards);
+        document.getElementById('globalToHit').addEventListener('input', renderCards);
+
+        // Primo render
+        renderControls();
+        renderCards();
+    </script>
+</body>
+</html>
