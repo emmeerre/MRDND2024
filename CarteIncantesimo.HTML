@@ -105,7 +105,7 @@
         .info-note code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; color: var(--gold-light); font-size: 0.9em; font-family: 'Courier New', monospace; }
 
         /* ===================== GRIGLIA CARDS ===================== */
-        .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 210mm; margin: 0 auto; }
+        .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 210mm; margin: 0 auto; align-items: stretch; }
         .empty-msg { grid-column: 1 / -1; text-align: center; color: #88775a; padding: 80px 20px; font-size: 1.2em; font-style: italic; }
 
         /* ===================== SINGOLA CARD ===================== */
@@ -115,6 +115,8 @@
             border-radius: 8px; padding: 22px 20px 16px;
             position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.35), inset 0 0 40px rgba(180,140,80,0.08);
             page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+            display: flex; flex-direction: column;
+            height: 100%;
         }
         .spell-card::before { content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 1px solid rgba(196,168,130,0.35); border-radius: 5px; pointer-events: none; z-index: 1; }
         .spell-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(ellipse at 15% 15%, rgba(160,120,60,0.07) 0%, transparent 40%), radial-gradient(ellipse at 85% 85%, rgba(160,120,60,0.07) 0%, transparent 40%); pointer-events: none; z-index: 0; }
@@ -125,54 +127,61 @@
         .corner.bl { bottom: 9px; left: 9px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); border-bottom-left-radius: 3px; }
         .corner.br { bottom: 9px; right: 9px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); border-bottom-right-radius: 3px; }
 
-        .card-content { position: relative; z-index: 2; }
-        .card-header { position: relative; margin-bottom: 6px; }
+        .card-content { position: relative; z-index: 2; display: flex; flex-direction: column; flex-grow: 1; height: 100%; }
+        .card-header { position: relative; margin-bottom: 6px; flex-shrink: 0; }
 
-        /* Selettore Tema Card */
+        .page-number-top {
+            position: absolute; top: 2px; right: 0; font-family: 'Cinzel', serif;
+            font-size: 0.7em; color: var(--ink-medium); font-weight: 700;
+            background: rgba(255,255,255,0.4); padding: 2px 8px;
+            border-radius: 4px; border: 1px solid var(--border-light); z-index: 5;
+        }
+
         .theme-selector-wrapper {
-            margin-bottom: 5px;
-            padding-right: 85px;
-            font-size: 0.6em;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            margin-bottom: 5px; padding-right: 45px; font-size: 0.6em; opacity: 0.9;
+            display: flex; align-items: center; gap: 6px;
         }
-        .theme-selector-wrapper span {
-            font-family: 'Cinzel', serif;
-            color: var(--ink-medium);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .theme-selector-wrapper span { font-family: 'Cinzel', serif; color: var(--ink-medium); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .theme-selector {
-            font-family: 'EB Garamond', serif;
-            font-size: 1em;
-            border: 1px solid var(--border-light);
-            background: rgba(255,255,255,0.5);
-            color: var(--ink-medium);
-            border-radius: 4px;
-            padding: 2px 4px;
-            cursor: pointer;
+            font-family: 'EB Garamond', serif; font-size: 1em;
+            border: 1px solid var(--border-light); background: rgba(255,255,255,0.5);
+            color: var(--ink-medium); border-radius: 4px; padding: 2px 4px; cursor: pointer;
         }
         .theme-selector:focus { outline: none; border-color: var(--gold); }
 
-        .badges-container { position: absolute; top: 2px; right: 0; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; z-index: 4; }
-        .conc-badge, .ritual-badge { font-family: 'Cinzel', serif; font-size: 0.45em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 3px; white-space: nowrap; color: #fff; }
+        .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; padding-right: 45px; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+        .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; padding-right: 45px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Nuovo layout Titolo + Badge su un'unica riga */
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding-right: 45px;
+            margin-bottom: 4px;
+        }
+        .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
+
+        .badges-container {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+        .conc-badge, .ritual-badge { font-family: 'Cinzel', serif; font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: 3px; white-space: nowrap; color: #fff; align-self: center; }
         .conc-badge { background: linear-gradient(135deg, var(--conc-bg), var(--conc-light)); box-shadow: 0 2px 6px rgba(192,57,43,0.4); }
         .ritual-badge { background: linear-gradient(135deg, var(--ritual-bg), var(--ritual-light)); box-shadow: 0 2px 6px rgba(46,204,113,0.4); }
 
-        .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; padding-right: 85px; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
-        .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; padding-right: 85px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); padding-right: 85px; }
-
-        .divider { display: flex; align-items: center; justify-content: center; margin: 7px 0 12px; gap: 8px; }
+        .divider { display: flex; align-items: center; justify-content: center; margin: 7px 0 12px; gap: 8px; flex-shrink: 0; }
         .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); max-width: 65px; }
         .divider-icon { color: var(--gold); font-size: 0.7em; }
 
-        .spell-description { font-size: 0.8em; line-height: 1.55; color: var(--ink-dark); text-align: justify; margin-bottom: 14px; min-height: 50px; }
+        .spell-description { font-size: 0.8em; line-height: 1.55; color: var(--ink-dark); text-align: justify; margin-bottom: 14px; min-height: 50px; flex-grow: 1; }
         .spell-description b, .spell-description strong { font-weight: 700; color: var(--ink-medium); }
         .spell-description::first-letter { font-family: 'Cinzel', serif; font-size: 1.65em; font-weight: 700; float: left; line-height: 0.9; margin-right: 4px; margin-top: 3px; color: var(--ink-medium); }
+
+        .card-bottom-wrapper { margin-top: auto; flex-shrink: 0; }
 
         .stats-table { width: 100%; border-collapse: collapse; font-size: 0.7em; border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; background: rgba(250,243,227,0.5); table-layout: fixed; }
         .stats-table td { padding: 4px 6px; border: 1px solid var(--border-light); vertical-align: middle; word-break: break-word; }
@@ -199,52 +208,23 @@
         select.stat-input-inline { width: 38px; -webkit-appearance: none; -moz-appearance: none; appearance: none; background: transparent; cursor: pointer; }
 
         /* ===================== TEMI COLORI ===================== */
-        .theme-default { /* Eredita le variabili :root */ }
-
-        .theme-paladino {
-            --border: #D4AF37; --border-light: #E6C558; --ink-medium: #1a1a1a; --gold: #D4AF37;
-            --parchment-light: #fffcf5; --parchment-bg: #fff8e1; --parchment-dark: #f5ead0;
-        }
-        .theme-clerico {
-            --border: #9b59b6; --border-light: #bb8fce; --ink-medium: #4a235a; --gold: #9b59b6;
-            --parchment-light: #ffffff; --parchment-bg: #f9f0ff; --parchment-dark: #ece0f5;
-        }
-        .theme-ranger {
-            --border: #27ae60; --border-light: #52be80; --ink-medium: #145a32; --gold: #f1c40f;
-            --parchment-light: #fdfff9; --parchment-bg: #f0fff4; --parchment-dark: #d4f5d4;
-        }
-        .theme-druido {
-            --border: #1abc9c; --border-light: #48c9b0; --ink-medium: #0e6251; --gold: #3498db;
-            --parchment-light: #fdfffb; --parchment-bg: #f0fff8; --parchment-dark: #d4f5e0;
-        }
-        .theme-stregone {
-            --border: #e74c3c; --border-light: #ec7063; --ink-medium: #641e16; --gold: #e67e22;
-            --parchment-light: #fffdfb; --parchment-bg: #fff5f0; --parchment-dark: #f5e0d4;
-        }
-        .theme-mago {
-            --border: #2980b9; --border-light: #5499c7; --ink-medium: #154360; --gold: #2980b9;
-            --parchment-light: #fdfeff; --parchment-bg: #f0f8ff; --parchment-dark: #d4e6f5;
-        }
-        .theme-warlock {
-            --border: #922b21; --border-light: #c0392b; --ink-medium: #1a1a1a; --gold: #922b21;
-            --parchment-light: #fffdfb; --parchment-bg: #fff5f5; --parchment-dark: #f5e0e0;
-        }
-        .theme-bardo {
-            --border: #f1c40f; --border-light: #f7dc6f; --ink-medium: #7d6608; --gold: #5dade2;
-            --parchment-light: #fffdf0; --parchment-bg: #fffdf5; --parchment-dark: #f5f5d4;
-        }
-        .theme-artificiere {
-            --border: #95a5a6; --border-light: #bdc3c7; --ink-medium: #566573; --gold: #7f8c8d;
-            --parchment-light: #fdfdfd; --parchment-bg: #f9f9f9; --parchment-dark: #f0f0f0;
-        }
+        .theme-paladino { --border: #D4AF37; --border-light: #E6C558; --ink-medium: #1a1a1a; --gold: #D4AF37; --parchment-light: #fffcf5; --parchment-bg: #fff8e1; --parchment-dark: #f5ead0; }
+        .theme-clerico { --border: #9b59b6; --border-light: #bb8fce; --ink-medium: #4a235a; --gold: #9b59b6; --parchment-light: #ffffff; --parchment-bg: #f9f0ff; --parchment-dark: #ece0f5; }
+        .theme-ranger { --border: #27ae60; --border-light: #52be80; --ink-medium: #145a32; --gold: #f1c40f; --parchment-light: #fdfff9; --parchment-bg: #f0fff4; --parchment-dark: #d4f5d4; }
+        .theme-druido { --border: #1abc9c; --border-light: #48c9b0; --ink-medium: #0e6251; --gold: #3498db; --parchment-light: #fdfffb; --parchment-bg: #f0fff8; --parchment-dark: #d4f5e0; }
+        .theme-stregone { --border: #e74c3c; --border-light: #ec7063; --ink-medium: #641e16; --gold: #e67e22; --parchment-light: #fffdfb; --parchment-bg: #fff5f0; --parchment-dark: #f5e0d4; }
+        .theme-mago { --border: #2980b9; --border-light: #5499c7; --ink-medium: #154360; --gold: #2980b9; --parchment-light: #fdfeff; --parchment-bg: #f0f8ff; --parchment-dark: #d4e6f5; }
+        .theme-warlock { --border: #922b21; --border-light: #c0392b; --ink-medium: #1a1a1a; --gold: #922b21; --parchment-light: #fffdfb; --parchment-bg: #fff5f5; --parchment-dark: #f5e0e0; }
+        .theme-bardo { --border: #f1c40f; --border-light: #f7dc6f; --ink-medium: #7d6608; --gold: #5dade2; --parchment-light: #fffdf0; --parchment-bg: #fffdf5; --parchment-dark: #f5f5d4; }
+        .theme-artificiere { --border: #95a5a6; --border-light: #bdc3c7; --ink-medium: #566573; --gold: #7f8c8d; --parchment-light: #fdfdfd; --parchment-bg: #f9f9f9; --parchment-dark: #f0f0f0; }
 
         @media print {
             body { background: white; padding: 0; margin: 0; }
             .controls { display: none !important; }
             .cards-grid { gap: 5mm; max-width: none; padding: 0; }
-            .spell-card { box-shadow: none; page-break-inside: avoid; break-inside: avoid; }
+            .spell-card { box-shadow: none; page-break-inside: avoid; break-inside: avoid; height: auto; }
             .stat-input, .stat-input-inline { border: none !important; background: transparent !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; }
-            .theme-selector-wrapper { display: none !important; } /* Nasconde il selettore in stampa */
+            .theme-selector-wrapper { display: none !important; }
             @page { size: A4 portrait; margin: 12mm; }
         }
 
@@ -303,14 +283,16 @@
         </div>
 
         <div class="info-note">
-            💡 <strong>Come aggiungere un incantesimo:</strong> modifica l'array <code>spells</code> nello script in fondo al file.<br>
+            💡 <strong>Come aggiungere un incantesimo:</strong> modifica l'array <code>spells</code> nello script in fondo al file, oppure crea un file <code>ListaIncantesimi.txt</code> nella stessa cartella (su GitHub Pages) contenente un array JSON valido.<br>
             📝 <strong>Grassetto:</strong> usa <code>&lt;b&gt;testo&lt;/b&gt;</code> nella descrizione.<br>
             ⚙️ <strong>Componenti:</strong> imposta <code>verbal</code>, <code>somatic</code>, <code>material</code> a <code>true/false</code>.<br>
             🛡️ <strong>Tiro Salvezza:</strong> inserisci la stat (es. "Destrezza") e l'<code>saveOutcome</code> (es. "Dimezza", "Annulla").<br>
             🎯 <strong>Tiro per colpire:</strong> imposta <code>toHit: true</code> per mostrare il bonus modificabile.<br>
             📋 <strong>Classi:</strong> scrivile nel campo <code>classes</code> separandole da virgole.<br>
-            ✨ <strong>Rituale:</strong> imposta <code>ritual: true</code> per mostrare il badge verde in alto.<br>
-            🎨 <strong>Temi:</strong> il colore si imposta automaticamente in base alla classe, ma puoi cambiarlo dal menu a tendina su ogni card.
+            ✨ <strong>Rituale:</strong> imposta <code>ritual: true</code> per mostrare il badge verde.<br>
+            🎨 <strong>Temi:</strong> il colore si imposta automaticamente in base alla classe, ma puoi cambiarlo dal menu a tendina su ogni card.<br>
+            📄 <strong>Pagine:</strong> usa il campo <code>pageNumber: "1/2"</code>. Se diverso da "1/1", appare in alto a destra.<br>
+            🚫 <strong>Nascondi Tabella:</strong> imposta <code>hideTable: true</code> per lasciare più spazio al testo.
         </div>
     </div>
 
@@ -318,9 +300,9 @@
 
     <script>
         /* ================================================================
-           DATI DEGLI INCANTESIMI
+           DATI PREDEFINITI DEGLI INCANTESIMI (Usati se ListaIncantesimi.txt non esiste)
            ================================================================ */
-        const spells = [
+        const defaultSpells = [
             {
                 name: "Bacche Benefiche",
                 level: "1° Livello",
@@ -328,6 +310,8 @@
                 classes: "Druido, Ranger",
                 concentration: false,
                 ritual: true,
+                pageNumber: "1/1",
+                hideTable: false,
                 description: "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
                 castingTime: "1 Azione",
                 savingThrow: "NO",
@@ -345,6 +329,8 @@
                 classes: "Mago, Stregone",
                 concentration: false,
                 ritual: false,
+                pageNumber: "1/2",
+                hideTable: false,
                 description: "Una brillante vampata si sprigiona da un punto a scelta entro gittata. Ogni creatura in un raggio di <b>6 metri</b> dal punto deve effettuare un tiro salvezza su Destrezza. Subisce <b>8d6 danni da fuoco</b> in caso di fallimento, o la metà in caso di successo. Il fuoco danneggia gli oggetti nell'area e incendia quelli infiammabili non indossati.",
                 castingTime: "1 Azione",
                 savingThrow: "Destrezza",
@@ -362,7 +348,9 @@
                 classes: "Bardo, Stregone, Warlock",
                 concentration: true,
                 ritual: false,
-                description: "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza, fallendolo automaticamente se tu o i tuoi compagni state combattendo contro di esso. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso.",
+                pageNumber: "2/2",
+                hideTable: true,
+                description: "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza, fallendolo automaticamente se tu o i tuoi compagni state combattendo contro di esso. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso. L'incantesimo ha un effetto così potente che il testo continua per riempire tutto lo spazio disponibile della card, dimostrando che la tabella scompare e la descrizione prende tutto lo spazio rimanente in modo elegante e giustificato.",
                 castingTime: "1 Azione",
                 savingThrow: "Saggezza",
                 saveOutcome: "Annulla",
@@ -379,6 +367,8 @@
                 classes: "Mago, Stregone, Warlock",
                 concentration: false,
                 ritual: false,
+                pageNumber: "1/1",
+                hideTable: false,
                 description: "Lanci un <b>dardo di fuoco</b> verso una creatura o un oggetto a vista entro gittata. Effettua un <b>attacco con incantesimo a distanza</b> contro il bersaglio. In caso di colpo, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un oggetto infiammabile colpito dal dardo prende fuoco se non è indossato o trasportato.",
                 castingTime: "1 Azione",
                 savingThrow: "NO",
@@ -391,6 +381,7 @@
             }
         ];
 
+        let spells = []; // Sarà popolato dal fetch o dai dati predefiniti
         let cardOverrides = {};
 
         /* ================================================================
@@ -471,7 +462,6 @@
             renderCards();
         }
 
-        // Indovina il tema in base alla stringa delle classi
         function guessDefaultTheme(spell) {
             const c = spell.classes.toLowerCase();
             if (c.includes("paladino")) return "theme-paladino";
@@ -505,8 +495,9 @@
                 const vCD      = getCardValue(spellIndex, 'cd');
                 const vToHit   = getCardValue(spellIndex, 'toHit');
                 
-                // Gestione Tema: usa l'override se presente, altrimenti indovina dalla classe
                 const vTheme = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
+
+                const pageNumHTML = (spell.pageNumber && spell.pageNumber !== "1/1") ? `<div class="page-number-top">${spell.pageNumber}</div>` : '';
 
                 let compWordsHTML = '<div class="components-list">';
                 if (spell.components.verbal)  compWordsHTML += '<span class="comp-word">Verbale</span>';
@@ -533,18 +524,40 @@
                     toHitCellHTML = `<td class="stat-value"><input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}"></td>`;
                 }
 
+                // Costruzione badge da affiancare al titolo
                 let badgesHTML = '<div class="badges-container">';
                 if (spell.concentration) badgesHTML += '<div class="conc-badge">Concentrazione</div>';
                 if (spell.ritual) badgesHTML += '<div class="ritual-badge">Rituale</div>';
                 badgesHTML += '</div>';
 
+                let tableHTML = '';
+                if (!spell.hideTable) {
+                    tableHTML = `
+                        <table class="stats-table">
+                            <tr>
+                                <td class="stat-label">Tempo di Lancio</td><td class="stat-value">${spell.castingTime}</td>
+                                <td class="stat-label">Durata</td><td class="stat-value">${spell.duration}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
+                                <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
+                            </tr>
+                            <tr>
+                                <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
+                                <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
+                            </tr>
+                            ${materialRowHTML}
+                        </table>
+                    `;
+                }
+
                 const card = document.createElement('div');
-                card.className = 'spell-card ' + vTheme; // Applica il tema alla card
+                card.className = 'spell-card ' + vTheme;
                 card.innerHTML = `
                     <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
                     <div class="card-content">
                         <div class="card-header">
-                            ${badgesHTML}
+                            ${pageNumHTML}
                             <div class="theme-selector-wrapper">
                                 <span>Tema:</span>
                                 <select class="theme-selector" data-spell="${spellIndex}" data-field="theme">
@@ -569,37 +582,27 @@
                                 (<input type="text" class="stat-input-inline card-bonus" data-spell="${spellIndex}" data-field="bonus" value="${vBonus}" size="2">)
                             </div>
                             <div class="spell-classes">${spell.classes}</div>
-                            <div class="spell-title">${spell.name}</div>
+                            
+                            <div class="title-row">
+                                <div class="spell-title">${spell.name}</div>
+                                ${badgesHTML}
+                            </div>
                         </div>
                         <div class="divider"><span class="divider-line"></span><span class="divider-icon">✦</span><span class="divider-line"></span></div>
                         <div class="spell-description">${spell.description}</div>
-                        <table class="stats-table">
-                            <tr>
-                                <td class="stat-label">Tempo di Lancio</td><td class="stat-value">${spell.castingTime}</td>
-                                <td class="stat-label">Durata</td><td class="stat-value">${spell.duration}</td>
-                            </tr>
-                            <tr>
-                                <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
-                                <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
-                            </tr>
-                            <tr>
-                                <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
-                                <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
-                            </tr>
-                            ${materialRowHTML}
-                        </table>
+                        <div class="card-bottom-wrapper">
+                            ${tableHTML}
+                        </div>
                     </div>
                 `;
 
-                // Imposta i valori corretti per i select
                 card.querySelector('.card-ability').value = vAbility;
                 card.querySelector('.theme-selector').value = vTheme;
 
-                // Listener per salvare le modifiche
                 card.querySelectorAll('[data-field]').forEach(el => {
                     el.addEventListener('input', function() {
                         setCardOverride(parseInt(this.dataset.spell), this.dataset.field, this.value);
-                        if (this.dataset.field === 'theme') renderCards(); // Forza il re-render per applicare il CSS del tema
+                        if (this.dataset.field === 'theme') renderCards();
                     });
                     el.addEventListener('change', function() {
                         setCardOverride(parseInt(this.dataset.spell), this.dataset.field, this.value);
@@ -611,18 +614,48 @@
             });
         }
 
-        populateFilters();
-        document.getElementById('searchName').addEventListener('input', renderControls);
-        document.getElementById('filterSchool').addEventListener('change', renderControls);
-        document.getElementById('filterLevel').addEventListener('change', renderControls);
-        document.getElementById('filterClass').addEventListener('change', renderControls);
-        document.getElementById('globalAbility').addEventListener('change', renderCards);
-        document.getElementById('globalBonus').addEventListener('input', renderCards);
-        document.getElementById('globalCD').addEventListener('input', renderCards);
-        document.getElementById('globalToHit').addEventListener('input', renderCards);
+        // =========================================================
+        // INIZIALIZZAZIONE ASINCRONA (Carica file txt se presente)
+        // =========================================================
+        async function initializePage() {
+            try {
+                // Tenta di caricare il file esterno (funziona su GitHub Pages)
+                const response = await fetch('ListaIncantesimi.txt');
+                if (response.ok) {
+                    const text = await response.text();
+                    const externalSpells = JSON.parse(text);
+                    if (Array.isArray(externalSpells) && externalSpells.length > 0) {
+                        spells = externalSpells;
+                        console.log('Incantesimi caricati da ListaIncantesimi.txt');
+                    } else {
+                        spells = defaultSpells;
+                    }
+                } else {
+                    spells = defaultSpells;
+                }
+            } catch (error) {
+                // Se fallisce (es. file aperto localmente senza server), usa i dati predefiniti
+                spells = defaultSpells;
+                console.log('File esterno non trovato. Uso dati predefiniti nel codice.');
+            }
 
-        renderControls();
-        renderCards();
+            // Imposta i listener e fa il primo render
+            populateFilters();
+            document.getElementById('searchName').addEventListener('input', renderControls);
+            document.getElementById('filterSchool').addEventListener('change', renderControls);
+            document.getElementById('filterLevel').addEventListener('change', renderControls);
+            document.getElementById('filterClass').addEventListener('change', renderControls);
+            document.getElementById('globalAbility').addEventListener('change', renderCards);
+            document.getElementById('globalBonus').addEventListener('input', renderCards);
+            document.getElementById('globalCD').addEventListener('input', renderCards);
+            document.getElementById('globalToHit').addEventListener('input', renderCards);
+
+            renderControls();
+            renderCards();
+        }
+
+        // Avvia la pagina
+        initializePage();
     </script>
 </body>
 </html>
