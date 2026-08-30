@@ -87,7 +87,7 @@
     "saveOutcome": "Dimezza",
     "components": { "verbal": true, "somatic": true, "material": true },
     "material": "un rametto di vischio",
-    "toHit": true,
+    "toHit": false,
     "duration": "24 ore",
     "range": "se stesso"
   },
