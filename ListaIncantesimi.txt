@@ -17,5 +17,24 @@
     "toHit": false,
     "duration": "24 ore",
     "range": "Incantatore"
+  },
+  {
+    "name": "Bacche Benefiche",
+    "level": "1° Livello",
+    "school": "Trasmutazione",
+    "classes": "Druido, Ranger",
+    "concentration": false,
+    "ritual": true,
+    "pageNumber": "1/1",
+    "hideTable": false,
+    "description": "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
+    "castingTime": "1 Azione",
+    "savingThrow": "NO",
+    "saveOutcome": "",
+    "components": { verbal: true, somatic: true, material: true },
+    "material": "un rametto di vischio",
+    "toHit": false,
+    "duration": "24 ore",
+    "range": "Incantatore"
   }
 ]
