@@ -13,7 +13,7 @@
     "pageNumber": "1/1",
     "hideTable": false,
     "description": "Marchia magicamente una creatura visibile e a gittata. L'incantatore infligge <b>+1d6 danni da forza extra</b> al bersaglio ogni volta che lo colpisce con un tiro per colpire.<br>Inoltre, l'incantatore ha vantaggio a qualsiasi prova di Saggezza (<b>Percezione o Sopravvivenza</b>) per trovare il bersaglio.<br>Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo, un’azione bonus sposta il marchio su un'altra creatura entro gittata visibile.<br><b>Slot inc. di livello superiore:</b> La concentrazione può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).",
-    "castingTime": "Az. Bonus",
+    "castingTime": "Az Bonus",
     "savingThrow": "NO",
     "saveOutcome": "",
     "components": { "verbal": true, "somatic": false, "material": false },
@@ -43,7 +43,7 @@
     "material": "",
     "toHit": false,
     "duration": "10 min.",
-    "range": "incantatore"
+    "range": "se stesso"
   },
   {
     "name": "Dardo Infuocato 2",
@@ -65,7 +65,7 @@
     "components": { "verbal": true, "somatic": true, "material": false },
     "material": "",
     "toHit": true,
-    "duration": "Istantanea",
+    "duration": "Istante",
     "range": "36 metri"
   }
 ]
