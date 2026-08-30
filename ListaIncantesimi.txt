@@ -12,7 +12,7 @@
     "castingTime": "1 Azione",
     "savingThrow": "NO",
     "saveOutcome": "",
-    "components": { verbal: true, somatic: true, material: true },
+    "components": { "verbal": true, "somatic": true, "material": true },
     "material": "un rametto di vischio",
     "toHit": false,
     "duration": "24 ore",
