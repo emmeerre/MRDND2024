@@ -15,7 +15,7 @@
     "description": "marchia magicamente una creatura entro gittata e visibile. l'incantatore infligge +1d6 danni da forza extra al bersaglio ogni volta che lo colpisce con un tiro per colpire.
 Inoltre, l'incantatore dispone di vantaggio a qualsiasi prova di Saggezza (Percezione o Sopravvivenza) che effettua per trovare il bersaglio.
 Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo,un’azione bonus sposta il marchio su un'altra creatura entro gittata visibile.
-<b>slot inc. di livello superiore:<\b> La concentrazione dell'incantatore può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).
+<b>slot inc. di livello superiore:</b> La concentrazione dell'incantatore può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).
 ",
     "castingTime": "Az. Bonus",
     "savingThrow": "NO",
