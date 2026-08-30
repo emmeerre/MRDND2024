@@ -1,7 +1,5 @@
 [
   {
-    "name": "Frecce Incantate",
-    "level": "1° Livello",
     "name": "Bacche Benefiche",
     "level": "1° Livello",
     "school": "Trasmutazione",
