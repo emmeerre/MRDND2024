@@ -90,12 +90,33 @@
     "toHit": true,
     "duration": "24 ore",
     "range": "se stesso"
+  },
+  {
+    "name": "Intralciare",
+    "level": "1° Liv.",
+    "school": "Evocazione",
+    "classes": "druido, ranger",
+    "castingTime": "Azione",    
+    "HighlightBox1": "concentrazione",
+    "ColorHighlightBox1": "red",
+    "HighlightBox2": "",
+    "ColorHighlightBox2": "",
+    "HighlightBox3": "",
+    "ColorHighlightBox3": "",
+    "pageNumber": "1/1",
+    "hideTable": false,
+    "description": "Dei vegetali afferranti spuntano dal terreno in un quadrato di 6m/4q per lato in un punto situato entro gittata. i vegetali trasformano quell'area in un terreno difficile e scompaiono al termine dell'incantesimo.<br> Ogni creatura nell’area diversa dall'incantatore 
+deve superare un tiro salvezza su Forza, altrimenti è trattenuta fino al termine dell'incantesimo.
+Le creature trattenute possono usare un'azione per effettuare una prova di Forza (Atletica) contro
+la CD del tiro salvezza sull'incantesimo. In caso di successo, si liberano dai vegetali afferranti e non sono più trattenute.",
+    "savingThrow": "FOR",
+    "saveOutcome": "Nega",
+    "components": { "verbal": true, "somatic": true, "material": false },
+    "material": "",
+    "toHit": true,
+    "duration": "1 minuto ",
+    "range": "27m/18q"
   }
-
-
  
-
-
-
 
 ]
