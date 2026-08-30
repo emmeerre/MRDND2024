@@ -1,7 +1,7 @@
 [
   {
     "name": "Marchio del cacciatore (X2)",
-    "level": "1° Livello",
+    "level": "1° Liv.",
     "school": "Divinazione",
     "classes": "Ranger",
     "HighlightBox1": "Concentrazione",
@@ -12,7 +12,7 @@
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
-    "description": "Marchia magicamente una creatura entro gittata e visibile. L'incantatore infligge +1d6 danni da forza extra al bersaglio ogni volta che lo colpisce con un tiro per colpire.<br>Inoltre, l'incantatore dispone di vantaggio a qualsiasi prova di Saggezza (Percezione o Sopravvivenza) che effettua per trovare il bersaglio.<br>Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo, un’azione bonus sposta il marchio su un'altra creatura entro gittata visibile.<br><b>Slot inc. di livello superiore:</b> La concentrazione dell'incantatore può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).",
+    "description": "Marchia magicamente una creatura visibile e a gittata. L'incantatore infligge <b>+1d6 danni da forza extra</b> al bersaglio ogni volta che lo colpisce con un tiro per colpire.<br>Inoltre, l'incantatore ha vantaggio a qualsiasi prova di Saggezza (<b>Percezione o Sopravvivenza</b>) per trovare il bersaglio.<br>Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo, un’azione bonus sposta il marchio su un'altra creatura entro gittata visibile.<br><b>Slot inc. di livello superiore:</b> La concentrazione può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).",
     "castingTime": "Az. Bonus",
     "savingThrow": "NO",
     "saveOutcome": "",
@@ -23,27 +23,28 @@
     "range": "27m/18q"
   },
   {
-    "name": "Dardo Infuocato",
-    "level": "Trucco",
-    "school": "Evocazione",
-    "classes": "Mago, Stregone",
-    "HighlightBox1": "",
-    "ColorHighlightBox1": "",
+    "name": "Parlare con gli animali",
+    "level": "1° Liv.",
+    "school": "Divinazione",
+    "classes": "Bardo, Druido, Ranger, Warlock ",
+    "HighlightBox1": "Rituale",
+    "ColorHighlightBox1": "Green",
     "HighlightBox2": "",
     "ColorHighlightBox2": "",
     "HighlightBox3": "",
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
-    "description": "Lanci un dardo di fuoco...",
+    "description": "Per la durata dell'incantesimo, l'incantatore comprende le bestie e può comunicare verbalmente con loro sando una qualunque abilità dell'azione di Influenza.<br>Nella maggior parte dei casi hanno ben poco da dire su temi che esulano dalla sopravvivenza o dallo spirito di squadra, ma almeno possono fornire informazioni su luoghi e mostri nelle vicinanze, oltre a tutto ciò che hanno notato nel corso dell'ultima giornata.
+",
     "castingTime": "1 Azione",
     "savingThrow": "NO",
     "saveOutcome": "",
     "components": { "verbal": true, "somatic": true, "material": false },
     "material": "",
-    "toHit": true,
-    "duration": "Istantanea",
-    "range": "36 metri"
+    "toHit": false,
+    "duration": "10 min.",
+    "range": "incantatore"
   },
   {
     "name": "Dardo Infuocato 2",
