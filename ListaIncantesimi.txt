@@ -105,10 +105,7 @@
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
-    "description": "Dei vegetali afferranti spuntano dal terreno in un quadrato di 6m/4q per lato in un punto situato entro gittata. i vegetali trasformano quell'area in un terreno difficile e scompaiono al termine dell'incantesimo.<br> Ogni creatura nell’area diversa dall'incantatore 
-deve superare un tiro salvezza su Forza, altrimenti è trattenuta fino al termine dell'incantesimo.
-Le creature trattenute possono usare un'azione per effettuare una prova di Forza (Atletica) contro
-la CD del tiro salvezza sull'incantesimo. In caso di successo, si liberano dai vegetali afferranti e non sono più trattenute.",
+    "description": "Dei vegetali afferranti spuntano dal terreno in un <b>quadrato di 6m/4q</b> per lato in un punto situato a gittata. i vegetali trasformano quell'area in un <b>terreno difficile</b> e scompaiono al termine dell'incantesimo.<br> Ogni creatura nell’area diversa dall'incantatore deve superare un <b>tiro salvezza su Forza</b>, altrimenti è trattenuta fino . Le creature trattenute possono usare un'azione per effettuare una <b>prova di Forza (Atletica)</b> contro la CD del tiro salvezza sull'incantesimo. In caso di successo, si liberano dai vegetali afferranti e non sono più trattenute.",
     "savingThrow": "FOR",
     "saveOutcome": "Nega",
     "components": { "verbal": true, "somatic": true, "material": false },
