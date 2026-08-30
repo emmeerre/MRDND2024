@@ -160,14 +160,21 @@
             display: flex; 
             flex-direction: column; 
             align-items: flex-start; 
-            gap: 3px; 
+            gap: 2px; 
             line-height: 1.2; 
             padding-left: 8px; 
             justify-content: center; 
             height: 100%; 
         }
-        .save-stat { font-style: italic; font-weight: 600; color: var(--ink-dark); }
-        .save-cd { font-size: 0.95em; font-weight: 700; color: var(--ink-medium); display: flex; align-items: center; gap: 4px; }
+        
+        /* Layout per Tiro Salvezza (2 righe) */
+        .save-line-1 {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Spazio tra DES e CD 12 */
+        }
+        .save-stat { font-style: italic; font-weight: 600; color: var(--ink-dark); white-space: nowrap; }
+        .save-cd { font-size: 0.95em; font-weight: 700; color: var(--ink-medium); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
         .save-outcome { font-size: 0.85em; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: var(--gold); }
 
         .components-list .comp-word { display: block; font-style: italic; font-weight: 600; color: var(--ink-dark); line-height: 1.3; white-space: nowrap; }
@@ -448,12 +455,20 @@
                     materialRowHTML = `<tr class="material-row"><td colspan="6"><span class="comp-material-text">${spell.material}</span></td></tr>`;
                 }
 
-                // Contenuto Tiro Salvezza
+                // Contenuto Tiro Salvezza (struttura a 2 righe)
                 let saveCellContent;
                 if (spell.savingThrow === "NO") {
                     saveCellContent = '<span class="stat-value no">NO</span>';
                 } else {
-                    saveCellContent = `<div class="save-stack"><span class="save-stat">${spell.savingThrow}</span><span class="save-cd">CD <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span><span class="save-outcome">${spell.saveOutcome}</span></div>`;
+                    saveCellContent = `
+                        <div class="save-stack">
+                            <div class="save-line-1">
+                                <span class="save-stat">${spell.savingThrow}</span>
+                                <span class="save-cd">CD <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span>
+                            </div>
+                            <span class="save-outcome">${spell.saveOutcome}</span>
+                        </div>
+                    `;
                 }
 
                 // Contenuto Tiro per colpire
@@ -465,8 +480,6 @@
                 }
 
                 // Costruzione Tabella Statica a 6 colonne
-                // Riga 1: Tempo, Durata, Gittata
-                // Riga 2: Tiro Salvezza (rowspan 2), Tiro per colpire (rowspan 1) -- Wait, the logic below is correct.
                 let tableHTML = `
                     <table class="stats-table">
                         <tr>
