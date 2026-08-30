@@ -105,7 +105,7 @@
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
-    "description": "Dei vegetali afferranti spuntano dal terreno in un <b>quadrato di 6m/4q</b> per lato in un punto situato a gittata. i vegetali trasformano quell'area in un <b>terreno difficile</b> e scompaiono al termine dell'incantesimo.<br> Ogni creatura nell’area diversa dall'incantatore deve superare un <b>tiro salvezza su Forza</b>, altrimenti è trattenuta fino . Le creature trattenute possono usare un'azione per effettuare una <b>prova di Forza (Atletica)</b> contro la CD del tiro salvezza sull'incantesimo. In caso di successo, si liberano dai vegetali afferranti e non sono più trattenute.",
+    "description": "Dei vegetali afferranti spuntano dal terreno in un <b>quadrato di 6m/4q</b> per lato in un punto situato a gittata. i vegetali trasformano quell'area in un <b>terreno difficile</b> e scompaiono al termine dell'incantesimo.<br> Ogni creatura nell’area diversa dall'incantatore deve superare un <b>tiro salvezza su Forza</b>, altrimenti è trattenuta fino . Le creature trattenute possono usare un'<b>azione</b> per effettuare una <b>prova di Forza (Atletica)</b> contro la CD del tiro salvezza sull'incantesimo. In caso di successo, si liberano dai vegetali afferranti e non sono più trattenute.",
     "savingThrow": "FOR",
     "saveOutcome": "Nega",
     "components": { "verbal": true, "somatic": true, "material": false },
@@ -113,7 +113,34 @@
     "toHit": true,
     "duration": "1 minuto ",
     "range": "27m/18q"
+  },
+  {
+    "name": "Charme su persone",
+    "level": "1° Liv.",
+    "school": "Ammaliamento",
+    "classes": "bardo, druido, ranger, warlock",
+    "castingTime": "Azione",    
+    "HighlightBox1": "concentrazione",
+    "ColorHighlightBox1": "red",
+    "HighlightBox2": "",
+    "ColorHighlightBox2": "",
+    "HighlightBox3": "",
+    "ColorHighlightBox3": "",
+    "pageNumber": "1/1",
+    "hideTable": false,
+    "Un umanoide entro gittata visibile effettua un <b>tiro salvezza su Saggezza</b>, disponendo di vantaggio se l'incantatore o i suoi alleati stanno combattendo contro di essa. In caso di fallimento, il bersaglio è affascinato fino al termine dell'incantesimo o finché non gli vengono inflitti danni dall'incantatore o i suoi alleati. La creatura affascinata è amichevole nei confronti dell'incantatore. Al termine dell'incantesimo, il bersaglio capirà di essere stato affascinato dall'incantatore.<br><b>incantesimo di livello superior:</b> L'incantatore può bersagliare una creatura aggiuntiva per ogni slot di livello superiore al 1º.",
+    "savingThrow": "SAG",
+    "saveOutcome": "Nega",
+    "components": { "verbal": true, "somatic": true, "material": false },
+    "material": "",
+    "toHit": true,
+    "duration": "1 ora",
+    "range": "9m\6q"
   }
+
+
+
+
  
 
 ]
