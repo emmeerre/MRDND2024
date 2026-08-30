@@ -53,6 +53,19 @@
         .controls h1 { font-family: 'Cinzel', serif; font-size: 1.6em; color: var(--gold-light); letter-spacing: 1px; }
         .controls-subtitle { font-size: 0.85em; color: #a08060; margin-left: auto; }
 
+        /* Status Bar per il Fetch */
+        .load-status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-family: 'EB Garamond', serif;
+            font-size: 0.9em;
+            border: 1px solid;
+        }
+        .status-success { background: rgba(46, 204, 113, 0.15); border-color: #2ecc71; color: #2ecc71; }
+        .status-warning { background: rgba(241, 196, 15, 0.15); border-color: #f1c40f; color: #f1c40f; }
+        .status-error { background: rgba(231, 76, 60, 0.15); border-color: #e74c3c; color: #e74c3c; }
+
         .caster-global {
             display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
             margin-bottom: 20px; padding: 16px 18px;
@@ -240,6 +253,11 @@
             <span class="controls-subtitle">D&D 5ª Edizione</span>
         </div>
 
+        <!-- Indicatore Stato Caricamento Dati -->
+        <div id="loadStatus" class="load-status status-warning">
+            ⏳ Caricamento dati in corso...
+        </div>
+
         <div class="caster-global">
             <h3>✦ Dati Incantatore — Valori predefiniti per tutte le card</h3>
             <div class="caster-field">
@@ -284,14 +302,9 @@
         </div>
 
         <div class="info-note">
-            💡 <strong>Come aggiungere un incantesimo:</strong> crea un file di testo chiamato esattamente <code>ListaIncantesimi.txt</code> (con la "I" maiuscola) nella stessa cartella di questo file HTML su GitHub.<br>
-            All'interno del file, inserisci un array JSON valido. Ricorda: tutte le chiavi devono avere le virgolette (es. <code>"name"</code>, non <code>name</code>) e non devono esserci campi duplicati.<br>
-            📝 <strong>Grassetto:</strong> usa <code>&lt;b&gt;testo&lt;/b&gt;</code> nella descrizione.<br>
-            ⚙️ <strong>Componenti:</strong> imposta <code>"verbal"</code>, <code>"somatic"</code>, <code>"material"</code> a <code>true/false</code>.<br>
-            🛡️ <strong>Tiro Salvezza:</strong> inserisci la stat e l'<code>saveOutcome</code> (es. "Dimezza", "Annulla").<br>
-            🎯 <strong>Tiro per colpire:</strong> imposta <code>"toHit": true</code> per mostrare il bonus.<br>
-            📄 <strong>Pagine:</strong> usa <code>"pageNumber": "1/2"</code>. Se diverso da "1/1", appare in alto a destra.<br>
-            🚫 <strong>Nascondi Tabella:</strong> imposta <code>"hideTable": true</code> per lasciare più spazio al testo.
+            💡 <strong>Come aggiungere un incantesimo:</strong> crea un file di testo chiamato esattamente <code>ListaIncantesimi.txt</code> nella stessa cartella di questo file HTML su GitHub.<br>
+            All'interno del file, inserisci un array JSON valido. Ricorda: tutte le chiavi devono avere le virgolette (es. <code>"name"</code>) e non devono esserci campi duplicati.<br>
+            📝 <strong>Grassetto:</strong> usa <code>&lt;b&gt;testo&lt;/b&gt;</code> nella descrizione.
         </div>
     </div>
 
@@ -303,7 +316,7 @@
            ================================================================ */
         const defaultSpells = [
             {
-                "name": "Bacche Benefiche",
+                "name": "Bacche Benefiche (Default)",
                 "level": "1° Livello",
                 "school": "Trasmutazione",
                 "classes": "Druido, Ranger",
@@ -320,67 +333,10 @@
                 "toHit": false,
                 "duration": "24 ore",
                 "range": "Incantatore"
-            },
-            {
-                "name": "Palla di Fuoco",
-                "level": "3° Livello",
-                "school": "Evocazione",
-                "classes": "Mago, Stregone",
-                "concentration": false,
-                "ritual": false,
-                "pageNumber": "1/2",
-                "hideTable": false,
-                "description": "Una brillante vampata si sprigiona da un punto a scelta entro gittata. Ogni creatura in un raggio di <b>6 metri</b> dal punto deve effettuare un tiro salvezza su Destrezza. Subisce <b>8d6 danni da fuoco</b> in caso di fallimento, o la metà in caso di successo.",
-                "castingTime": "1 Azione",
-                "savingThrow": "Destrezza",
-                "saveOutcome": "Dimezza",
-                "components": { "verbal": true, "somatic": true, "material": true },
-                "material": "guano di pipistrello e zolfo",
-                "toHit": false,
-                "duration": "Istantanea",
-                "range": "45 metri"
-            },
-            {
-                "name": "Ammaliare Persone",
-                "level": "1° Livello",
-                "school": "Incantamento",
-                "classes": "Bardo, Stregone, Warlock",
-                "concentration": true,
-                "ritual": false,
-                "pageNumber": "2/2",
-                "hideTable": true,
-                "description": "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso. L'incantesimo ha un effetto così potente che il testo continua per riempire tutto lo spazio disponibile della card, dimostrando che la tabella scompare e la descrizione prende tutto lo spazio rimanente.",
-                "castingTime": "1 Azione",
-                "savingThrow": "Saggezza",
-                "saveOutcome": "Annulla",
-                "components": { "verbal": true, "somatic": true, "material": true },
-                "material": "un po' di rossetto o argilla bagnata",
-                "toHit": false,
-                "duration": "1 Ora",
-                "range": "9 metri"
-            },
-            {
-                "name": "Dardo Infuocato",
-                "level": "Trucco",
-                "school": "Evocazione",
-                "classes": "Mago, Stregone, Warlock",
-                "concentration": false,
-                "ritual": false,
-                "pageNumber": "1/1",
-                "hideTable": false,
-                "description": "Lanci un <b>dardo di fuoco</b> verso una creatura o un oggetto a vista entro gittata. Effettua un <b>attacco con incantesimo a distanza</b> contro il bersaglio. In caso di colpo, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un oggetto infiammabile colpito dal dardo prende fuoco se non è indossato o trasportato.",
-                "castingTime": "1 Azione",
-                "savingThrow": "NO",
-                "saveOutcome": "",
-                "components": { "verbal": true, "somatic": true, "material": false },
-                "material": "",
-                "toHit": true,
-                "duration": "Istantanea",
-                "range": "36 metri"
             }
         ];
 
-        let spells = []; // Sarà popolato dal fetch o dai dati predefiniti
+        let spells = []; 
         let cardOverrides = {};
 
         /* ================================================================
@@ -617,33 +573,40 @@
         // =========================================================
         async function initializePage() {
             const grid = document.getElementById('cardsGrid');
+            const statusDiv = document.getElementById('loadStatus');
+            
             try {
-                // Tenta di caricare il file esterno (funziona su GitHub Pages)
-                const response = await fetch('ListaIncantesimi.txt');
+                // Aggiungo un parametro cache-busting per forzare GitHub a dare il file più recente
+                const response = await fetch('ListaIncantesimi.txt?v=' + Date.now());
+                
                 if (response.ok) {
                     const text = await response.text();
                     try {
                         const externalSpells = JSON.parse(text);
                         if (Array.isArray(externalSpells) && externalSpells.length > 0) {
                             spells = externalSpells;
-                            console.log('Incantesimi caricati da ListaIncantesimi.txt');
+                            statusDiv.innerHTML = "✅ Dati caricati con successo dal file esterno: <strong>ListaIncantesimi.txt</strong>";
+                            statusDiv.className = "load-status status-success";
                         } else {
                             spells = defaultSpells;
-                            console.log('Il file esterno è vuoto o non è un array valido. Uso dati predefiniti.');
+                            statusDiv.innerHTML = "⚠️ Il file esterno è vuoto o non contiene un array valido. Uso dati predefiniti.";
+                            statusDiv.className = "load-status status-warning";
                         }
                     } catch (parseError) {
                         spells = defaultSpells;
+                        statusDiv.innerHTML = "❌ Errore di sintassi JSON nel file ListaIncantesimi.txt! Uso dati predefiniti. Controlla virgolette e virgole.";
+                        statusDiv.className = "load-status status-error";
                         console.error('Errore di parsing JSON:', parseError);
-                        grid.innerHTML = `<div class="error-msg">⚠️ ERRORE NEL FILE ListaIncantesimi.txt<br><br>Il file contiene errori di sintassi JSON (es. virgolette mancanti, chiavi duplicate, o virgole errate).<br><br>Controlla la console del browser (F12) per i dettagli.<br><br>Per ora vengono mostrati i dati predefiniti del codice.</div>`;
                     }
                 } else {
                     spells = defaultSpells;
-                    console.log('File esterno non trovato. Uso dati predefiniti nel codice.');
+                    statusDiv.innerHTML = "⚠️ File <strong>ListaIncantesimi.txt</strong> non trovato (Errore " + response.status + "). Assicurati che il nome sia esatto e sia nella stessa cartella dell'HTML. Uso dati predefiniti.";
+                    statusDiv.className = "load-status status-warning";
                 }
             } catch (error) {
-                // Se fallisce (es. file aperto localmente senza server), usa i dati predefiniti
                 spells = defaultSpells;
-                console.log('Errore di rete o file locale. Uso dati predefiniti nel codice.');
+                statusDiv.innerHTML = "⚠️ Impossibile caricare il file esterno (probabile blocco CORS se aperto in locale). Uso dati predefiniti.";
+                statusDiv.className = "load-status status-warning";
             }
 
             // Imposta i listener e fa il primo render
