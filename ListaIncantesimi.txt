@@ -1,26 +1,30 @@
 [
   {
-    "name": "Ammaliare Persone",
+    "name": "Marchio del cacciatore (X2)",
     "level": "1° Livello",
-    "school": "Incantamento",
-    "classes": "Bardo, Druido, Stregone",
+    "school": "Divinazione",
+    "classes": "Ranger",
     "HighlightBox1": "Concentrazione",
     "ColorHighlightBox1": "Red",
-    "HighlightBox2": "Rituale",
+    "HighlightBox2": "",
     "ColorHighlightBox2": "Green",
-    "HighlightBox3": "Forma Animale",
+    "HighlightBox3": "",
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
-    "description": "Cerchi di ammaliare un umanoide...",
-    "castingTime": "1 Azione",
-    "savingThrow": "Saggezza",
-    "saveOutcome": "Annulla",
-    "components": { "verbal": true, "somatic": true, "material": true },
-    "material": "un po' di rossetto",
+    "description": "marchia magicamente una creatura entro gittata e visibile. l'incantatore infligge +1d6 danni da forza extra al bersaglio ogni volta che lo colpisce con un tiro per colpire.
+Inoltre, l'incantatore dispone di vantaggio a qualsiasi prova di Saggezza (Percezione o Sopravvivenza) che effettua per trovare il bersaglio.
+Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo,un’azione bonus sposta il marchio su un'altra creatura entro gittata visibile.
+<b>slot inc. di livello superiore:<\b> La concentrazione dell'incantatore può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).
+",
+    "castingTime": "Az. Bonus",
+    "savingThrow": "NO",
+    "saveOutcome": "",
+    "components": { "verbal": true, "somatic": false, "material": false },
+    "material": "",
     "toHit": false,
     "duration": "1 Ora",
-    "range": "9 metri"
+    "range": "27m/18q"
   },
   {
     "name": "Dardo Infuocato",
