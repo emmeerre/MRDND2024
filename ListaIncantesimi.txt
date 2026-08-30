@@ -152,7 +152,7 @@
     "pageNumber": "1/1",
     "hideTable": false,
     "description": "l'incantatore percepisce la presenza di effetti magici entro <b>9m/6q</b> da sé. Se percepisce tali effetti, può eseguire un <b>azione bonus</b> per vedere una debole aura attorno a ogni creatura o oggetto visibile nell'area che contenga magia per capire la <b>scuola di magia</b> si tratta, se ne esiste una.L'incantesimo viene bloccato da 30 cm di pietra, terriccio o legno, 2,5 centimetri di metallo o una sottile lamina di piombo.",
-    "savingThrow": "",
+    "savingThrow": "NO",
     "saveOutcome": "",
     "components": { "verbal": true, "somatic": true, "material": false },
     "material": "",
