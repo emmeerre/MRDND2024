@@ -107,6 +107,7 @@
         /* ===================== GRIGLIA CARDS ===================== */
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 210mm; margin: 0 auto; align-items: stretch; }
         .empty-msg { grid-column: 1 / -1; text-align: center; color: #88775a; padding: 80px 20px; font-size: 1.2em; font-style: italic; }
+        .error-msg { grid-column: 1 / -1; text-align: left; color: #ffaaaa; padding: 20px; font-size: 1em; background: #4a0000; border: 1px solid #ff0000; border-radius: 8px; white-space: pre-wrap; font-family: monospace; }
 
         /* ===================== SINGOLA CARD ===================== */
         .spell-card {
@@ -283,16 +284,14 @@
         </div>
 
         <div class="info-note">
-            💡 <strong>Come aggiungere un incantesimo:</strong> modifica l'array <code>spells</code> nello script in fondo al file, oppure crea un file <code>ListaIncantesimi.txt</code> nella stessa cartella (su GitHub Pages) contenente un array JSON valido.<br>
+            💡 <strong>Come aggiungere un incantesimo:</strong> crea un file di testo chiamato esattamente <code>ListaIncantesimi.txt</code> (con la "I" maiuscola) nella stessa cartella di questo file HTML su GitHub.<br>
+            All'interno del file, inserisci un array JSON valido. Ricorda: tutte le chiavi devono avere le virgolette (es. <code>"name"</code>, non <code>name</code>) e non devono esserci campi duplicati.<br>
             📝 <strong>Grassetto:</strong> usa <code>&lt;b&gt;testo&lt;/b&gt;</code> nella descrizione.<br>
-            ⚙️ <strong>Componenti:</strong> imposta <code>verbal</code>, <code>somatic</code>, <code>material</code> a <code>true/false</code>.<br>
-            🛡️ <strong>Tiro Salvezza:</strong> inserisci la stat (es. "Destrezza") e l'<code>saveOutcome</code> (es. "Dimezza", "Annulla").<br>
-            🎯 <strong>Tiro per colpire:</strong> imposta <code>toHit: true</code> per mostrare il bonus modificabile.<br>
-            📋 <strong>Classi:</strong> scrivile nel campo <code>classes</code> separandole da virgole.<br>
-            ✨ <strong>Rituale:</strong> imposta <code>ritual: true</code> per mostrare il badge verde.<br>
-            🎨 <strong>Temi:</strong> il colore si imposta automaticamente in base alla classe, ma puoi cambiarlo dal menu a tendina su ogni card.<br>
-            📄 <strong>Pagine:</strong> usa il campo <code>pageNumber: "1/2"</code>. Se diverso da "1/1", appare in alto a destra.<br>
-            🚫 <strong>Nascondi Tabella:</strong> imposta <code>hideTable: true</code> per lasciare più spazio al testo.
+            ⚙️ <strong>Componenti:</strong> imposta <code>"verbal"</code>, <code>"somatic"</code>, <code>"material"</code> a <code>true/false</code>.<br>
+            🛡️ <strong>Tiro Salvezza:</strong> inserisci la stat e l'<code>saveOutcome</code> (es. "Dimezza", "Annulla").<br>
+            🎯 <strong>Tiro per colpire:</strong> imposta <code>"toHit": true</code> per mostrare il bonus.<br>
+            📄 <strong>Pagine:</strong> usa <code>"pageNumber": "1/2"</code>. Se diverso da "1/1", appare in alto a destra.<br>
+            🚫 <strong>Nascondi Tabella:</strong> imposta <code>"hideTable": true</code> per lasciare più spazio al testo.
         </div>
     </div>
 
@@ -300,84 +299,84 @@
 
     <script>
         /* ================================================================
-           DATI PREDEFINITI DEGLI INCANTESIMI (Usati se ListaIncantesimi.txt non esiste)
+           DATI PREDEFINITI (Usati se ListaIncantesimi.txt non esiste o va in errore)
            ================================================================ */
         const defaultSpells = [
             {
-                name: "Bacche Benefiche",
-                level: "1° Livello",
-                school: "Trasmutazione",
-                classes: "Druido, Ranger",
-                concentration: false,
-                ritual: true,
-                pageNumber: "1/1",
-                hideTable: false,
-                description: "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
-                castingTime: "1 Azione",
-                savingThrow: "NO",
-                saveOutcome: "",
-                components: { verbal: true, somatic: true, material: true },
-                material: "un rametto di vischio",
-                toHit: false,
-                duration: "24 ore",
-                range: "Incantatore"
+                "name": "Bacche Benefiche",
+                "level": "1° Livello",
+                "school": "Trasmutazione",
+                "classes": "Druido, Ranger",
+                "concentration": false,
+                "ritual": true,
+                "pageNumber": "1/1",
+                "hideTable": false,
+                "description": "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
+                "castingTime": "1 Azione",
+                "savingThrow": "NO",
+                "saveOutcome": "",
+                "components": { "verbal": true, "somatic": true, "material": true },
+                "material": "un rametto di vischio",
+                "toHit": false,
+                "duration": "24 ore",
+                "range": "Incantatore"
             },
             {
-                name: "Palla di Fuoco",
-                level: "3° Livello",
-                school: "Evocazione",
-                classes: "Mago, Stregone",
-                concentration: false,
-                ritual: false,
-                pageNumber: "1/2",
-                hideTable: false,
-                description: "Una brillante vampata si sprigiona da un punto a scelta entro gittata. Ogni creatura in un raggio di <b>6 metri</b> dal punto deve effettuare un tiro salvezza su Destrezza. Subisce <b>8d6 danni da fuoco</b> in caso di fallimento, o la metà in caso di successo. Il fuoco danneggia gli oggetti nell'area e incendia quelli infiammabili non indossati.",
-                castingTime: "1 Azione",
-                savingThrow: "Destrezza",
-                saveOutcome: "Dimezza",
-                components: { verbal: true, somatic: true, material: true },
-                material: "guano di pipistrello e zolfo",
-                toHit: false,
-                duration: "Istantanea",
-                range: "45 metri"
+                "name": "Palla di Fuoco",
+                "level": "3° Livello",
+                "school": "Evocazione",
+                "classes": "Mago, Stregone",
+                "concentration": false,
+                "ritual": false,
+                "pageNumber": "1/2",
+                "hideTable": false,
+                "description": "Una brillante vampata si sprigiona da un punto a scelta entro gittata. Ogni creatura in un raggio di <b>6 metri</b> dal punto deve effettuare un tiro salvezza su Destrezza. Subisce <b>8d6 danni da fuoco</b> in caso di fallimento, o la metà in caso di successo.",
+                "castingTime": "1 Azione",
+                "savingThrow": "Destrezza",
+                "saveOutcome": "Dimezza",
+                "components": { "verbal": true, "somatic": true, "material": true },
+                "material": "guano di pipistrello e zolfo",
+                "toHit": false,
+                "duration": "Istantanea",
+                "range": "45 metri"
             },
             {
-                name: "Ammaliare Persone",
-                level: "1° Livello",
-                school: "Incantamento",
-                classes: "Bardo, Stregone, Warlock",
-                concentration: true,
-                ritual: false,
-                pageNumber: "2/2",
-                hideTable: true,
-                description: "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza, fallendolo automaticamente se tu o i tuoi compagni state combattendo contro di esso. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso. L'incantesimo ha un effetto così potente che il testo continua per riempire tutto lo spazio disponibile della card, dimostrando che la tabella scompare e la descrizione prende tutto lo spazio rimanente in modo elegante e giustificato.",
-                castingTime: "1 Azione",
-                savingThrow: "Saggezza",
-                saveOutcome: "Annulla",
-                components: { verbal: true, somatic: true, material: true },
-                material: "un po' di rossetto o argilla bagnata",
-                toHit: false,
-                duration: "1 Ora",
-                range: "9 metri"
+                "name": "Ammaliare Persone",
+                "level": "1° Livello",
+                "school": "Incantamento",
+                "classes": "Bardo, Stregone, Warlock",
+                "concentration": true,
+                "ritual": false,
+                "pageNumber": "2/2",
+                "hideTable": true,
+                "description": "Cerchi di ammaliare un umanoide a scelta entro gittata. Deve effettuare un tiro salvezza su Saggezza. In caso di fallimento, è <b>ammaliato</b> da te fino al termine dell'incantesimo o finché non fallisci un tiro di Carisma contro di esso. L'incantesimo ha un effetto così potente che il testo continua per riempire tutto lo spazio disponibile della card, dimostrando che la tabella scompare e la descrizione prende tutto lo spazio rimanente.",
+                "castingTime": "1 Azione",
+                "savingThrow": "Saggezza",
+                "saveOutcome": "Annulla",
+                "components": { "verbal": true, "somatic": true, "material": true },
+                "material": "un po' di rossetto o argilla bagnata",
+                "toHit": false,
+                "duration": "1 Ora",
+                "range": "9 metri"
             },
             {
-                name: "Dardo Infuocato",
-                level: "Trucco",
-                school: "Evocazione",
-                classes: "Mago, Stregone, Warlock",
-                concentration: false,
-                ritual: false,
-                pageNumber: "1/1",
-                hideTable: false,
-                description: "Lanci un <b>dardo di fuoco</b> verso una creatura o un oggetto a vista entro gittata. Effettua un <b>attacco con incantesimo a distanza</b> contro il bersaglio. In caso di colpo, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un oggetto infiammabile colpito dal dardo prende fuoco se non è indossato o trasportato.",
-                castingTime: "1 Azione",
-                savingThrow: "NO",
-                saveOutcome: "",
-                components: { verbal: true, somatic: true, material: false },
-                material: "",
-                toHit: true,
-                duration: "Istantanea",
-                range: "36 metri"
+                "name": "Dardo Infuocato",
+                "level": "Trucco",
+                "school": "Evocazione",
+                "classes": "Mago, Stregone, Warlock",
+                "concentration": false,
+                "ritual": false,
+                "pageNumber": "1/1",
+                "hideTable": false,
+                "description": "Lanci un <b>dardo di fuoco</b> verso una creatura o un oggetto a vista entro gittata. Effettua un <b>attacco con incantesimo a distanza</b> contro il bersaglio. In caso di colpo, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un oggetto infiammabile colpito dal dardo prende fuoco se non è indossato o trasportato.",
+                "castingTime": "1 Azione",
+                "savingThrow": "NO",
+                "saveOutcome": "",
+                "components": { "verbal": true, "somatic": true, "material": false },
+                "material": "",
+                "toHit": true,
+                "duration": "Istantanea",
+                "range": "36 metri"
             }
         ];
 
@@ -524,7 +523,6 @@
                     toHitCellHTML = `<td class="stat-value"><input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}"></td>`;
                 }
 
-                // Costruzione badge da affiancare al titolo
                 let badgesHTML = '<div class="badges-container">';
                 if (spell.concentration) badgesHTML += '<div class="conc-badge">Concentrazione</div>';
                 if (spell.ritual) badgesHTML += '<div class="ritual-badge">Rituale</div>';
@@ -618,25 +616,34 @@
         // INIZIALIZZAZIONE ASINCRONA (Carica file txt se presente)
         // =========================================================
         async function initializePage() {
+            const grid = document.getElementById('cardsGrid');
             try {
                 // Tenta di caricare il file esterno (funziona su GitHub Pages)
                 const response = await fetch('ListaIncantesimi.txt');
                 if (response.ok) {
                     const text = await response.text();
-                    const externalSpells = JSON.parse(text);
-                    if (Array.isArray(externalSpells) && externalSpells.length > 0) {
-                        spells = externalSpells;
-                        console.log('Incantesimi caricati da ListaIncantesimi.txt');
-                    } else {
+                    try {
+                        const externalSpells = JSON.parse(text);
+                        if (Array.isArray(externalSpells) && externalSpells.length > 0) {
+                            spells = externalSpells;
+                            console.log('Incantesimi caricati da ListaIncantesimi.txt');
+                        } else {
+                            spells = defaultSpells;
+                            console.log('Il file esterno è vuoto o non è un array valido. Uso dati predefiniti.');
+                        }
+                    } catch (parseError) {
                         spells = defaultSpells;
+                        console.error('Errore di parsing JSON:', parseError);
+                        grid.innerHTML = `<div class="error-msg">⚠️ ERRORE NEL FILE ListaIncantesimi.txt<br><br>Il file contiene errori di sintassi JSON (es. virgolette mancanti, chiavi duplicate, o virgole errate).<br><br>Controlla la console del browser (F12) per i dettagli.<br><br>Per ora vengono mostrati i dati predefiniti del codice.</div>`;
                     }
                 } else {
                     spells = defaultSpells;
+                    console.log('File esterno non trovato. Uso dati predefiniti nel codice.');
                 }
             } catch (error) {
                 // Se fallisce (es. file aperto localmente senza server), usa i dati predefiniti
                 spells = defaultSpells;
-                console.log('File esterno non trovato. Uso dati predefiniti nel codice.');
+                console.log('Errore di rete o file locale. Uso dati predefiniti nel codice.');
             }
 
             // Imposta i listener e fa il primo render
