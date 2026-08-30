@@ -7,16 +7,12 @@
     "HighlightBox1": "Concentrazione",
     "ColorHighlightBox1": "Red",
     "HighlightBox2": "",
-    "ColorHighlightBox2": "Green",
+    "ColorHighlightBox2": "",
     "HighlightBox3": "",
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
-    "description": "marchia magicamente una creatura entro gittata e visibile. l'incantatore infligge +1d6 danni da forza extra al bersaglio ogni volta che lo colpisce con un tiro per colpire.
-Inoltre, l'incantatore dispone di vantaggio a qualsiasi prova di Saggezza (Percezione o Sopravvivenza) che effettua per trovare il bersaglio.
-Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo,un’azione bonus sposta il marchio su un'altra creatura entro gittata visibile.
-<b>slot inc. di livello superiore:</b> La concentrazione dell'incantatore può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).
-",
+    "description": "Marchia magicamente una creatura entro gittata e visibile. L'incantatore infligge +1d6 danni da forza extra al bersaglio ogni volta che lo colpisce con un tiro per colpire.<br>Inoltre, l'incantatore dispone di vantaggio a qualsiasi prova di Saggezza (Percezione o Sopravvivenza) che effettua per trovare il bersaglio.<br>Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo, un’azione bonus sposta il marchio su un'altra creatura entro gittata visibile.<br><b>Slot inc. di livello superiore:</b> La concentrazione dell'incantatore può durare di più utilizzando uno slot incantesimo di 3º o 4º livello (fino a 8 ore) o di 5º livello o superiore (fino a 24 ore).",
     "castingTime": "Az. Bonus",
     "savingThrow": "NO",
     "saveOutcome": "",
@@ -50,7 +46,7 @@ Se il bersaglio scende a 0 p.f. prima del termine dell'incantesimo,un’azione b
     "range": "36 metri"
   },
   {
-    "name": "Dardo Infuocato",
+    "name": "Dardo Infuocato 2",
     "level": "Trucco",
     "school": "Evocazione",
     "classes": "Mago, Stregone",
