@@ -67,5 +67,35 @@
     "toHit": true,
     "duration": "Istante",
     "range": "36 metri"
+  },
+  {
+    "name": "Bacche benefiche",
+    "level": "1° Liv.",
+    "school": "Evocazione",
+    "classes": "druido, ranger",
+    "HighlightBox1": "",
+    "ColorHighlightBox1": "",
+    "HighlightBox2": "",
+    "ColorHighlightBox2": "",
+    "HighlightBox3": "",
+    "ColorHighlightBox3": "",
+    "pageNumber": "1/1",
+    "hideTable": false,
+    "description": "Appaiono <b>10 bacche</b> infuse di magia. Una creatura può effettuare un'azione bonus per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento per una giornata . Le bacche non mangiate durano 24 ore.",
+    "castingTime": "Azione",
+    "savingThrow": "DES",
+    "saveOutcome": "Dimezza",
+    "components": { "verbal": true, "somatic": true, "material": true },
+    "material": "un rametto di vischio",
+    "toHit": true,
+    "duration": "24 ore",
+    "range": "se stesso"
   }
+
+
+ 
+
+
+
+
 ]
