@@ -107,33 +107,35 @@
         .card-content { position: relative; z-index: 2; display: flex; flex-direction: column; flex-grow: 1; height: 100%; }
         .card-header { position: relative; margin-bottom: 6px; flex-shrink: 0; }
 
-        /* Contenitore in alto a destra per pagine e riquadri */
-        .top-right-stack {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-            z-index: 5;
-            max-width: 45%; /* Non occupa tutta la card */
-        }
+        .page-number-top { position: absolute; top: 2px; right: 0; font-family: 'Cinzel', serif; font-size: 0.7em; color: var(--ink-medium); font-weight: 700; background: rgba(255,255,255,0.4); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-light); z-index: 5; }
 
-        .page-number-top { font-family: 'Cinzel', serif; font-size: 0.7em; color: var(--ink-medium); font-weight: 700; background: rgba(255,255,255,0.4); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-light); }
-
-        .badges-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
-        .highlight-badge { font-family: 'Cinzel', serif; font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: 3px; white-space: nowrap; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); }
-
-        .theme-selector-wrapper { margin-bottom: 5px; font-size: 0.6em; opacity: 0.9; display: flex; align-items: center; gap: 6px; }
+        .theme-selector-wrapper { margin-bottom: 5px; padding-right: 45px; font-size: 0.6em; opacity: 0.9; display: flex; align-items: center; gap: 6px; }
         .theme-selector-wrapper span { font-family: 'Cinzel', serif; color: var(--ink-medium); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .theme-selector { font-family: 'EB Garamond', serif; font-size: 1em; border: 1px solid var(--border-light); background: rgba(255,255,255,0.5); color: var(--ink-medium); border-radius: 4px; padding: 2px 4px; cursor: pointer; }
         .theme-selector:focus { outline: none; border-color: var(--gold); }
 
-        .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
-        .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; padding-right: 45px; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+        .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; padding-right: 45px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); margin-bottom: 4px; }
+        /* Titolo e Riquadri sulla stessa riga */
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            padding-right: 45px;
+            margin-bottom: 4px;
+        }
+        .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); flex-grow: 1; }
+
+        .badges-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+        .highlight-badge { font-family: 'Cinzel', serif; font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: 3px; white-space: nowrap; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); }
 
         .divider { display: flex; align-items: center; justify-content: center; margin: 7px 0 12px; gap: 8px; flex-shrink: 0; }
         .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); max-width: 65px; }
@@ -145,13 +147,25 @@
 
         .card-bottom-wrapper { margin-top: auto; flex-shrink: 0; }
 
-        .stats-table { width: 100%; border-collapse: collapse; font-size: 0.7em; border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; background: rgba(250,243,227,0.5); table-layout: fixed; }
-        .stats-table td { padding: 4px 6px; border: 1px solid var(--border-light); vertical-align: middle; word-break: break-word; }
-        .stat-label { font-family: 'Cinzel', serif; font-weight: 600; color: var(--ink-medium); background: rgba(196,168,130,0.18); font-size: 0.78em; white-space: nowrap; letter-spacing: 0.3px; width: 22%; overflow: hidden; text-overflow: ellipsis; }
-        .stat-value { color: var(--ink-dark); font-style: italic; font-weight: 500; text-align: center; }
-        .stat-value.no { color: #9a7040; font-weight: 600; font-style: normal; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; }
+        /* Tabella a 6 colonne fisse */
+        .stats-table { width: 100%; border-collapse: collapse; font-size: 0.68em; border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; background: rgba(250,243,227,0.5); table-layout: fixed; }
+        .stats-table td { padding: 4px 5px; border: 1px solid var(--border-light); vertical-align: middle; word-break: break-word; }
+        
+        .stat-label { font-family: 'Cinzel', serif; font-weight: 600; color: var(--ink-medium); background: rgba(196,168,130,0.18); font-size: 0.78em; white-space: nowrap; letter-spacing: 0.3px; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+        .stat-value { color: var(--ink-dark); font-style: italic; font-weight: 500; text-align: left; padding-left: 8px; }
+        .stat-value.no { color: #9a7040; font-weight: 600; font-style: normal; text-transform: uppercase; font-size: 0.88em; letter-spacing: 0.5px; }
 
-        .save-stack, .components-list { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; padding: 2px 0; }
+        /* Allineamento verticale per le celle spanned */
+        .save-stack, .components-list { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start; 
+            gap: 3px; 
+            line-height: 1.2; 
+            padding-left: 8px; 
+            justify-content: center; 
+            height: 100%; 
+        }
         .save-stat { font-style: italic; font-weight: 600; color: var(--ink-dark); }
         .save-cd { font-size: 0.95em; font-weight: 700; color: var(--ink-medium); display: flex; align-items: center; gap: 4px; }
         .save-outcome { font-size: 0.85em; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: var(--gold); }
@@ -160,7 +174,7 @@
         .material-row td { text-align: left; padding: 5px 10px; background: rgba(196,168,130,0.1); }
         .material-row .comp-material-text { display: block; font-size: 0.85em; opacity: 0.8; font-style: italic; line-height: 1.2; white-space: normal; color: var(--ink-medium); }
 
-        .stat-input { background: transparent; border: 1px solid transparent; color: var(--ink-dark); font-family: 'EB Garamond', serif; font-size: 0.95em; font-weight: 700; font-style: normal; text-align: center; width: 35px; cursor: text; padding: 2px 3px; border-radius: 3px; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        .stat-input { background: transparent; border: 1px solid transparent; color: var(--ink-dark); font-family: 'EB Garamond', serif; font-size: 0.95em; font-weight: 700; font-style: normal; text-align: center; width: 80%; max-width: 35px; cursor: text; padding: 2px 3px; border-radius: 3px; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
         .stat-input:hover { border-color: var(--border-light); background: rgba(255,255,255,0.3); }
         .stat-input:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,0.45); }
 
@@ -249,7 +263,7 @@
         <div class="info-note">
             💡 <strong>Struttura Dati:</strong>usa <code>ListaIncantesimi.txt</code>.<br>
             🎨 <strong>Riquadri:</strong> Usa <code>"HighlightBox1": "Testo"</code> e <code>"ColorHighlightBox1": "Red"</code> (fino a 3 box). Colori supportati: Red, Green, Blue, Purple, Orange, Gold, Black, Gray.<br>
-            📊 <strong>Tabella Intelligente:</strong> Se "Tiro Salvezza" e "Tiro per colpire" sono <code>"NO"</code>, le righe vengono omesse e Gittata/Componenti si allineano.
+            📊 <strong>Tabella:</strong> Struttura su 3 righe. Componenti a destra su 3 righe, Tiro Salvezza a sinistra su 2 righe, Tiro per colpire a sinistra su 1 riga.
         </div>
     </div>
 
@@ -257,7 +271,7 @@
 
     <script>
         /* ================================================================
-           DATI PREDEFINITI (Esempio con nuova struttura HighlightBox)
+           DATI PREDEFINITI 
            ================================================================ */
         const defaultSpells = [
             {
@@ -291,8 +305,6 @@
         /* ================================================================
            LOGICA DI RENDERING E FILTRI
            ================================================================ */
-        
-        // Mappatura colori HTML/JS in gradienti CSS belli
         function getColorFromString(colorStr) {
             if (!colorStr) return 'transparent';
             const c = colorStr.toLowerCase();
@@ -306,7 +318,7 @@
                 'black': 'linear-gradient(135deg, #1a1a1a, #333333)',
                 'gray': 'linear-gradient(135deg, #7f8c8d, #95a5a6)'
             };
-            return map[c] || colorStr; // Fallback al colore grezzo se non mappato
+            return map[c] || colorStr;
         }
 
         function populateFilters() {
@@ -412,28 +424,19 @@
                 const vToHit   = getCardValue(spellIndex, 'toHit');
                 const vTheme   = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
 
-                // Costruzione stack in alto a destra (Pagine + Badge)
-                let topRightHTML = '<div class="top-right-stack">';
-                if (spell.pageNumber && spell.pageNumber !== "1/1") {
-                    topRightHTML += `<div class="page-number-top">${spell.pageNumber}</div>`;
-                }
-                
-                let hasBadges = false;
+                // Costruzione Riquadri Highlight
                 let badgesHTML = '<div class="badges-container">';
                 for (let i = 1; i <= 3; i++) {
                     const boxText = spell[`HighlightBox${i}`];
                     const boxColor = spell[`ColorHighlightBox${i}`];
                     if (boxText) {
-                        hasBadges = true;
                         const bgColor = getColorFromString(boxColor);
                         badgesHTML += `<div class="highlight-badge" style="background: ${bgColor};">${boxText}</div>`;
                     }
                 }
                 badgesHTML += '</div>';
-                if (hasBadges) topRightHTML += badgesHTML;
-                topRightHTML += '</div>';
 
-                // Componenti
+                // Componenti (corpo della cella)
                 let compWordsHTML = '<div class="components-list">';
                 if (spell.components.verbal)  compWordsHTML += '<span class="comp-word">Verbale</span>';
                 if (spell.components.somatic) compWordsHTML += '<span class="comp-word">Somatica</span>';
@@ -442,83 +445,56 @@
 
                 let materialRowHTML = '';
                 if (spell.components.material && spell.material) {
-                    materialRowHTML = `<tr class="material-row"><td colspan="4"><span class="comp-material-text">${spell.material}</span></td></tr>`;
+                    materialRowHTML = `<tr class="material-row"><td colspan="6"><span class="comp-material-text">${spell.material}</span></td></tr>`;
                 }
 
-                // Celle Tabella
-                let saveCellHTML;
+                // Contenuto Tiro Salvezza
+                let saveCellContent;
                 if (spell.savingThrow === "NO") {
-                    saveCellHTML = '<td class="stat-value no">NO</td>';
+                    saveCellContent = '<span class="stat-value no">NO</span>';
                 } else {
-                    saveCellHTML = `<td class="stat-value"><div class="save-stack"><span class="save-stat">${spell.savingThrow}</span><span class="save-cd">CD <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span><span class="save-outcome">${spell.saveOutcome}</span></div></td>`;
+                    saveCellContent = `<div class="save-stack"><span class="save-stat">${spell.savingThrow}</span><span class="save-cd">CD <input type="text" class="stat-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span><span class="save-outcome">${spell.saveOutcome}</span></div>`;
                 }
 
-                let toHitCellHTML;
-                if (!spell.toHit) {
-                    toHitCellHTML = '<td class="stat-value no">NO</td>';
+                // Contenuto Tiro per colpire
+                let toHitCellContent;
+                if (!spell.toHit || spell.toHit === "NO") {
+                    toHitCellContent = '<span class="stat-value no">NO</span>';
                 } else {
-                    toHitCellHTML = `<td class="stat-value"><input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}"></td>`;
+                    toHitCellContent = `<input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}">`;
                 }
 
-                // Logica Tabella Dinamica
-                const isToHit = spell.toHit && spell.toHit !== "NO";
-                const isSave = spell.savingThrow && spell.savingThrow !== "NO";
-                
-                let tableRowsHTML = `
-                    <tr>
-                        <td class="stat-label">Tempo di Lancio</td><td class="stat-value">${spell.castingTime}</td>
-                        <td class="stat-label">Durata</td><td class="stat-value">${spell.duration}</td>
-                    </tr>
+                // Costruzione Tabella Statica a 6 colonne
+                // Riga 1: Tempo, Durata, Gittata
+                // Riga 2: Tiro Salvezza (rowspan 2), Tiro per colpire (rowspan 1) -- Wait, the logic below is correct.
+                let tableHTML = `
+                    <table class="stats-table">
+                        <tr>
+                            <td class="stat-label">Tempo</td>
+                            <td class="stat-value">${spell.castingTime}</td>
+                            <td class="stat-label">Durata</td>
+                            <td class="stat-value">${spell.duration}</td>
+                            <td class="stat-label">Gittata</td>
+                            <td class="stat-value">${spell.range}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label" rowspan="2">Tiro Salvezza</td>
+                            <td class="stat-value" rowspan="2" colspan="2">${saveCellContent}</td>
+                            <td class="stat-label" rowspan="3">Componenti</td>
+                            <td class="stat-value" rowspan="3" colspan="2">${compWordsHTML}</td>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                            <td class="stat-label">Tiro per colpire</td>
+                            <td class="stat-value" colspan="2">${toHitCellContent}</td>
+                        </tr>
+                        ${materialRowHTML}
+                    </table>
                 `;
 
-                if (!isToHit && !isSave) {
-                    // Entrambi NO: uniamo Gittata e Componenti
-                    tableRowsHTML += `
-                        <tr>
-                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
-                            <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
-                        </tr>
-                    `;
-                } else if (isToHit && !isSave) {
-                    // Solo Tiro per colpire
-                    tableRowsHTML += `
-                        <tr>
-                            <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
-                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
-                        </tr>
-                        <tr>
-                            <td class="stat-label">Componenti</td><td class="stat-value" colspan="3">${compWordsHTML}</td>
-                        </tr>
-                    `;
-                } else if (!isToHit && isSave) {
-                    // Solo Tiro Salvezza
-                    tableRowsHTML += `
-                        <tr>
-                            <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
-                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
-                        </tr>
-                        <tr>
-                            <td class="stat-label">Componenti</td><td class="stat-value" colspan="3">${compWordsHTML}</td>
-                        </tr>
-                    `;
-                } else {
-                    // Entrambi presenti (layout standard)
-                    tableRowsHTML += `
-                        <tr>
-                            <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
-                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
-                        </tr>
-                        <tr>
-                            <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
-                            <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
-                        </tr>
-                    `;
-                }
+                if (spell.hideTable) tableHTML = '';
 
-                let tableHTML = '';
-                if (!spell.hideTable) {
-                    tableHTML = `<table class="stats-table">${tableRowsHTML}${materialRowHTML}</table>`;
-                }
+                const pageNumHTML = (spell.pageNumber && spell.pageNumber !== "1/1") ? `<div class="page-number-top">${spell.pageNumber}</div>` : '';
 
                 const card = document.createElement('div');
                 card.className = 'spell-card ' + vTheme;
@@ -526,7 +502,7 @@
                     <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
                     <div class="card-content">
                         <div class="card-header">
-                            ${topRightHTML}
+                            ${pageNumHTML}
                             <div class="theme-selector-wrapper">
                                 <span>Tema:</span>
                                 <select class="theme-selector" data-spell="${spellIndex}" data-field="theme">
@@ -551,7 +527,11 @@
                                 (<input type="text" class="stat-input-inline card-bonus" data-spell="${spellIndex}" data-field="bonus" value="${vBonus}" size="2">)
                             </div>
                             <div class="spell-classes">${spell.classes}</div>
-                            <div class="spell-title">${spell.name}</div>
+                            
+                            <div class="title-row">
+                                <div class="spell-title">${spell.name}</div>
+                                ${badgesHTML}
+                            </div>
                         </div>
                         <div class="divider"><span class="divider-line"></span><span class="divider-icon">✦</span><span class="divider-line"></span></div>
                         <div class="spell-description">${spell.description}</div>
@@ -578,7 +558,7 @@
         }
 
         // =========================================================
-        // INIZIALIZZAZIONE ASINCRONA (Carica file txt se presente)
+        // INIZIALIZZAZIONE ASINCRONA
         // =========================================================
         async function initializePage() {
             const statusDiv = document.getElementById('loadStatus');
