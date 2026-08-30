@@ -135,9 +135,33 @@
     "material": "",
     "toHit": true,
     "duration": "1 ora",
-    "range": "9m\6q"
+    "range": "9m/6q"
+  },
+  {
+    "name": "individuazione del magico",
+    "level": "1° Liv.",
+    "school": "Divinazione",
+    "classes": "bardo, chierico, druido, mago, paladino, ranger, stregone, warlock",
+    "castingTime": "Azione",    
+    "HighlightBox1": "concentrazione",
+    "ColorHighlightBox1": "red",
+    "HighlightBox2": "",
+    "ColorHighlightBox2": "",
+    "HighlightBox3": "",
+    "ColorHighlightBox3": "",
+    "pageNumber": "1/1",
+    "hideTable": false,
+    "description": "l'incantatore percepisce la presenza di effetti magici entro <b>9m/6q</b> da sé. Se percepisce tali effetti, può eseguire un <b>azione bonus</b> per vedere una debole aura attorno a ogni creatura o oggetto visibile nell'area che contenga magia per capire la <b>scuola di magia</b> si tratta, se ne esiste una.L'incantesimo viene bloccato da 30 cm di pietra, terriccio o legno, 2,5 centimetri di metallo o una sottile lamina di piombo.",
+    "savingThrow": "SAG",
+    "saveOutcome": "Nega",
+    "components": { "verbal": true, "somatic": true, "material": false },
+    "material": "",
+    "toHit": true,
+    "duration": "10 min",
+    "range": "se stesso"
   }
 
+ 
 
 
 
