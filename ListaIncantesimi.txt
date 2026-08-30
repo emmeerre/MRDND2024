@@ -8,7 +8,7 @@
     "ColorHighlightBox1": "Red",
     "HighlightBox2": "Rituale",
     "ColorHighlightBox2": "Green",
-    "HighlightBox3": "",
+    "HighlightBox3": "Forma Animale",
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
