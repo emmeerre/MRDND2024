@@ -128,7 +128,7 @@
     "ColorHighlightBox3": "",
     "pageNumber": "1/1",
     "hideTable": false,
-    "Un umanoide entro gittata visibile effettua un <b>tiro salvezza su Saggezza</b>, disponendo di vantaggio se l'incantatore o i suoi alleati stanno combattendo contro di essa. In caso di fallimento, il bersaglio è affascinato fino al termine dell'incantesimo o finché non gli vengono inflitti danni dall'incantatore o i suoi alleati. La creatura affascinata è amichevole nei confronti dell'incantatore. Al termine dell'incantesimo, il bersaglio capirà di essere stato affascinato dall'incantatore.<br><b>incantesimo di livello superior:</b> L'incantatore può bersagliare una creatura aggiuntiva per ogni slot di livello superiore al 1º.",
+    "description": "Un umanoide entro gittata visibile effettua un <b>tiro salvezza su Saggezza</b>, disponendo di vantaggio se l'incantatore o i suoi alleati stanno combattendo contro di essa. In caso di fallimento, il bersaglio è affascinato fino al termine dell'incantesimo o finché non gli vengono inflitti danni dall'incantatore o i suoi alleati. La creatura affascinata è amichevole nei confronti dell'incantatore. Al termine dell'incantesimo, il bersaglio capirà di essere stato affascinato dall'incantatore.<br><b>incantesimo di livello superiore:</b> L'incantatore può bersagliare una creatura aggiuntiva per ogni slot di livello superiore al 1º.",
     "savingThrow": "SAG",
     "saveOutcome": "Nega",
     "components": { "verbal": true, "somatic": true, "material": false },
