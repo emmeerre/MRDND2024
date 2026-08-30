@@ -18,10 +18,6 @@
             --gold-light: #d4af37;
             --border: #c4a882;
             --border-light: #d4bc94;
-            --conc-bg: #a02828;
-            --conc-light: #c0392b;
-            --ritual-bg: #1e8449;
-            --ritual-light: #2ecc71;
         }
 
         body {
@@ -53,74 +49,41 @@
         .controls h1 { font-family: 'Cinzel', serif; font-size: 1.6em; color: var(--gold-light); letter-spacing: 1px; }
         .controls-subtitle { font-size: 0.85em; color: #a08060; margin-left: auto; }
 
-        /* Status Bar per il Fetch */
-        .load-status {
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-family: 'EB Garamond', serif;
-            font-size: 0.9em;
-            border: 1px solid;
-        }
+        .load-status { padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; font-family: 'EB Garamond', serif; font-size: 0.9em; border: 1px solid; }
         .status-success { background: rgba(46, 204, 113, 0.15); border-color: #2ecc71; color: #2ecc71; }
         .status-warning { background: rgba(241, 196, 15, 0.15); border-color: #f1c40f; color: #f1c40f; }
         .status-error { background: rgba(231, 76, 60, 0.15); border-color: #e74c3c; color: #e74c3c; }
 
-        .caster-global {
-            display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;
-            margin-bottom: 20px; padding: 16px 18px;
-            background: rgba(212,175,55,0.06); border-radius: 10px;
-            border: 1px solid rgba(212,175,55,0.15);
-        }
+        .caster-global { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 20px; padding: 16px 18px; background: rgba(212,175,55,0.06); border-radius: 10px; border: 1px solid rgba(212,175,55,0.15); }
         .caster-global h3 { width: 100%; font-family: 'Cinzel', serif; font-size: 0.85em; color: var(--gold-light); margin-bottom: 8px; letter-spacing: 1px; }
         .caster-field { display: flex; flex-direction: column; gap: 4px; }
         .caster-field label { font-size: 0.7em; color: #a08060; text-transform: uppercase; letter-spacing: 0.5px; }
-        .caster-field input, .caster-field select, .filter-bar input, .filter-bar select {
-            background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2);
-            color: #e8d5b0; padding: 8px 12px; border-radius: 6px;
-            font-family: 'EB Garamond', serif; font-size: 1em; cursor: pointer;
-        }
+        .caster-field input, .caster-field select, .filter-bar input, .filter-bar select { background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2); color: #e8d5b0; padding: 8px 12px; border-radius: 6px; font-family: 'EB Garamond', serif; font-size: 1em; cursor: pointer; }
         .caster-field select { width: 110px; }
-        .caster-field input:focus, .caster-field select:focus, .filter-bar input:focus, .filter-bar select:focus {
-            outline: none; border-color: var(--gold-light); box-shadow: 0 0 8px rgba(212,175,55,0.2);
-        }
+        .caster-field input:focus, .caster-field select:focus, .filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: var(--gold-light); box-shadow: 0 0 8px rgba(212,175,55,0.2); }
 
         .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
         .filter-bar input { flex: 1; min-width: 180px; }
         .filter-bar select { min-width: 140px; }
 
         .spell-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-        .spell-checkbox {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.04); padding: 7px 14px;
-            border-radius: 8px; cursor: pointer; transition: all 0.2s;
-            border: 1px solid rgba(212,175,55,0.1); font-size: 0.92em;
-        }
+        .spell-checkbox { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.04); padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(212,175,55,0.1); font-size: 0.92em; }
         .spell-checkbox:hover { background: rgba(212,175,55,0.1); border-color: rgba(212,175,55,0.3); }
         .spell-checkbox input { accent-color: var(--gold-light); cursor: pointer; }
         .spell-checkbox em { color: #a08060; font-size: 0.85em; font-style: italic; }
 
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn {
-            background: var(--gold-light); color: #1a1208; border: none;
-            padding: 10px 22px; border-radius: 8px; font-family: 'Cinzel', serif;
-            font-weight: 600; font-size: 0.85em; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;
-        }
+        .btn { background: var(--gold-light); color: #1a1208; border: none; padding: 10px 22px; border-radius: 8px; font-family: 'Cinzel', serif; font-weight: 600; font-size: 0.85em; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
         .btn:hover { background: #e6c558; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
         .btn-secondary { background: transparent; border: 1px solid rgba(212,175,55,0.4); color: var(--gold-light); }
         .btn-secondary:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-light); }
 
-        .info-note {
-            margin-top: 14px; padding: 12px 16px; background: rgba(212,175,55,0.06);
-            border-left: 3px solid var(--gold); border-radius: 4px;
-            font-size: 0.82em; color: #b8a080; line-height: 1.7;
-        }
+        .info-note { margin-top: 14px; padding: 12px 16px; background: rgba(212,175,55,0.06); border-left: 3px solid var(--gold); border-radius: 4px; font-size: 0.82em; color: #b8a080; line-height: 1.7; }
         .info-note code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; color: var(--gold-light); font-size: 0.9em; font-family: 'Courier New', monospace; }
 
         /* ===================== GRIGLIA CARDS ===================== */
         .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 210mm; margin: 0 auto; align-items: stretch; }
         .empty-msg { grid-column: 1 / -1; text-align: center; color: #88775a; padding: 80px 20px; font-size: 1.2em; font-style: italic; }
-        .error-msg { grid-column: 1 / -1; text-align: left; color: #ffaaaa; padding: 20px; font-size: 1em; background: #4a0000; border: 1px solid #ff0000; border-radius: 8px; white-space: pre-wrap; font-family: monospace; }
 
         /* ===================== SINGOLA CARD ===================== */
         .spell-card {
@@ -144,48 +107,33 @@
         .card-content { position: relative; z-index: 2; display: flex; flex-direction: column; flex-grow: 1; height: 100%; }
         .card-header { position: relative; margin-bottom: 6px; flex-shrink: 0; }
 
-        .page-number-top {
-            position: absolute; top: 2px; right: 0; font-family: 'Cinzel', serif;
-            font-size: 0.7em; color: var(--ink-medium); font-weight: 700;
-            background: rgba(255,255,255,0.4); padding: 2px 8px;
-            border-radius: 4px; border: 1px solid var(--border-light); z-index: 5;
+        /* Contenitore in alto a destra per pagine e riquadri */
+        .top-right-stack {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+            z-index: 5;
+            max-width: 45%; /* Non occupa tutta la card */
         }
 
-        .theme-selector-wrapper {
-            margin-bottom: 5px; padding-right: 45px; font-size: 0.6em; opacity: 0.9;
-            display: flex; align-items: center; gap: 6px;
-        }
+        .page-number-top { font-family: 'Cinzel', serif; font-size: 0.7em; color: var(--ink-medium); font-weight: 700; background: rgba(255,255,255,0.4); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-light); }
+
+        .badges-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+        .highlight-badge { font-family: 'Cinzel', serif; font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: 3px; white-space: nowrap; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); }
+
+        .theme-selector-wrapper { margin-bottom: 5px; font-size: 0.6em; opacity: 0.9; display: flex; align-items: center; gap: 6px; }
         .theme-selector-wrapper span { font-family: 'Cinzel', serif; color: var(--ink-medium); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .theme-selector {
-            font-family: 'EB Garamond', serif; font-size: 1em;
-            border: 1px solid var(--border-light); background: rgba(255,255,255,0.5);
-            color: var(--ink-medium); border-radius: 4px; padding: 2px 4px; cursor: pointer;
-        }
+        .theme-selector { font-family: 'EB Garamond', serif; font-size: 1em; border: 1px solid var(--border-light); background: rgba(255,255,255,0.5); color: var(--ink-medium); border-radius: 4px; padding: 2px 4px; cursor: pointer; }
         .theme-selector:focus { outline: none; border-color: var(--gold); }
 
-        .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; padding-right: 45px; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
-        .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; padding-right: 45px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+        .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* Nuovo layout Titolo + Badge su un'unica riga */
-        .title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            padding-right: 45px;
-            margin-bottom: 4px;
-        }
-        .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
-
-        .badges-container {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
-            align-items: center;
-        }
-        .conc-badge, .ritual-badge { font-family: 'Cinzel', serif; font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: 3px; white-space: nowrap; color: #fff; align-self: center; }
-        .conc-badge { background: linear-gradient(135deg, var(--conc-bg), var(--conc-light)); box-shadow: 0 2px 6px rgba(192,57,43,0.4); }
-        .ritual-badge { background: linear-gradient(135deg, var(--ritual-bg), var(--ritual-light)); box-shadow: 0 2px 6px rgba(46,204,113,0.4); }
+        .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); margin-bottom: 4px; }
 
         .divider { display: flex; align-items: center; justify-content: center; margin: 7px 0 12px; gap: 8px; flex-shrink: 0; }
         .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); max-width: 65px; }
@@ -253,10 +201,7 @@
             <span class="controls-subtitle">D&D 5ª Edizione</span>
         </div>
 
-        <!-- Indicatore Stato Caricamento Dati -->
-        <div id="loadStatus" class="load-status status-warning">
-            ⏳ Caricamento dati in corso...
-        </div>
+        <div id="loadStatus" class="load-status status-warning">⏳ Caricamento dati in corso...</div>
 
         <div class="caster-global">
             <h3>✦ Dati Incantatore — Valori predefiniti per tutte le card</h3>
@@ -302,9 +247,9 @@
         </div>
 
         <div class="info-note">
-            💡 <strong>Come aggiungere un incantesimo:</strong> crea un file di testo chiamato esattamente <code>ListaIncantesimi.txt</code> nella stessa cartella di questo file HTML su GitHub.<br>
-            All'interno del file, inserisci un array JSON valido. Ricorda: tutte le chiavi devono avere le virgolette (es. <code>"name"</code>) e non devono esserci campi duplicati.<br>
-            📝 <strong>Grassetto:</strong> usa <code>&lt;b&gt;testo&lt;/b&gt;</code> nella descrizione.
+            💡 <strong>Struttura Dati:</strong>usa <code>ListaIncantesimi.txt</code>.<br>
+            🎨 <strong>Riquadri:</strong> Usa <code>"HighlightBox1": "Testo"</code> e <code>"ColorHighlightBox1": "Red"</code> (fino a 3 box). Colori supportati: Red, Green, Blue, Purple, Orange, Gold, Black, Gray.<br>
+            📊 <strong>Tabella Intelligente:</strong> Se "Tiro Salvezza" e "Tiro per colpire" sono <code>"NO"</code>, le righe vengono omesse e Gittata/Componenti si allineano.
         </div>
     </div>
 
@@ -312,7 +257,7 @@
 
     <script>
         /* ================================================================
-           DATI PREDEFINITI (Usati se ListaIncantesimi.txt non esiste o va in errore)
+           DATI PREDEFINITI (Esempio con nuova struttura HighlightBox)
            ================================================================ */
         const defaultSpells = [
             {
@@ -320,11 +265,15 @@
                 "level": "1° Livello",
                 "school": "Trasmutazione",
                 "classes": "Druido, Ranger",
-                "concentration": false,
-                "ritual": true,
+                "HighlightBox1": "Rituale",
+                "ColorHighlightBox1": "Green",
+                "HighlightBox2": "",
+                "ColorHighlightBox2": "",
+                "HighlightBox3": "",
+                "ColorHighlightBox3": "",
                 "pageNumber": "1/1",
                 "hideTable": false,
-                "description": "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata. Le bacche non mangiate scompaiono al termine dell'incantesimo.",
+                "description": "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata.",
                 "castingTime": "1 Azione",
                 "savingThrow": "NO",
                 "saveOutcome": "",
@@ -342,6 +291,24 @@
         /* ================================================================
            LOGICA DI RENDERING E FILTRI
            ================================================================ */
+        
+        // Mappatura colori HTML/JS in gradienti CSS belli
+        function getColorFromString(colorStr) {
+            if (!colorStr) return 'transparent';
+            const c = colorStr.toLowerCase();
+            const map = {
+                'red': 'linear-gradient(135deg, #c0392b, #e74c3c)',
+                'green': 'linear-gradient(135deg, #1e8449, #2ecc71)',
+                'blue': 'linear-gradient(135deg, #2980b9, #3498db)',
+                'purple': 'linear-gradient(135deg, #8e44ad, #9b59b6)',
+                'orange': 'linear-gradient(135deg, #d35400, #e67e22)',
+                'gold': 'linear-gradient(135deg, #b8860b, #d4af37)',
+                'black': 'linear-gradient(135deg, #1a1a1a, #333333)',
+                'gray': 'linear-gradient(135deg, #7f8c8d, #95a5a6)'
+            };
+            return map[c] || colorStr; // Fallback al colore grezzo se non mappato
+        }
+
         function populateFilters() {
             const schools = [...new Set(spells.map(s => s.school))].sort();
             const levels = [...new Set(spells.map(s => s.level))].sort();
@@ -358,13 +325,12 @@
         function renderControls() {
             const list = document.getElementById('spellList');
             list.innerHTML = '';
+            let visibleCount = 0;
 
             const nameQuery = document.getElementById('searchName').value.toLowerCase();
             const schoolQuery = document.getElementById('filterSchool').value;
             const levelQuery = document.getElementById('filterLevel').value;
             const classQuery = document.getElementById('filterClass').value;
-
-            let visibleCount = 0;
 
             spells.forEach((spell, i) => {
                 const matchesName = spell.name.toLowerCase().includes(nameQuery);
@@ -400,9 +366,7 @@
         }
 
         function getCardValue(index, field) {
-            if (cardOverrides[index] && cardOverrides[index][field] !== undefined) {
-                return cardOverrides[index][field];
-            }
+            if (cardOverrides[index] && cardOverrides[index][field] !== undefined) return cardOverrides[index][field];
             if (getGlobalCaster()[field] !== undefined) return getGlobalCaster()[field];
             return undefined;
         }
@@ -412,10 +376,7 @@
             cardOverrides[index][field] = value;
         }
 
-        function applyGlobalToAll() {
-            cardOverrides = {};
-            renderCards();
-        }
+        function applyGlobalToAll() { cardOverrides = {}; renderCards(); }
 
         function guessDefaultTheme(spell) {
             const c = spell.classes.toLowerCase();
@@ -449,11 +410,30 @@
                 const vBonus   = getCardValue(spellIndex, 'bonus');
                 const vCD      = getCardValue(spellIndex, 'cd');
                 const vToHit   = getCardValue(spellIndex, 'toHit');
+                const vTheme   = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
+
+                // Costruzione stack in alto a destra (Pagine + Badge)
+                let topRightHTML = '<div class="top-right-stack">';
+                if (spell.pageNumber && spell.pageNumber !== "1/1") {
+                    topRightHTML += `<div class="page-number-top">${spell.pageNumber}</div>`;
+                }
                 
-                const vTheme = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
+                let hasBadges = false;
+                let badgesHTML = '<div class="badges-container">';
+                for (let i = 1; i <= 3; i++) {
+                    const boxText = spell[`HighlightBox${i}`];
+                    const boxColor = spell[`ColorHighlightBox${i}`];
+                    if (boxText) {
+                        hasBadges = true;
+                        const bgColor = getColorFromString(boxColor);
+                        badgesHTML += `<div class="highlight-badge" style="background: ${bgColor};">${boxText}</div>`;
+                    }
+                }
+                badgesHTML += '</div>';
+                if (hasBadges) topRightHTML += badgesHTML;
+                topRightHTML += '</div>';
 
-                const pageNumHTML = (spell.pageNumber && spell.pageNumber !== "1/1") ? `<div class="page-number-top">${spell.pageNumber}</div>` : '';
-
+                // Componenti
                 let compWordsHTML = '<div class="components-list">';
                 if (spell.components.verbal)  compWordsHTML += '<span class="comp-word">Verbale</span>';
                 if (spell.components.somatic) compWordsHTML += '<span class="comp-word">Somatica</span>';
@@ -465,6 +445,7 @@
                     materialRowHTML = `<tr class="material-row"><td colspan="4"><span class="comp-material-text">${spell.material}</span></td></tr>`;
                 }
 
+                // Celle Tabella
                 let saveCellHTML;
                 if (spell.savingThrow === "NO") {
                     saveCellHTML = '<td class="stat-value no">NO</td>';
@@ -479,30 +460,64 @@
                     toHitCellHTML = `<td class="stat-value"><input type="text" class="stat-input" data-spell="${spellIndex}" data-field="toHit" value="${vToHit}"></td>`;
                 }
 
-                let badgesHTML = '<div class="badges-container">';
-                if (spell.concentration) badgesHTML += '<div class="conc-badge">Concentrazione</div>';
-                if (spell.ritual) badgesHTML += '<div class="ritual-badge">Rituale</div>';
-                badgesHTML += '</div>';
+                // Logica Tabella Dinamica
+                const isToHit = spell.toHit && spell.toHit !== "NO";
+                const isSave = spell.savingThrow && spell.savingThrow !== "NO";
+                
+                let tableRowsHTML = `
+                    <tr>
+                        <td class="stat-label">Tempo di Lancio</td><td class="stat-value">${spell.castingTime}</td>
+                        <td class="stat-label">Durata</td><td class="stat-value">${spell.duration}</td>
+                    </tr>
+                `;
+
+                if (!isToHit && !isSave) {
+                    // Entrambi NO: uniamo Gittata e Componenti
+                    tableRowsHTML += `
+                        <tr>
+                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
+                            <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
+                        </tr>
+                    `;
+                } else if (isToHit && !isSave) {
+                    // Solo Tiro per colpire
+                    tableRowsHTML += `
+                        <tr>
+                            <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
+                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label">Componenti</td><td class="stat-value" colspan="3">${compWordsHTML}</td>
+                        </tr>
+                    `;
+                } else if (!isToHit && isSave) {
+                    // Solo Tiro Salvezza
+                    tableRowsHTML += `
+                        <tr>
+                            <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
+                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label">Componenti</td><td class="stat-value" colspan="3">${compWordsHTML}</td>
+                        </tr>
+                    `;
+                } else {
+                    // Entrambi presenti (layout standard)
+                    tableRowsHTML += `
+                        <tr>
+                            <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
+                            <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
+                            <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
+                        </tr>
+                    `;
+                }
 
                 let tableHTML = '';
                 if (!spell.hideTable) {
-                    tableHTML = `
-                        <table class="stats-table">
-                            <tr>
-                                <td class="stat-label">Tempo di Lancio</td><td class="stat-value">${spell.castingTime}</td>
-                                <td class="stat-label">Durata</td><td class="stat-value">${spell.duration}</td>
-                            </tr>
-                            <tr>
-                                <td class="stat-label">Tiro per colpire</td>${toHitCellHTML}
-                                <td class="stat-label">Gittata</td><td class="stat-value">${spell.range}</td>
-                            </tr>
-                            <tr>
-                                <td class="stat-label">Tiro Salvezza</td>${saveCellHTML}
-                                <td class="stat-label">Componenti</td><td class="stat-value">${compWordsHTML}</td>
-                            </tr>
-                            ${materialRowHTML}
-                        </table>
-                    `;
+                    tableHTML = `<table class="stats-table">${tableRowsHTML}${materialRowHTML}</table>`;
                 }
 
                 const card = document.createElement('div');
@@ -511,7 +526,7 @@
                     <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
                     <div class="card-content">
                         <div class="card-header">
-                            ${pageNumHTML}
+                            ${topRightHTML}
                             <div class="theme-selector-wrapper">
                                 <span>Tema:</span>
                                 <select class="theme-selector" data-spell="${spellIndex}" data-field="theme">
@@ -536,17 +551,11 @@
                                 (<input type="text" class="stat-input-inline card-bonus" data-spell="${spellIndex}" data-field="bonus" value="${vBonus}" size="2">)
                             </div>
                             <div class="spell-classes">${spell.classes}</div>
-                            
-                            <div class="title-row">
-                                <div class="spell-title">${spell.name}</div>
-                                ${badgesHTML}
-                            </div>
+                            <div class="spell-title">${spell.name}</div>
                         </div>
                         <div class="divider"><span class="divider-line"></span><span class="divider-icon">✦</span><span class="divider-line"></span></div>
                         <div class="spell-description">${spell.description}</div>
-                        <div class="card-bottom-wrapper">
-                            ${tableHTML}
-                        </div>
+                        <div class="card-bottom-wrapper">${tableHTML}</div>
                     </div>
                 `;
 
@@ -572,13 +581,9 @@
         // INIZIALIZZAZIONE ASINCRONA (Carica file txt se presente)
         // =========================================================
         async function initializePage() {
-            const grid = document.getElementById('cardsGrid');
             const statusDiv = document.getElementById('loadStatus');
-            
             try {
-                // Aggiungo un parametro cache-busting per forzare GitHub a dare il file più recente
                 const response = await fetch('ListaIncantesimi.txt?v=' + Date.now());
-                
                 if (response.ok) {
                     const text = await response.text();
                     try {
@@ -594,13 +599,12 @@
                         }
                     } catch (parseError) {
                         spells = defaultSpells;
-                        statusDiv.innerHTML = "❌ Errore di sintassi JSON nel file ListaIncantesimi.txt! Uso dati predefiniti. Controlla virgolette e virgole.";
+                        statusDiv.innerHTML = "❌ Errore di sintassi JSON nel file ListaIncantesimi.txt! Uso dati predefiniti.";
                         statusDiv.className = "load-status status-error";
-                        console.error('Errore di parsing JSON:', parseError);
                     }
                 } else {
                     spells = defaultSpells;
-                    statusDiv.innerHTML = "⚠️ File <strong>ListaIncantesimi.txt</strong> non trovato (Errore " + response.status + "). Assicurati che il nome sia esatto e sia nella stessa cartella dell'HTML. Uso dati predefiniti.";
+                    statusDiv.innerHTML = "⚠️ File <strong>ListaIncantesimi.txt</strong> non trovato (Errore " + response.status + "). Uso dati predefiniti.";
                     statusDiv.className = "load-status status-warning";
                 }
             } catch (error) {
@@ -609,7 +613,6 @@
                 statusDiv.className = "load-status status-warning";
             }
 
-            // Imposta i listener e fa il primo render
             populateFilters();
             document.getElementById('searchName').addEventListener('input', renderControls);
             document.getElementById('filterSchool').addEventListener('change', renderControls);
@@ -624,7 +627,6 @@
             renderCards();
         }
 
-        // Avvia la pagina
         initializePage();
     </script>
 </body>
