@@ -54,15 +54,17 @@
         .status-warning { background: rgba(241, 196, 15, 0.15); border-color: #f1c40f; color: #f1c40f; }
         .status-error { background: rgba(231, 76, 60, 0.15); border-color: #e74c3c; color: #e74c3c; }
 
-        .file-loader { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .file-loader { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         .file-loader label { font-size: 0.8em; color: #a08060; width: 100%; margin-bottom: -5px; }
-        .file-links { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 200px; }
+        .file-links { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 200px; align-items: center; }
         .file-link-btn { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); color: #e8d5b0; padding: 5px 12px; border-radius: 15px; font-size: 0.8em; cursor: pointer; transition: all 0.2s; }
         .file-link-btn:hover { background: rgba(212,175,55,0.3); }
         .file-link-btn.active { background: var(--gold-light); color: #1a1208; border-color: var(--gold-light); font-weight: bold; }
         
         .manual-load { display: flex; gap: 5px; align-items: center; }
-        .manual-load input { background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2); color: #e8d5b0; padding: 6px 10px; border-radius: 6px; font-family: 'EB Garamond', serif; font-size: 0.85em; width: 180px; }
+        .manual-load input { background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2); color: #e8d5b0; padding: 6px 10px; border-radius: 6px; font-family: 'EB Garamond', serif; font-size: 0.85em; width: 150px; }
+        
+        .local-io { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .caster-global { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 20px; padding: 16px 18px; background: rgba(212,175,55,0.06); border-radius: 10px; border: 1px solid rgba(212,175,55,0.15); }
         .caster-global h3 { width: 100%; font-family: 'Cinzel', serif; font-size: 0.85em; color: var(--gold-light); margin-bottom: 8px; letter-spacing: 1px; }
@@ -87,8 +89,9 @@
         .btn:hover { background: #e6c558; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
         .btn-secondary { background: transparent; border: 1px solid rgba(212,175,55,0.4); color: var(--gold-light); }
         .btn-secondary:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-light); }
+        .btn-sm { padding: 6px 12px; font-size: 0.8em; }
 
-        .info-note { margin-top: 14px; padding: 12px 16px; background: rgba(212,175,55,0.06); border-left: 3px solid var(--gold); border-radius: 4px; font-size: 0.82em; color: #b8a080; line-height: 1.7; display: none; } /* Nascosto di default */
+        .info-note { margin-top: 14px; padding: 12px 16px; background: rgba(212,175,55,0.06); border-left: 3px solid var(--gold); border-radius: 4px; font-size: 0.82em; color: #b8a080; line-height: 1.7; display: none; }
         .info-note.visible { display: block; }
         .info-note code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; color: var(--gold-light); font-size: 0.9em; font-family: 'Courier New', monospace; }
 
@@ -128,22 +131,10 @@
         .spell-meta { font-family: 'Cinzel', serif; font-size: 0.52em; color: var(--gold); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; font-weight: 600; padding-right: 45px; display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
         .spell-classes { font-family: 'EB Garamond', serif; font-size: 0.66em; color: var(--ink-medium); font-style: italic; margin-bottom: 5px; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 4px;
-        }
+        .title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
         .spell-title { font-family: 'Cinzel', serif; font-size: 1.35em; font-weight: 700; color: var(--ink-medium); line-height: 1.15; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.3); flex-grow: 1; }
 
-        .badges-container {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            align-items: flex-end;
-            flex-shrink: 0;
-        }
+        .badges-container { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
         .highlight-badge { font-family: 'Cinzel', serif; font-size: 0.5em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: 3px; white-space: nowrap; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3); }
 
         .divider { display: flex; align-items: center; justify-content: center; margin: 7px 0 12px; gap: 8px; flex-shrink: 0; }
@@ -156,7 +147,6 @@
 
         .card-bottom-wrapper { margin-top: auto; flex-shrink: 0; }
 
-        /* Tabella a 6 colonne fisse */
         .stats-table { width: 100%; border-collapse: collapse; font-size: 0.68em; border: 1.5px solid var(--border); border-radius: 4px; overflow: hidden; background: rgba(250,243,227,0.5); table-layout: fixed; }
         .stats-table td { padding: 4px 5px; border: 1px solid var(--border-light); vertical-align: middle; word-break: break-word; }
         
@@ -164,41 +154,12 @@
         .stat-value { color: var(--ink-dark); font-style: italic; font-weight: 500; text-align: left; padding-left: 8px; }
         .stat-value.no { color: #9a7040; font-weight: 600; font-style: normal; text-transform: uppercase; font-size: 0.88em; letter-spacing: 0.5px; text-align: center; }
 
-        .save-stack, .components-list { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 2px; 
-            line-height: 1.2; 
-            justify-content: center; 
-            height: 100%;
-        }
+        .save-stack, .components-list { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; justify-content: center; height: 100%; }
         
-        .save-line-1 {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap; 
-        }
+        .save-line-1 { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .save-stat { font-style: italic; font-weight: 600; color: var(--ink-dark); }
-        .save-cd { 
-            font-size: 0.95em; 
-            font-weight: 700; 
-            color: var(--ink-medium); 
-            display: flex; 
-            align-items: center; 
-            gap: 4px; 
-            white-space: nowrap; 
-        }
-        .save-outcome { 
-            font-size: 0.85em; 
-            opacity: 0.85; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px; 
-            font-weight: 600; 
-            color: var(--gold); 
-            text-align: center;
-        }
+        .save-cd { font-size: 0.95em; font-weight: 700; color: var(--ink-medium); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .save-outcome { font-size: 0.85em; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: var(--gold); text-align: center; }
 
         .components-list .comp-word { display: block; font-style: italic; font-weight: 600; color: var(--ink-dark); line-height: 1.3; white-space: nowrap; }
         .material-row td { text-align: left; padding: 5px 10px; background: rgba(196,168,130,0.1); }
@@ -242,6 +203,8 @@
 </head>
 <body>
 
+    <input type="file" id="importFileInput" accept=".json, .txt" style="display: none;">
+
     <div class="controls">
         <div class="controls-header">
             <h1>📜 Schede Incantesimi</h1>
@@ -250,13 +213,16 @@
 
         <div id="loadStatus" class="load-status status-warning">⏳ Caricamento dati in corso...</div>
 
-        <!-- Selettore File di Dati Automatico -->
         <div class="file-loader">
-            <label>📁 Gruppi di Incantesimi (.txt):</label>
+            <label>📁 Gruppi di Incantesimi (Online .txt) o File Locale:</label>
             <div class="file-links" id="fileLinks"></div>
             <div class="manual-load">
                 <input type="text" id="dataFileInput" value="ListaIncantesimi.txt">
-                <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="reloadData()">🔄</button>
+                <button class="btn btn-secondary btn-sm" onclick="reloadData()">🔄 Carica online</button>
+            </div>
+            <div class="local-io">
+                <button class="btn btn-secondary btn-sm" onclick="exportLocalData()">💾 Salva su PC</button>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFileInput').click()">📂 Carica da PC</button>
             </div>
         </div>
 
@@ -306,9 +272,12 @@
 
         <div class="info-note" id="infoNote">
             💡 <strong>Struttura Dati JSON:</strong>usa file <code>.txt</code>. Non premere "Invio" dentro le descrizioni, usa <code>&lt;br&gt;</code>.<br>
-            🎨 <strong>Tema:</strong> aggiungi <code>"theme": "theme-mago"</code> per forzare il colore. Valori: theme-paladino, theme-clerico, theme-ranger, theme-druido, theme-stregone, theme-mago, theme-warlock, theme-bardo, theme-artificiere.<br>
-            🖼️ <strong>Riquadri:</strong> Usa <code>"HighlightBox1": "Testo"</code> e <code>"ColorHighlightBox1": "Red"</code>. Colori: Red, Green, Blue, Purple, Orange, Gold, Black, Gray.<br>
-            📊 <strong>Tabella:</strong> Struttura fissa su 3 righe. Se non serve la tabella, usa <code>"hideTable": true</code>.
+            🎨 <strong>Tema:</strong> aggiungi <code>"theme": "theme-mago"</code> per forzare il colore.<br>
+            🖼️ <strong>Riquadri:</strong> Usa <code>"HighlightBox1": "Testo"</code> e <code>"ColorHighlightBox1": "Red"</code>.<br>
+            📊 <strong>Tabella:</strong> Struttura fissa su 3 righe. Se non serve la tabella, usa <code>"hideTable": true</code>.<br>
+            💾 <strong>Salvataggio Locale:</strong> "Salva su PC" esporta la lista attuale (comprende temi e statistiche globali). "Carica da PC" importa un file salvato in precedenza.<br>
+            🌐 <strong>Salvataggio Online .txt:</strong> Puoi incollare nei file .txt su GitHub anche le impostazioni globali usando il formato:<br>
+            <code>{ "casterSettings": { "ability": "INT", "bonus": "+3", "cd": "15", "toHit": "+5" }, "spells": [ ...lista incantesimi... ] }</code>
         </div>
     </div>
 
@@ -316,9 +285,7 @@
 
     <script>
         /* ================================================================
-           CONFIGURAZIONE GITHUB API (Per leggere i file .txt in automatico)
-           Sostituisci "emmeerre" con il tuo nome utente GitHub e
-           "MRDND2024" con il nome del tuo repository.
+           CONFIGURAZIONE GITHUB API
            ================================================================ */
         const GITHUB_USER = 'emmeerre';
         const GITHUB_REPO = 'MRDND2024';
@@ -329,7 +296,7 @@
                 "level": "1° Livello",
                 "school": "Trasmutazione",
                 "classes": "Druido, Ranger",
-                "theme": "theme-druido", // Esempio: tema forzato da file di testo
+                "theme": "theme-druido",
                 "HighlightBox1": "Rituale",
                 "ColorHighlightBox1": "Green",
                 "pageNumber": "1/1",
@@ -378,7 +345,6 @@
             linksContainer.innerHTML = '<span style="font-size:0.8em; color:#a08060; padding: 5px 0;">Caricamento lista file...</span>';
             
             try {
-                // Usa l'API di GitHub per elencare i contenuti della root del repo
                 const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`;
                 const response = await fetch(apiUrl);
                 
@@ -400,14 +366,12 @@
                     btn.onclick = () => {
                         document.getElementById('dataFileInput').value = file.name;
                         reloadData();
-                        // Evidenzia il pulsante attivo
                         document.querySelectorAll('.file-link-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
                     };
                     linksContainer.appendChild(btn);
                 });
 
-                // Attiva automaticamente il primo file o quello di default
                 const defaultFile = document.getElementById('dataFileInput').value;
                 const btns = document.querySelectorAll('.file-link-btn');
                 btns.forEach(b => {
@@ -494,9 +458,7 @@
         function applyGlobalToAll() { cardOverrides = {}; renderCards(); }
 
         function guessDefaultTheme(spell) {
-            // Se il tema è specificato nel file .txt, ha la priorità
             if (spell.theme) return spell.theme;
-            
             const c = spell.classes.toLowerCase();
             if (c.includes("paladino")) return "theme-paladino";
             if (c.includes("chierico")) return "theme-clerico";
@@ -528,9 +490,7 @@
                 const vBonus   = getCardValue(spellIndex, 'bonus');
                 const vCD      = getCardValue(spellIndex, 'cd');
                 const vToHit   = getCardValue(spellIndex, 'toHit');
-                
-                // Il tema viene dal file TXT, dall'override manuale, o indovinato dalla classe
-                const vTheme = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
+                const vTheme   = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
 
                 let badgesHTML = '<div class="badges-container">';
                 for (let i = 1; i <= 3; i++) {
@@ -681,6 +641,9 @@
             await initializePage(filename);
         }
 
+        // =========================================================
+        // INIZIALIZZAZIONE ASINCRONA (Supporta Array e Oggetto complesso)
+        // =========================================================
         async function initializePage(filename = 'ListaIncantesimi.txt') {
             const statusDiv = document.getElementById('loadStatus');
             const grid = document.getElementById('cardsGrid');
@@ -694,9 +657,30 @@
                 if (response.ok) {
                     const text = await response.text();
                     try {
-                        const externalSpells = JSON.parse(text);
-                        if (Array.isArray(externalSpells) && externalSpells.length > 0) {
+                        const parsedData = JSON.parse(text);
+                        let externalSpells = [];
+                        let casterSettings = null;
+
+                        if (Array.isArray(parsedData)) {
+                            // Formato standard: solo array di incantesimi
+                            externalSpells = parsedData;
+                        } else if (parsedData && Array.isArray(parsedData.spells)) {
+                            // Formato esteso: include anche le impostazioni globali
+                            externalSpells = parsedData.spells;
+                            casterSettings = parsedData.casterSettings;
+                        }
+
+                        if (externalSpells.length > 0) {
                             spells = externalSpells;
+                            
+                            // Se ci sono impostazioni globali nel file .txt, aggiorna i campi in alto
+                            if (casterSettings) {
+                                document.getElementById('globalAbility').value = casterSettings.ability || 'SAG';
+                                document.getElementById('globalBonus').value = casterSettings.bonus || '+2';
+                                document.getElementById('globalCD').value = casterSettings.cd || '12';
+                                document.getElementById('globalToHit').value = casterSettings.toHit || '+4';
+                            }
+
                             statusDiv.innerHTML = `✅ Dati caricati con successo dal file esterno: <strong>${filename}</strong>`;
                             statusDiv.className = "load-status status-success";
                         } else {
@@ -726,7 +710,99 @@
             renderCards();
         }
 
-        // Listener
+        // =========================================================
+        // FUNZIONI: SALVATAGGIO E CARICAMENTO LOCALE (PC)
+        // =========================================================
+        function exportLocalData() {
+            const casterSettings = {
+                ability: document.getElementById('globalAbility').value,
+                bonus: document.getElementById('globalBonus').value,
+                cd: document.getElementById('globalCD').value,
+                toHit: document.getElementById('globalToHit').value
+            };
+
+            const spellsToExport = spells.map((spell, index) => {
+                let spellCopy = JSON.parse(JSON.stringify(spell));
+                if (cardOverrides[index] && cardOverrides[index].theme) {
+                    spellCopy.theme = cardOverrides[index].theme;
+                }
+                return spellCopy;
+            });
+
+            const dataToExport = {
+                casterSettings: casterSettings,
+                spells: spellsToExport
+            };
+
+            const jsonStr = JSON.stringify(dataToExport, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'SetIncantesimi_Custom.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            const statusDiv = document.getElementById('loadStatus');
+            statusDiv.innerHTML = `✅ File salvato localmente sul tuo PC!`;
+            statusDiv.className = "load-status status-success";
+        }
+
+        function importLocalData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                try {
+                    const data = JSON.parse(text);
+                    const statusDiv = document.getElementById('loadStatus');
+                    
+                    if (data.casterSettings) {
+                        document.getElementById('globalAbility').value = data.casterSettings.ability || 'SAG';
+                        document.getElementById('globalBonus').value = data.casterSettings.bonus || '+2';
+                        document.getElementById('globalCD').value = data.casterSettings.cd || '12';
+                        document.getElementById('globalToHit').value = data.casterSettings.toHit || '+4';
+                    }
+                    
+                    let importedSpells = [];
+                    if (Array.isArray(data)) {
+                        importedSpells = data;
+                    } else if (Array.isArray(data.spells)) {
+                        importedSpells = data.spells;
+                    }
+
+                    if (importedSpells.length > 0) {
+                        spells = importedSpells;
+                        cardOverrides = {}; 
+
+                        document.querySelectorAll('.file-link-btn').forEach(b => b.classList.remove('active'));
+
+                        statusDiv.innerHTML = `✅ Dati caricati con successo dal file locale: <strong>${file.name}</strong>`;
+                        statusDiv.className = "load-status status-success";
+                        
+                        populateFilters();
+                        renderControls();
+                        renderCards();
+                    } else {
+                        alert("Il file non contiene una lista di incantesimi valida.");
+                    }
+                } catch (parseError) {
+                    const lineInfo = getJSONErrorLine(text, parseError);
+                    const statusDiv = document.getElementById('loadStatus');
+                    statusDiv.innerHTML = `❌ Errore di sintassi JSON nel file importato${lineInfo}!`;
+                    statusDiv.className = "load-status status-error";
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; 
+        }
+
+        document.getElementById('importFileInput').addEventListener('change', importLocalData);
         document.getElementById('searchName').addEventListener('input', renderControls);
         document.getElementById('filterSchool').addEventListener('change', renderControls);
         document.getElementById('filterLevel').addEventListener('change', renderControls);
@@ -736,10 +812,7 @@
         document.getElementById('globalCD').addEventListener('input', renderCards);
         document.getElementById('globalToHit').addEventListener('input', renderCards);
 
-        // Avvio
-        // 1. Scansiona i file .txt disponibili su GitHub
         fetchAvailableFiles();
-        // 2. Carica il file di default
         initializePage();
     </script>
 </body>
