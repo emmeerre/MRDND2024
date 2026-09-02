@@ -325,6 +325,11 @@
         "somatic": false,
         "material": false
       },
+      "material": "",
+      "toHit": false,
+      "duration": "Istante",
+      "range": "incantatore"
+    },
     {
       "name": "Camuffare se stesso",
       "level": "1° Liv.",
