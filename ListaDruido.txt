@@ -28,6 +28,11 @@
         "somatic": true,
         "material": false
       },
+      "material": "",
+      "toHit": false,
+      "duration": "Istante",
+      "range": "9m/6q"
+     },
       {
       "name": "Artificio druidico",
       "level": "Trucco",
