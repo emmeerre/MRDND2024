@@ -169,6 +169,60 @@
       "range": "3m/2q"
     },
     {
+      "name": "Caduta morbida",
+      "level": "1° Liv.",
+      "school": "Trasmutazione",
+      "classes": "bardo, mago, stregone",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "L'incantatore sceglie fino a cinque creature in caduta entro gittata. La velocità di discesa di una creatura in caduta rallenta fino a <b>18m/12q</b> per round finché l'incantesimo non termina. Se una creatura cade prima del termine dell'incantesimo, non subisce alcun danno da caduta e interrompe l'effetto dell'incantesimo.",
+      "castingTime": "reazione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": false,
+        "material": true
+      },
+      "material": "una piccola piuma",
+      "toHit": false,
+      "duration": "1 min.",
+      "range": "18m/12q"
+    },
+    {
+      "name": "Movimenti del ragno",
+      "level": "2° Liv.",
+      "school": "Trasmutazione",
+      "classes": "mago, stregone, warlock",
+      "HighlightBox1": "Concentrazione",
+      "ColorHighlightBox1": "Red",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "Fino al termine dell'incantesimo, una creatura consenziente toccata dall'incantatore ottiene la capacità di muoversi verticalmente e orizzontalmente su pareti e soffitti, mantenendo le mani libere. Il bersaglio ottiene anche una velocità di scalata pari alla sua velocità.<br><b>Utilizzo di uno slot incantesimo di livello superiore:</b> L'incantatore può bersagliare una creatura aggiuntiva per ogni slot di livello superiore al 2º.",
+      "castingTime": "azione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": true,
+        "material": true
+      },
+      "material": "una goccia di bitume e un ragno",
+      "toHit": false,
+      "duration": "1 ora",
+      "range": "contatto"
+    },
+    {
       "name": "Illusione minore",
       "level": "Trucco",
       "school": "Illusione",
@@ -277,33 +331,6 @@
       "range": "incantatore"
     },
     {
-      "name": "Caduta morbida",
-      "level": "1° Liv.",
-      "school": "Trasmutazione",
-      "classes": "bardo, mago, stregone",
-      "HighlightBox1": "",
-      "ColorHighlightBox1": "",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "L'incantatore sceglie fino a cinque creature in caduta entro gittata. La velocità di discesa di una creatura in caduta rallenta fino a <b>18m/12q</b> per round finché l'incantesimo non termina. Se una creatura cade prima del termine dell'incantesimo, non subisce alcun danno da caduta e interrompe l'effetto dell'incantesimo.",
-      "castingTime": "reazione",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": false,
-        "material": true
-      },
-      "material": "una piccola piuma",
-      "toHit": false,
-      "duration": "1 min.",
-      "range": "18m/12q"
-    },
-    {
       "name": "Elementalismo",
       "level": "Trucco",
       "school": "Trasmutazione",
@@ -410,33 +437,6 @@
       "toHit": false,
       "duration": "1 min.",
       "range": "18m/12q"
-    },
-    {
-      "name": "Movimenti del ragno",
-      "level": "2° Liv.",
-      "school": "Trasmutazione",
-      "classes": "mago, stregone, warlock",
-      "HighlightBox1": "Concentrazione",
-      "ColorHighlightBox1": "Red",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "Fino al termine dell'incantesimo, una creatura consenziente toccata dall'incantatore ottiene la capacità di muoversi verticalmente e orizzontalmente su pareti e soffitti, mantenendo le mani libere. Il bersaglio ottiene anche una velocità di scalata pari alla sua velocità.<br><b>Utilizzo di uno slot incantesimo di livello superiore:</b> L'incantatore può bersagliare una creatura aggiuntiva per ogni slot di livello superiore al 2º.",
-      "castingTime": "azione",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": true,
-        "material": true
-      },
-      "material": "una goccia di bitume e un ragno",
-      "toHit": false,
-      "duration": "1 ora",
-      "range": "contatto"
     },
     {
       "name": "Camuffare se stesso",
