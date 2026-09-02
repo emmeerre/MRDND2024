@@ -1,5 +1,11 @@
-[
-  {
+{
+  "casterSettings": {
+    "ability": "INT",
+    "bonus": "+5",
+    "cd": "16",
+    "toHit": "+8"
+  },
+  "spells": [{
     "name": "Marchio del cacciatore (X2)",
     "level": "1° Liv.",
     "school": "Divinazione",
@@ -138,5 +144,6 @@
     "range": "se stesso"
   }
 
- 
-]
+  ]
+}
+  
