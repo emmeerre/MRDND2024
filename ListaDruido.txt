@@ -87,7 +87,7 @@
       "material": "vischio",
       "toHit": false,
       "duration": "1 min.",
-      "range": "Se stesso",
+      "range": "Se Stesso",
       "theme": "theme-druido"
     },
     {
