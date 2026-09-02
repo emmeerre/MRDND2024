@@ -1,9 +1,9 @@
 {
   "casterSettings": {
     "ability": "INT",
-    "bonus": "+5",
-    "cd": "16",
-    "toHit": "+8"
+    "bonus": "+0",
+    "cd": "10",
+    "toHit": "+0"
   },
   "spells": [
     {
@@ -31,7 +31,8 @@
       "material": "",
       "toHit": false,
       "duration": "10 min.",
-      "range": "incantatore"
+      "range": "Se stesso",
+      "theme": "theme-default"
     },
     {
       "name": "Senso Bestiale",
@@ -58,7 +59,8 @@
       "material": "",
       "toHit": false,
       "duration": "1 Ora",
-      "range": "contatto"
+      "range": "contatto",
+      "theme": "theme-default"
     }
   ]
 }
