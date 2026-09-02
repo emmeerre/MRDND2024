@@ -331,33 +331,6 @@
       "range": "contatto"
     },
     {
-      "name": "Amicizia con gli animali",
-      "level": "1° Liv.",
-      "school": "Ammaliamento",
-      "classes": "bardo, druido, ranger",
-      "HighlightBox1": "",
-      "ColorHighlightBox1": "",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "sceglie come bersaglio una bestia Visibile. Il bersaglio deve superare un <b>tiro salvezza su Saggezza</b>, altrimenti rimane <b>affascinato</b> per la durata dell'incantesimo. Se l'incantatore o uno dei suoi alleati infligge danni al bersaglio, l'incantesimo termina.<br><b>incantesimo di livello superiore:</b> L'incantatore può scegliere come <b>bersaglio una bestia aggiuntiva</b> per ogni slot di livello superiore al 1º.",
-      "castingTime": "azione",
-      "savingThrow": "SAG",
-      "saveOutcome": "Nega",
-      "components": {
-        "verbal": true,
-        "somatic": true,
-        "material": true
-      },
-      "material": "un boccone di cibo",
-      "toHit": false,
-      "duration": "24 ore",
-      "range": "9m/6q"
-    },
-    {
       "name": "Parola guaritrice",
       "level": "1° Liv.",
       "school": "Abiurazione",
@@ -410,6 +383,33 @@
       "toHit": false,
       "duration": "Istante",
       "range": "incantatore"
+    },
+    {
+      "name": "Amicizia con gli animali",
+      "level": "1° Liv.",
+      "school": "Ammaliamento",
+      "classes": "bardo, druido, ranger",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "sceglie come bersaglio una bestia Visibile. Il bersaglio deve superare un <b>tiro salvezza su Saggezza</b>, altrimenti rimane <b>affascinato</b> per la durata dell'incantesimo. Se l'incantatore o uno dei suoi alleati infligge danni al bersaglio, l'incantesimo termina.<br><b>incantesimo di livello superiore:</b> L'incantatore può scegliere come <b>bersaglio una bestia aggiuntiva</b> per ogni slot di livello superiore al 1º.",
+      "castingTime": "azione",
+      "savingThrow": "SAG",
+      "saveOutcome": "Nega",
+      "components": {
+        "verbal": true,
+        "somatic": true,
+        "material": true
+      },
+      "material": "un boccone di cibo",
+      "toHit": false,
+      "duration": "24 ore",
+      "range": "9m/6q"
     },
     {
       "name": "Bagliore lunare",
