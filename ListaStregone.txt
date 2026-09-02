@@ -304,6 +304,60 @@
       "range": "9m/6q"
     },
     {
+      "name": "Passo velato",
+      "level": "2° Liv.",
+      "school": "Evocazione",
+      "classes": "mago, stregone, warlock",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "L'incantatore è avvolto per un istante da una foschia argentata e si teletrasporta di un massimo di <b>9m/6q</b> fino a uno spazio libero che è in grado di vedere.",
+      "castingTime": "Az Bonus",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": false,
+        "material": false
+      },
+      "material": "",
+      "toHit": false,
+      "duration": "Istante",
+      "range": "incantatore"
+    },
+    {
+      "name": "Caduta morbida",
+      "level": "1° Liv.",
+      "school": "Trasmutazione",
+      "classes": "bardo, mago, stregone",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "L'incantatore sceglie fino a cinque creature in caduta entro gittata. La velocità di discesa di una creatura in caduta rallenta fino a <b>18m/12q</b> per round finché l'incantesimo non termina. Se una creatura cade prima del termine dell'incantesimo, non subisce alcun danno da caduta e interrompe l'effetto dell'incantesimo.",
+      "castingTime": "reazione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": false,
+        "material": true
+      },
+      "material": "una piccola piuma",
+      "toHit": false,
+      "duration": "1 min.",
+      "range": "18m/12q"
+    },
+    {
       "name": "Elementalismo",
       "level": "Trucco",
       "school": "Trasmutazione",
@@ -385,33 +439,6 @@
       "range": "18m/12q"
     },
     {
-      "name": "Caduta morbida",
-      "level": "1° Liv.",
-      "school": "Trasmutazione",
-      "classes": "bardo, mago, stregone",
-      "HighlightBox1": "",
-      "ColorHighlightBox1": "",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "L'incantatore sceglie fino a cinque creature in caduta entro gittata. La velocità di discesa di una creatura in caduta rallenta fino a <b>18m/12q</b> per round finché l'incantesimo non termina. Se una creatura cade prima del termine dell'incantesimo, non subisce alcun danno da caduta e interrompe l'effetto dell'incantesimo.",
-      "castingTime": "reazione",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": false,
-        "material": true
-      },
-      "material": "una piccola piuma",
-      "toHit": false,
-      "duration": "1 min.",
-      "range": "18m/12q"
-    },
-    {
       "name": "Movimenti del ragno",
       "level": "2° Liv.",
       "school": "Trasmutazione",
@@ -437,33 +464,6 @@
       "toHit": false,
       "duration": "1 ora",
       "range": "contatto"
-    },
-    {
-      "name": "Passo velato",
-      "level": "2° Liv.",
-      "school": "Evocazione",
-      "classes": "mago, stregone, warlock",
-      "HighlightBox1": "",
-      "ColorHighlightBox1": "",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "L'incantatore è avvolto per un istante da una foschia argentata e si teletrasporta di un massimo di <b>9m/6q</b> fino a uno spazio libero che è in grado di vedere.",
-      "castingTime": "Az Bonus",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": false,
-        "material": false
-      },
-      "material": "",
-      "toHit": false,
-      "duration": "Istante",
-      "range": "incantatore"
     }
   ]
 }
