@@ -27,7 +27,8 @@
         "verbal": true,
         "somatic": true,
         "material": false
-      },{
+      },
+      {
       "name": "Artificio druidico",
       "level": "Trucco",
       "school": "Trasmutazione",
