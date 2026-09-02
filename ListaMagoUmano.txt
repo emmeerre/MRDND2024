@@ -250,6 +250,33 @@
       "range": "se stesso"
     },
     {
+      "name": "Comprensione dei linguaggi",
+      "level": "1° Liv.",
+      "school": "Divinazione",
+      "classes": "bardo, mago, stregone, warlock",
+      "HighlightBox1": "Rituale",
+      "ColorHighlightBox1": "Green",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "Per la durata dell'incantesimo, l'incantatore comprende il significato letterale di qualsiasi linguaggio che è in grado di sentire o vedere tramite segni. Comprende inoltre ogni linguaggio scritto che è in grado di vedere, ma deve toccare la superficie su cui sono scritte le parole. È necessario circa 1 minuto per leggere una pagina di testo. Questo incantesimo non decodifica simboli o messaggi segreti.",
+      "castingTime": "azione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": true,
+        "material": true
+      },
+      "material": "un pizzico di fuliggine e di sale",
+      "toHit": false,
+      "duration": "1 ora",
+      "range": "se stesso"
+    },
+    {
       "name": "Localizza oggetto",
       "level": "2° Liv.",
       "school": "Divinazione",
@@ -289,7 +316,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "Una linea di vento forte lunga <b>18m/12q</b> e ampia <b>3m/2q</b> viene indirizzata dall'incantatore in una direzione a sua scelta per la durata dell'incantesimo. Ogni creatura sulla linea deve superare un <b>tiro salvezza su Forza</b>, altrimenti viene spinta per <b>4,5m/3q</b> lontano dall'incantatore nella direzione della linea. Una creatura che termina il suo turno sulla linea deve effettuare lo stesso tiro salvezza. Qualsiasi creatura sulla linea deve usare 60 centimetri di movimento per ogni 30 centimetri percorsi per avvicinarsi all'incantatore. La folata può disperdere gas o vapore e spegne candele e simili fiamme non protette nell'area. Le fiamme protette, come quelle delle lanterne, tremolano e hanno il 50% di possibilità di spegnersi. Come <b>azione bonus</b> nei suoi turni successivi, l'incantatore può modificare la direzione in cui indirizzare la linea.",
+      "description": "Una linea di vento forte lunga <b>18m/12q</b> e ampia <b>3m/2q</b> viene indirizzata dall'incantatore in una direzione a sua scelta. Ogni creatura coinvolta deve superare un <b>tiro salvezza su Forza</b>, altrimenti viene spinta per <b>4,5m/3q</b> lontano dall'incantatore nella direzione della linea. Una creatura che termina il suo turno sulla linea deve effettuare lo stesso tiro salvezza. Qualsiasi creatura sulla linea deve usare il doppio del movimento avvicinarsi all'incantatore. La folata può disperdere gas o vapore e fiamme non protette nell'area. Le fiamme protette, come quelle delle lanterne, tremolano e hanno il 50% di possibilità di spegnersi. Come <b>azione bonus</b> nei suoi turni successivi, l'incantatore può modificare la direzione in cui indirizzare la linea.",
       "castingTime": "azione",
       "savingThrow": "FOR",
       "saveOutcome": "Nega",
@@ -301,33 +328,6 @@
       "material": "un seme di legume",
       "toHit": false,
       "duration": "1 min.",
-      "range": "se stesso"
-    },
-    {
-      "name": "Comprensione dei linguaggi",
-      "level": "1° Liv.",
-      "school": "Divinazione",
-      "classes": "bardo, mago, stregone, warlock",
-      "HighlightBox1": "Rituale",
-      "ColorHighlightBox1": "Green",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "Per la durata dell'incantesimo, l'incantatore comprende il significato letterale di qualsiasi linguaggio che è in grado di sentire o vedere tramite segni. Comprende inoltre ogni linguaggio scritto che è in grado di vedere, ma deve toccare la superficie su cui sono scritte le parole. È necessario circa 1 minuto per leggere una pagina di testo. Questo incantesimo non decodifica simboli o messaggi segreti.",
-      "castingTime": "azione",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": true,
-        "material": true
-      },
-      "material": "un pizzico di fuliggine e di sale",
-      "toHit": false,
-      "duration": "1 ora",
       "range": "se stesso"
     },
     {
