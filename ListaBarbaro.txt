@@ -1,0 +1,64 @@
+{
+  "casterSettings": {
+    "ability": "INT",
+    "bonus": "+5",
+    "cd": "16",
+    "toHit": "+8"
+  },
+  "spells": [
+    {
+      "name": "Parlare con gli animali",
+      "level": "1° Liv.",
+      "school": "Divinazione",
+      "classes": "bar, dru, ran, war",
+      "HighlightBox1": "Rituale",
+      "ColorHighlightBox1": "Green",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "Per la durata dell'incantesimo, l'incantatore comprende le bestie e può comunicare verbalmente con loro usando una qualunque abilità dell'azione di Influenza.<br>Nella maggior parte dei casi hanno ben poco da dire su temi che esulano dalla sopravvivenza o dallo spirito di squadra, ma almeno possono fornire informazioni su luoghi e mostri nelle vicinanze, oltre a tutto ciò che hanno notato nel corso dell'ultima giornata.",
+      "castingTime": "1 Azione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": true,
+        "material": false
+      },
+      "material": "",
+      "toHit": false,
+      "duration": "10 min.",
+      "range": "incantatore"
+    },
+    {
+      "name": "Senso Bestiale",
+      "level": "2° Liv.",
+      "school": "Divinazione",
+      "classes": "druido, ranger",
+      "HighlightBox1": "Concentrazione",
+      "ColorHighlightBox1": "Red",
+      "HighlightBox2": "Rituale",
+      "ColorHighlightBox2": "Green",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "<b>Percezione condivisa:</b> Puoi percepire attraverso i sensi della bestia e mantenere contemporaneamente i tuoi Sensi speciali: Ottieni i benefici di eventuali sensi speciali posseduti dalla bestia (come la vista cieca o l'olfatto acuto).",
+      "castingTime": "1 Azione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": false,
+        "somatic": true,
+        "material": false
+      },
+      "material": "",
+      "toHit": false,
+      "duration": "1 Ora",
+      "range": "contatto"
+    }
+  ]
+}
