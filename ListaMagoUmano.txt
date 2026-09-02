@@ -46,7 +46,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "L'incantatore scaglia una scintilla di fuoco verso una creatura o un oggetto situato entro gittata, effettuando un <b>attacco a distanza con incantesimo</b> contro il bersaglio. Se il colpo va a segno, il bersaglio subisce 1d10 danni da fuoco. Un oggetto infiammabile colpito da questo incantesimo prende fuoco se non indossato o trasportato in quel momento.<br><b>Trucchetto potenziato:</b> I danni aumentano di 1d10 quando l'incantatore raggiunge il 5º livello (2d10), l'11º livello (3d10) e il 17º livello (4d10).",
+      "description": "L'incantatore scaglia una scintilla di fuoco verso una creatura o un oggetto situato a gittata, effettuando un <b>attacco a distanza con incantesimo</b> contro il bersaglio. Se il colpo va a segno, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un <b>oggetto infiammabile colpito prende fuoco<b> se non indossato o trasportato in quel momento.<br><b>Trucchetto potenziato:</b> I danni aumentano di <b>1d10</b> quando l'incantatore raggiunge il 5º livello (<b>2d10</b>), l'11º livello (<b>3d10</b>) e il 17º livello (<b>4d10</b>).",
       "castingTime": "azione",
       "savingThrow": "NO",
       "saveOutcome": "",
@@ -73,8 +73,8 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "Un fulmine si sprigiona dall'incantatore verso una creatura da lui toccata. Con questo incantesimo, l'incantatore effettua un <b>attacco in mischia con incantesimo</b> contro il bersaglio. Se il colpo va a segno, il bersaglio subisce 1d8 danni da fulmine e non può effettuare attacchi di opportunità fino all'inizio del proprio turno successivo.<br><b>Trucchetto potenziato:</b> I danni aumentano di 1d8 quando l'incantatore raggiunge il 5º livello (2d8), l'11º livello (3d8) e il 17º livello (4d8).",
-      "castingTime": "azione",
+      "description": "Un fulmine si sprigiona dall'incantatore verso una creatura da lui toccata. Con questo incantesimo, l'incantatore effettua un <b>attacco in mischia contro il bersaglio</b>. Se il colpo va a segno, il bersaglio subisce <b>1d8</b> danni da <b>fulmine</b> e non può effettuare attacchi di opportunità fino all'inizio del proprio turno successivo.<br><b>Trucchetto potenziato:</b> I danni aumentano di <b>1d8</b> quando l'incantatore raggiunge il 5º livello (<b>2d8</b>), l'11º livello (<b>3d8</b>) e il 17º livello (<b>4d8</b>).",
+      "castingTime": "Azione",
       "savingThrow": "NO",
       "saveOutcome": "",
       "components": {
@@ -88,6 +88,33 @@
       "range": "contatto"
     },
     {
+      "name": "Dardo incantato",
+      "level": "1° Liv.",
+      "school": "Invocazione",
+      "classes": "mago, stregone",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "L'incantatore crea <b>tre dardi</b> lucenti di forza magica. Ogni dardo colpisce una o piu creatura visibile a. Un dardo infligge <b>1d4 + 1</b> danni da <b>forza</b>. Tutti i dardi colpiscono simultaneamente.<br><b> incantesimo di livello superiore:</b> L'incantesimo crea un dardo aggiuntivo per ogni slot di livello superiore al 1º.",
+      "castingTime": "Azione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": true,
+        "material": false
+      },
+      "material": "",
+      "toHit": false,
+      "duration": "Istante",
+      "range": "36m/24q"
+    },
+    {
       "name": "Illusione minore",
       "level": "Trucco",
       "school": "Illusione",
@@ -98,9 +125,36 @@
       "ColorHighlightBox2": "",
       "HighlightBox3": "",
       "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
+      "pageNumber": "1/2",
       "hideTable": false,
-      "description": "crea un suono o un'immagine di un oggetto L'illusione termina se l'incantatore lancia nuovamente l'incantesimo. l'azione di Studio per esaminare il suono o l'immagine, può determinare che si tratta di un'illusione superando una prova di Intelligenza (Indagare) contro la CD del tiro salvezza sull'incantesimo.<br><b>Suono:</b> la sua intensità può variare da quella di un sussurro a quella di un urlo. di un qualsiasi altro suono a sua scelta. Il suono può echeggiare ininterrottamente per tutta la durata dell'incantesimo, oppure l'incantatore può emettere dei suoni separati in momenti diversi.<br><b>Immagine:</b> l'immagine di un oggetto (come per esempio una sedia, una serie di impronte nel fango o uno scrigno), non deve essere più grande di un cubo con spigolo di <b>1,5m/1q</b>. L'illusione non può emettere suoni, lights, odori o qualsiasi altro effetto sensoriale L'illusione può essere rivelata da un'interazione fisica, poiché gli oggetti possono attraversarla.",
+      "description": "crea un suono o un'immagine di un oggetto L'illusione termina se l'incantatore lancia nuovamente l'incantesimo. l'azione di Studio per esaminare il suono o l'immagine, può determinare che si tratta di un'illusione superando una prova di Intelligenza (Indagare) contro la CD del tiro salvezza sull'incantesimo.<br><b>Suono:</b> la sua intensità può variare da quella di un sussurro a quella di un urlo. di un qualsiasi altro suono a sua scelta. Il suono può echeggiare ininterrottamente per tutta la durata dell'incantesimo, oppure l'incantatore può emettere dei suoni separati in momenti diversi.",
+      "castingTime": "azione",
+      "savingThrow": "INT",
+      "saveOutcome": "Nega",
+      "components": {
+        "verbal": false,
+        "somatic": true,
+        "material": true
+      },
+      "material": "un ciuffo di lana",
+      "toHit": false,
+      "duration": "1 min.",
+      "range": "9m/6q"
+    },
+    {
+      "name": "Illusione minore",
+      "level": "Trucco",
+      "school": "Illusione",
+      "classes": "bar, mag, streg, war",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "2/2",
+      "hideTable": false,
+      "description": "crea un suono o un'immagine di un oggetto L'illusione termina se l'incantatore lancia nuovamente l'incantesimo. l'azione di Studio per esaminare il suono o l'immagine, può determinare che si tratta di un'illusione superando una prova di Intelligenza (Indagare) contro la CD del tiro salvezza sull'incantesimo.<br><b>Immagine:</b> l'immagine di un oggetto (come per esempio una sedia, una serie di impronte nel fango o uno scrigno), non deve essere più grande di un cubo con spigolo di <b>1,5m/1q</b>. L'illusione non può emettere suoni, luci, odori o qualsiasi altro effetto sensoriale L'illusione può essere rivelata da un'interazione fisica, poiché gli oggetti possono attraversarla.",
       "castingTime": "azione",
       "savingThrow": "INT",
       "saveOutcome": "Nega",
@@ -127,7 +181,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "Guidato da un lampo di intuizione magica, l'incantatore effettua un <b>attacco con l'arma</b> utilizzata per lanciare l'incantesimo. Per determinare il <b>tiro per colpire</b> e il tiro per i danni, l'incantatore utilizza la sua caratteristica da incantatore invece che la Forza o la Destrezza. Se l'attacco infligge danni, possono essere danni radiosi o danni normali inflitti dall'arma (a scelta dell'incantatore).<br><b>Trucchetto potenziato:</b> A prescindere dal tipo di danni che l'incantatore sceglie (danni radiosi o danni normali dell'arma), l'attacco infligge danni radiosi extra quando l'incantatore raggiunge il 5º livello (1d6), l'11º livello (2d6) e il 17º livello (3d6).",
+      "description": "Guidato da un lampo di intuizione magica, l'incantatore effettua un <b>attacco con l'arma</b> utilizzata per lanciare l'incantesimo. Per determinare il <b>tiro per colpire</b> e il tiro per i danni, l'incantatore utilizza la sua caratteristica da incantatore invece che la <b>Forza</b> o la <b>Destrezza</b>. Se l'attacco infligge danni, possono essere danni <b>radiosi</b> o danni normali inflitti dall'arma (a scelta dell'incantatore).<br><b>Trucchetto potenziato:</b> A prescindere dal tipo di danni che l'incantatore sceglie, l'attacco infligge danni radiosi extra quando l'incantatore raggiunge il 5º livello (<b>1d6</b>), l'11º livello (<b>2d6</b>) e il 17º livello (<b>3d6</b>).",
       "castingTime": "azione",
       "savingThrow": "NO",
       "saveOutcome": "",
@@ -139,34 +193,7 @@
       "material": "un'arma nel cui uso l'incantatore ha competenza e ha un valore di 1 mr o più",
       "toHit": true,
       "duration": "Istante",
-      "range": "incantatore"
-    },
-    {
-      "name": "Dardo incantato",
-      "level": "1° Liv.",
-      "school": "Invocazione",
-      "classes": "mago, stregone",
-      "HighlightBox1": "",
-      "ColorHighlightBox1": "",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "L'incantatore crea tre dardi lucenti di forza magica. Ogni dardo colpisce una creatura a scelta dell'incantatore situata entro gittata che egli è in grado di vedere. Un dardo infligge 1d4 + 1 danni da forza al suo bersaglio. Tutti i dardi colpiscono simultaneamente e l'incantatore può dirigerli per colpire una o più creature.<br><b>Utilizzo di uno slot incantesimo di livello superiore:</b> L'incantesimo crea un dardo aggiuntivo per ogni slot di livello superiore al 1º.",
-      "castingTime": "azione",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": true,
-        "material": false
-      },
-      "material": "",
-      "toHit": false,
-      "duration": "Istante",
-      "range": "36m/24q"
+      "range": "se stesso"
     },
     {
       "name": "Risata incontenibile",
@@ -181,7 +208,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "Una creatura a scelta entro gittata che l'incantatore è in grado di vedere effettua un <b>tiro salvezza su Saggezza</b>. Se lo fallisce, cade a terra prona ed è incapacitata per la durata dell'incantesimo. Durante quel periodo di tempo, ride incontrollabilmente (se è in grado di ridere) e non può porre fine alla condizione prono. Il bersaglio effettua un altro <b>tiro salvezza su Saggezza</b> alla fine di ogni suo turno e ogni volta che subisce danni; in quest'ultimo caso, lo effettua con vantaggio. In caso di successo, l'incantesimo termina.<br><b>Utilizzo di uno slot incantesimo di livello superiore:</b> L'incantatore può bersagliare una creatura aggiuntiva per ogni slot di livello superiore al 1º.",
+      "description": "Una creatura a scelta visibile a gittata effettua un <b>tiro salvezza su Saggezza</b>. Se lo fallisce, cade a <b>terra prona</b> ed è <b>incapacitata</b> per la durata dell'incantesimo. Durante quel periodo di tempo, ride incontrollabilmente (se è in grado di ridere) e non può porre fine alla <b>condizione prono</b>. Il bersaglio effettua un altro <b>tiro salvezza su Saggezza</b> alla <b>fine di ogni suo turno e ogni volta che subisce danni</b>; in quest'ultimo caso, lo effettua <b>con vantaggio</b>. In caso di successo, l'incantesimo termina.<br><b>incantesimo di livello superiore:</b> L'incantatore può bersagliare una <b>creatura aggiuntiva</b> per ogni slot di livello superiore al 1º.",
       "castingTime": "azione",
       "savingThrow": "SAG",
       "saveOutcome": "Nega",
@@ -220,7 +247,7 @@
       "material": "",
       "toHit": false,
       "duration": "10 min.",
-      "range": "incantatore"
+      "range": "se stesso"
     },
     {
       "name": "Armatura magica",
@@ -235,7 +262,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "L'incantatore tocca una creatura consenziente che non indossa un'armatura. Fino al termine dell'incantesimo, la CA base del bersaglio diventa 13 più il suo modificatore di Destrezza. L'incantesimo termina in anticipo se il bersaglio indossa un'armatura.",
+      "description": "L'incantatore tocca una creatura consenziente che non indossa un'armatura. Fino al termine dell'incantesimo, la <b>CA</b> base del bersaglio diventa <b>13</b> più il suo <b>modificatore di Destrezza</b>. L'incantesimo termina in anticipo se il bersaglio indossa un'armatura.",
       "castingTime": "azione",
       "savingThrow": "NO",
       "saveOutcome": "",
@@ -262,7 +289,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "L'incantatore ottiene 2d4 + 4 punti ferita temporanei.<br><b>Utilizzo di uno slot incantesimo di livello superiore:</b> L'incantatore ottiene 5 punti ferita temporanei aggiuntivi per ogni slot di livello superiore al 1º.",
+      "description": "L'incantatore ottiene <b>2d4 + 4 punti ferita temporanei</b>.<br><b>incantesimo di livello superiore:</b> L'incantatore ottiene <b>5 punti ferita temporanei</b> aggiuntivi per ogni slot di livello superiore al 1º.",
       "castingTime": "azione",
       "savingThrow": "NO",
       "saveOutcome": "",
@@ -274,7 +301,7 @@
       "material": "una goccia di alcol",
       "toHit": false,
       "duration": "Istante",
-      "range": "incantatore"
+      "range": "se stesso"
     },
     {
       "name": "Ragnatela",
@@ -289,7 +316,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "evoca un ammasso di ragnatele appiccicose che riempiono un cubo con spigolo di <b>6m/4q</b> per la durata dell'incantesimo. Le ragnatele contano come terreno difficile e l'area al loro interno e leggermente oscurata. Se le ragnatele non sono ancorate tra due masse solide (per esempio pareti o alberi) o stese su un pavimento, un muro o un soffitto, collassano su se stesse e l'incantesimo termina all'inizio del turno successivo dell'incantatore. Le ragnatele stese su una superficie piatta hanno una profondità di <b>1,5m/1q</b>. La prima volta che una creatura vi entra in un turno o inizia lì il suo turno, deve superare un <b>tiro salvezza su Destrezza</b>, altrimenti sarà trattenuta finché sarà al loro interno o non si libera. Una creatura trattenuta dalle ragnatele può usare un'azione per effettuare una prova di Forza (Atletica) contro la CD del tiro salvezza sull'incantesimo. Se supera la prova, non è più trattenuta. Le ragnatele sono infiammabili. Un cubo di ragnatele con spigolo di <b>1,5m/1q</b> brucia in 1 round, infliggendo 2d4 danni da fuoco a ogni creatura che inizi il suo turno tra le fiamme.",
+      "description": "evoca un ammasso di ragnatele appiccicose che riempiono un cubo con spigolo di <b>6m/4q</b> per la durata dell'incantesimo. Le ragnatele contano come <b>terreno difficile</b> e l'area al loro interno e <b>leggermente oscurata</b>. Se le ragnatele non sono ancorate tra due masse solide (per esempio pareti o alberi) o stese su un pavimento, un muro o un soffitto, collassano su se stesse e l'incantesimo termina all'inizio del turno successivo dell'incantatore. Le ragnatele stese su una superficie piatta hanno una profondità di <b>1,5m/1q</b>. La prima volta che una creatura vi entra in un turno o inizia lì il suo turno, deve superare un <b>tiro salvezza su Destrezza</b>, altrimenti sarà trattenuta finché sarà al loro interno o non si libera. Una creatura trattenuta dalle ragnatele può usare un'azione per effettuare una <b>prova di Forza (Atletica)</b> contro la CD del tiro salvezza sull'incantesimo. Se supera la prova, non è più trattenuta. Le ragnatele sono infiammabili. Un cubo di ragnatele con spigolo di <b>1,5m/1q</b> brucia in 1 round, infliggendo </b>2d4 danni da fuoco</b> a ogni creatura che inizi il suo turno tra le fiamme.",
       "castingTime": "azione",
       "savingThrow": "DES",
       "saveOutcome": "Nega",
@@ -328,7 +355,7 @@
       "material": "un ramoscello biforcuto",
       "toHit": false,
       "duration": "10 min.",
-      "range": "incantatore"
+      "range": "se stesso"
     },
     {
       "name": "Folata di vento",
@@ -343,7 +370,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "Una linea di vento forte lunga <b>18m/12q</b> e ampia <b>3m/2q</b> viene indirizzata dall'incantatore in una direzione a sua scelta per la durata dell'incantesimo. Ogni creatura sulla linea deve superare un <b>tiro salvezza su Forza</b>, altrimenti viene spinta per <b>4,5m/3q</b> lontano dall'incantatore nella direzione della linea. Una creatura che termina il suo turno sulla linea deve effettuare lo stesso tiro salvezza. Qualsiasi creatura sulla linea deve usare 60 centimetri di movimento per ogni 30 centimetri percorsi per avvicinarsi all'incantatore. La folata può disperdere gas o vapore e spegne candele e simili fiamme non protette nell'area. Le fiamme protette, come quelle delle lanterne, tremolano e hanno il 50% di possibilità di spegnersi. Come azione bonus nei suoi turni successivi, l'incantatore può modificare la direzione in cui indirizzare la linea.",
+      "description": "Una linea di vento forte lunga <b>18m/12q</b> e ampia <b>3m/2q</b> viene indirizzata dall'incantatore in una direzione a sua scelta per la durata dell'incantesimo. Ogni creatura sulla linea deve superare un <b>tiro salvezza su Forza</b>, altrimenti viene spinta per <b>4,5m/3q</b> lontano dall'incantatore nella direzione della linea. Una creatura che termina il suo turno sulla linea deve effettuare lo stesso tiro salvezza. Qualsiasi creatura sulla linea deve usare 60 centimetri di movimento per ogni 30 centimetri percorsi per avvicinarsi all'incantatore. La folata può disperdere gas o vapore e spegne candele e simili fiamme non protette nell'area. Le fiamme protette, come quelle delle lanterne, tremolano e hanno il 50% di possibilità di spegnersi. Come <b>azione bonus</b> nei suoi turni successivi, l'incantatore può modificare la direzione in cui indirizzare la linea.",
       "castingTime": "azione",
       "savingThrow": "FOR",
       "saveOutcome": "Nega",
@@ -355,7 +382,7 @@
       "material": "un seme di legume",
       "toHit": false,
       "duration": "1 min.",
-      "range": "incantatore"
+      "range": "se stesso"
     },
     {
       "name": "Comprensione dei linguaggi",
@@ -382,7 +409,7 @@
       "material": "un pizzico di fuliggine e di sale",
       "toHit": false,
       "duration": "1 ora",
-      "range": "incantatore"
+      "range": "se stesso"
     }
   ]
 }
