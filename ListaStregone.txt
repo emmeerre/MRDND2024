@@ -277,33 +277,6 @@
       "range": "incantatore"
     },
     {
-      "name": "Elementalismo",
-      "level": "Trucco",
-      "school": "Trasmutazione",
-      "classes": "druido, mago, stregone",
-      "HighlightBox1": "",
-      "ColorHighlightBox1": "",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/3",
-      "hideTable": false,
-      "description": "L'incantatore esercita il suo controllo sugli elementi, creando uno dei seguenti effetti entro gittata.<br><b>Richiamo del fuoco:</b> Nell'area di un cubo con spigolo di <b>1,5m/1q</b>, l'incantatore crea una piccola nube di braci non incandescenti, colorate e che emettono fumo e un odore particolare. L'incantatore sceglie il colore e l'odore delle braci, che si possono usare per accendere candele, torce o lampade in quell'area. L'odore del fumo permane per 1 minuto.<br>",
-      "castingTime": "azione",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": true,
-        "material": false
-      },
-      "material": "",
-      "toHit": false,
-      "duration": "Istante",
-      "range": "9m/6q"
-    },
-    {
       "name": "Passo velato",
       "level": "2° Liv.",
       "school": "Evocazione",
@@ -356,6 +329,33 @@
       "toHit": false,
       "duration": "1 min.",
       "range": "18m/12q"
+    },
+    {
+      "name": "Elementalismo",
+      "level": "Trucco",
+      "school": "Trasmutazione",
+      "classes": "druido, mago, stregone",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/3",
+      "hideTable": false,
+      "description": "L'incantatore esercita il suo controllo sugli elementi, creando uno dei seguenti effetti entro gittata.<br><b>Richiamo del fuoco:</b> Nell'area di un cubo con spigolo di <b>1,5m/1q</b>, l'incantatore crea una piccola nube di braci non incandescenti, colorate e che emettono fumo e un odore particolare. L'incantatore sceglie il colore e l'odore delle braci, che si possono usare per accendere candele, torce o lampade in quell'area. L'odore del fumo permane per 1 minuto.<br>",
+      "castingTime": "azione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": true,
+        "material": false
+      },
+      "material": "",
+      "toHit": false,
+      "duration": "Istante",
+      "range": "9m/6q"
     },
     {
       "name": "Elementalismo",
