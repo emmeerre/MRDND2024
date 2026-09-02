@@ -54,9 +54,15 @@
         .status-warning { background: rgba(241, 196, 15, 0.15); border-color: #f1c40f; color: #f1c40f; }
         .status-error { background: rgba(231, 76, 60, 0.15); border-color: #e74c3c; color: #e74c3c; }
 
-        .file-loader { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
-        .file-loader label { font-size: 0.8em; color: #a08060; }
-        .file-loader input { background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2); color: #e8d5b0; padding: 8px 12px; border-radius: 6px; font-family: 'EB Garamond', serif; font-size: 0.9em; flex: 1; max-width: 300px; }
+        .file-loader { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .file-loader label { font-size: 0.8em; color: #a08060; width: 100%; margin-bottom: -5px; }
+        .file-links { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 200px; }
+        .file-link-btn { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); color: #e8d5b0; padding: 5px 12px; border-radius: 15px; font-size: 0.8em; cursor: pointer; transition: all 0.2s; }
+        .file-link-btn:hover { background: rgba(212,175,55,0.3); }
+        .file-link-btn.active { background: var(--gold-light); color: #1a1208; border-color: var(--gold-light); font-weight: bold; }
+        
+        .manual-load { display: flex; gap: 5px; align-items: center; }
+        .manual-load input { background: rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.2); color: #e8d5b0; padding: 6px 10px; border-radius: 6px; font-family: 'EB Garamond', serif; font-size: 0.85em; width: 180px; }
 
         .caster-global { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 20px; padding: 16px 18px; background: rgba(212,175,55,0.06); border-radius: 10px; border: 1px solid rgba(212,175,55,0.15); }
         .caster-global h3 { width: 100%; font-family: 'Cinzel', serif; font-size: 0.85em; color: var(--gold-light); margin-bottom: 8px; letter-spacing: 1px; }
@@ -76,13 +82,14 @@
         .spell-checkbox input { accent-color: var(--gold-light); cursor: pointer; }
         .spell-checkbox em { color: #a08060; font-size: 0.85em; font-style: italic; }
 
-        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .btn { background: var(--gold-light); color: #1a1208; border: none; padding: 10px 22px; border-radius: 8px; font-family: 'Cinzel', serif; font-weight: 600; font-size: 0.85em; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
         .btn:hover { background: #e6c558; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
         .btn-secondary { background: transparent; border: 1px solid rgba(212,175,55,0.4); color: var(--gold-light); }
         .btn-secondary:hover { background: rgba(212,175,55,0.1); border-color: var(--gold-light); }
 
-        .info-note { margin-top: 14px; padding: 12px 16px; background: rgba(212,175,55,0.06); border-left: 3px solid var(--gold); border-radius: 4px; font-size: 0.82em; color: #b8a080; line-height: 1.7; }
+        .info-note { margin-top: 14px; padding: 12px 16px; background: rgba(212,175,55,0.06); border-left: 3px solid var(--gold); border-radius: 4px; font-size: 0.82em; color: #b8a080; line-height: 1.7; display: none; } /* Nascosto di default */
+        .info-note.visible { display: block; }
         .info-note code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; color: var(--gold-light); font-size: 0.9em; font-family: 'Courier New', monospace; }
 
         /* ===================== GRIGLIA CARDS ===================== */
@@ -243,11 +250,14 @@
 
         <div id="loadStatus" class="load-status status-warning">⏳ Caricamento dati in corso...</div>
 
-        <!-- Selettore File di Dati -->
+        <!-- Selettore File di Dati Automatico -->
         <div class="file-loader">
-            <label>File Dati:</label>
-            <input type="text" id="dataFileInput" value="ListaIncantesimi.txt">
-            <button class="btn btn-secondary" onclick="reloadData()">🔄 Ricarica File</button>
+            <label>📁 Gruppi di Incantesimi (.txt):</label>
+            <div class="file-links" id="fileLinks"></div>
+            <div class="manual-load">
+                <input type="text" id="dataFileInput" value="ListaIncantesimi.txt">
+                <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="reloadData()">🔄</button>
+            </div>
         </div>
 
         <div class="caster-global">
@@ -290,13 +300,15 @@
             <button class="btn" onclick="window.print()">🖨️ Stampa</button>
             <button class="btn btn-secondary" onclick="selectAll(true)">Seleziona tutti</button>
             <button class="btn btn-secondary" onclick="selectAll(false)">Deseleziona tutti</button>
-            <button class="btn btn-secondary" onclick="applyGlobalToAll()">↻ Ripristina valori globali sulle card</button>
+            <button class="btn btn-secondary" onclick="applyGlobalToAll()">↻ Ripristina valori globali</button>
+            <button class="btn btn-secondary" onclick="toggleInfo()">❓ Suggerimenti</button>
         </div>
 
-        <div class="info-note">
-            💡 <strong>Struttura Dati:</strong>usa <code>ListaIncantesimi.txt</code>. Non premere "Invio" dentro le descrizioni, usa <code>&lt;br&gt;</code>.<br>
-            🎨 <strong>Riquadri:</strong> Usa <code>"HighlightBox1": "Testo"</code> e <code>"ColorHighlightBox1": "Red"</code>.<br>
-            📊 <strong>Tabella:</strong> Struttura fissa su 3 righe.
+        <div class="info-note" id="infoNote">
+            💡 <strong>Struttura Dati JSON:</strong>usa file <code>.txt</code>. Non premere "Invio" dentro le descrizioni, usa <code>&lt;br&gt;</code>.<br>
+            🎨 <strong>Tema:</strong> aggiungi <code>"theme": "theme-mago"</code> per forzare il colore. Valori: theme-paladino, theme-clerico, theme-ranger, theme-druido, theme-stregone, theme-mago, theme-warlock, theme-bardo, theme-artificiere.<br>
+            🖼️ <strong>Riquadri:</strong> Usa <code>"HighlightBox1": "Testo"</code> e <code>"ColorHighlightBox1": "Red"</code>. Colori: Red, Green, Blue, Purple, Orange, Gold, Black, Gray.<br>
+            📊 <strong>Tabella:</strong> Struttura fissa su 3 righe. Se non serve la tabella, usa <code>"hideTable": true</code>.
         </div>
     </div>
 
@@ -304,20 +316,22 @@
 
     <script>
         /* ================================================================
-           DATI PREDEFINITI 
+           CONFIGURAZIONE GITHUB API (Per leggere i file .txt in automatico)
+           Sostituisci "emmeerre" con il tuo nome utente GitHub e
+           "MRDND2024" con il nome del tuo repository.
            ================================================================ */
+        const GITHUB_USER = 'emmeerre';
+        const GITHUB_REPO = 'MRDND2024';
+
         const defaultSpells = [
             {
                 "name": "Bacche Benefiche (Default)",
                 "level": "1° Livello",
                 "school": "Trasmutazione",
                 "classes": "Druido, Ranger",
+                "theme": "theme-druido", // Esempio: tema forzato da file di testo
                 "HighlightBox1": "Rituale",
                 "ColorHighlightBox1": "Green",
-                "HighlightBox2": "",
-                "ColorHighlightBox2": "",
-                "HighlightBox3": "",
-                "ColorHighlightBox3": "",
                 "pageNumber": "1/1",
                 "hideTable": false,
                 "description": "Appaiono dieci bacche infuse di magia per la durata dell'incantesimo. Una creatura può usare un'<b>azione bonus</b> per mangiare una bacca, recuperando <b>1 punto ferita</b> e ottenendo nutrimento sufficiente per un'intera giornata.",
@@ -335,9 +349,6 @@
         let spells = []; 
         let cardOverrides = {};
 
-        /* ================================================================
-           LOGICA DI RENDERING E FILTRI
-           ================================================================ */
         function getColorFromString(colorStr) {
             if (!colorStr) return 'transparent';
             const c = colorStr.toLowerCase();
@@ -354,16 +365,75 @@
             return map[c] || colorStr;
         }
 
+        function toggleInfo() {
+            const note = document.getElementById('infoNote');
+            note.classList.toggle('visible');
+        }
+
+        // =========================================================
+        // FUNZIONE: Scansione GitHub Repository per file .txt
+        // =========================================================
+        async function fetchAvailableFiles() {
+            const linksContainer = document.getElementById('fileLinks');
+            linksContainer.innerHTML = '<span style="font-size:0.8em; color:#a08060; padding: 5px 0;">Caricamento lista file...</span>';
+            
+            try {
+                // Usa l'API di GitHub per elencare i contenuti della root del repo
+                const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/`;
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) throw new Error('API non disponibile');
+                
+                const files = await response.json();
+                const txtFiles = files.filter(f => f.name.endsWith('.txt'));
+                
+                linksContainer.innerHTML = '';
+                if (txtFiles.length === 0) {
+                    linksContainer.innerHTML = '<span style="font-size:0.8em; color:#a08060; padding: 5px 0;">Nessun file .txt trovato nel repo.</span>';
+                    return;
+                }
+                
+                txtFiles.forEach(file => {
+                    const btn = document.createElement('button');
+                    btn.className = 'file-link-btn';
+                    btn.innerText = '📄 ' + file.name.replace('.txt', '');
+                    btn.onclick = () => {
+                        document.getElementById('dataFileInput').value = file.name;
+                        reloadData();
+                        // Evidenzia il pulsante attivo
+                        document.querySelectorAll('.file-link-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    };
+                    linksContainer.appendChild(btn);
+                });
+
+                // Attiva automaticamente il primo file o quello di default
+                const defaultFile = document.getElementById('dataFileInput').value;
+                const btns = document.querySelectorAll('.file-link-btn');
+                btns.forEach(b => {
+                    if (b.innerText.includes(defaultFile.replace('.txt', ''))) b.classList.add('active');
+                });
+
+            } catch (error) {
+                linksContainer.innerHTML = '<span style="font-size:0.8em; color:#a08060; padding: 5px 0;">Impossibile leggere la cartella in automatico. Inserisci il nome manualmente.</span>';
+            }
+        }
+
         function populateFilters() {
             const schools = [...new Set(spells.map(s => s.school))].sort();
             const levels = [...new Set(spells.map(s => s.level))].sort();
             const classes = [...new Set(spells.flatMap(s => s.classes.split(',').map(c => c.trim())))].sort();
 
             const schoolSel = document.getElementById('filterSchool');
+            schoolSel.innerHTML = '<option value="">Tutte le Scuole</option>';
             schools.forEach(s => { schoolSel.innerHTML += `<option value="${s}">${s}</option>`; });
+            
             const levelSel = document.getElementById('filterLevel');
+            levelSel.innerHTML = '<option value="">Tutti i Livelli</option>';
             levels.forEach(l => { levelSel.innerHTML += `<option value="${l}">${l}</option>`; });
+            
             const classSel = document.getElementById('filterClass');
+            classSel.innerHTML = '<option value="">Tutte le Classi</option>';
             classes.forEach(c => { classSel.innerHTML += `<option value="${c}">${c}</option>`; });
         }
 
@@ -424,6 +494,9 @@
         function applyGlobalToAll() { cardOverrides = {}; renderCards(); }
 
         function guessDefaultTheme(spell) {
+            // Se il tema è specificato nel file .txt, ha la priorità
+            if (spell.theme) return spell.theme;
+            
             const c = spell.classes.toLowerCase();
             if (c.includes("paladino")) return "theme-paladino";
             if (c.includes("chierico")) return "theme-clerico";
@@ -455,7 +528,9 @@
                 const vBonus   = getCardValue(spellIndex, 'bonus');
                 const vCD      = getCardValue(spellIndex, 'cd');
                 const vToHit   = getCardValue(spellIndex, 'toHit');
-                const vTheme   = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
+                
+                // Il tema viene dal file TXT, dall'override manuale, o indovinato dalla classe
+                const vTheme = (cardOverrides[spellIndex] && cardOverrides[spellIndex].theme) || guessDefaultTheme(spell);
 
                 let badgesHTML = '<div class="badges-container">';
                 for (let i = 1; i <= 3; i++) {
@@ -480,7 +555,7 @@
                 }
 
                 let saveCellContent;
-                if (spell.savingThrow === "NO") {
+                if (spell.savingThrow === "NO" || !spell.savingThrow) {
                     saveCellContent = '<span class="stat-value no">NO</span>';
                 } else {
                     saveCellContent = `
@@ -489,7 +564,7 @@
                                 <span class="save-stat">${spell.savingThrow}</span>
                                 <span class="save-cd">CD <input type="text" class="stat-input cd-input" data-spell="${spellIndex}" data-field="cd" value="${vCD}"></span>
                             </div>
-                            <span class="save-outcome">${spell.saveOutcome}</span>
+                            <span class="save-outcome">${spell.saveOutcome || ''}</span>
                         </div>
                     `;
                 }
@@ -591,24 +666,16 @@
             });
         }
 
-        // =========================================================
-        // FUNZIONE: Trova riga errore JSON
-        // =========================================================
         function getJSONErrorLine(text, error) {
-            // Cerca "position X" nel messaggio di errore (formato comune in Chrome/Firefox)
             const posMatch = error.message.match(/position (\d+)/);
             if (posMatch) {
                 const pos = parseInt(posMatch[1]);
                 const lines = text.substring(0, pos).split('\n');
                 return ` (Riga ${lines.length})`;
             }
-            // Fallback se non trova la posizione
             return "";
         }
 
-        // =========================================================
-        // INIZIALIZZAZIONE ASINCRONA CON CAMBIO FILE
-        // =========================================================
         async function reloadData() {
             const filename = document.getElementById('dataFileInput').value || 'ListaIncantesimi.txt';
             await initializePage(filename);
@@ -617,7 +684,7 @@
         async function initializePage(filename = 'ListaIncantesimi.txt') {
             const statusDiv = document.getElementById('loadStatus');
             const grid = document.getElementById('cardsGrid');
-            grid.innerHTML = ''; // Pulisci griglia durante il caricamento
+            grid.innerHTML = ''; 
 
             statusDiv.className = "load-status status-warning";
             statusDiv.innerHTML = `⏳ Caricamento dati da <strong>${filename}</strong>...`;
@@ -659,6 +726,7 @@
             renderCards();
         }
 
+        // Listener
         document.getElementById('searchName').addEventListener('input', renderControls);
         document.getElementById('filterSchool').addEventListener('change', renderControls);
         document.getElementById('filterLevel').addEventListener('change', renderControls);
@@ -668,7 +736,10 @@
         document.getElementById('globalCD').addEventListener('input', renderCards);
         document.getElementById('globalToHit').addEventListener('input', renderCards);
 
-        // Avvia la pagina con il file predefinito
+        // Avvio
+        // 1. Scansiona i file .txt disponibili su GitHub
+        fetchAvailableFiles();
+        // 2. Carica il file di default
         initializePage();
     </script>
 </body>
