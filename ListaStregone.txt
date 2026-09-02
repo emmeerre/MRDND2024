@@ -88,6 +88,33 @@
       "range": "36m/24q"
     },
     {
+      "name": "Armatura magica",
+      "level": "1° Liv.",
+      "school": "Abiurazione",
+      "classes": "mago, stregone",
+      "HighlightBox1": "",
+      "ColorHighlightBox1": "",
+      "HighlightBox2": "",
+      "ColorHighlightBox2": "",
+      "HighlightBox3": "",
+      "ColorHighlightBox3": "",
+      "pageNumber": "1/1",
+      "hideTable": false,
+      "description": "L'incantatore tocca una creatura consenziente che non indossa un'armatura. Fino al termine dell'incantesimo, la CA base del bersaglio diventa 13 più il suo modificatore di Destrezza. L'incantesimo termina in anticipo se il bersaglio indossa un'armatura.",
+      "castingTime": "azione",
+      "savingThrow": "NO",
+      "saveOutcome": "",
+      "components": {
+        "verbal": true,
+        "somatic": true,
+        "material": true
+      },
+      "material": "un pezzo di cuoio trattato",
+      "toHit": false,
+      "duration": "8 ore",
+      "range": "contatto"
+    },
+    {
       "name": "Prestidigitazione",
       "level": "Trucco",
       "school": "Trasmutazione",
@@ -140,33 +167,6 @@
       "toHit": false,
       "duration": "1 ora",
       "range": "3m/2q"
-    },
-    {
-      "name": "Armatura magica",
-      "level": "1° Liv.",
-      "school": "Abiurazione",
-      "classes": "mago, stregone",
-      "HighlightBox1": "",
-      "ColorHighlightBox1": "",
-      "HighlightBox2": "",
-      "ColorHighlightBox2": "",
-      "HighlightBox3": "",
-      "ColorHighlightBox3": "",
-      "pageNumber": "1/1",
-      "hideTable": false,
-      "description": "L'incantatore tocca una creatura consenziente che non indossa un'armatura. Fino al termine dell'incantesimo, la CA base del bersaglio diventa 13 più il suo modificatore di Destrezza. L'incantesimo termina in anticipo se il bersaglio indossa un'armatura.",
-      "castingTime": "azione",
-      "savingThrow": "NO",
-      "saveOutcome": "",
-      "components": {
-        "verbal": true,
-        "somatic": true,
-        "material": true
-      },
-      "material": "un pezzo di cuoio trattato",
-      "toHit": false,
-      "duration": "8 ore",
-      "range": "contatto"
     },
     {
       "name": "Illusione minore",
