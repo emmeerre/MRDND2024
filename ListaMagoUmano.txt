@@ -46,7 +46,7 @@
       "ColorHighlightBox3": "",
       "pageNumber": "1/1",
       "hideTable": false,
-      "description": "L'incantatore scaglia una scintilla di fuoco verso una creatura o un oggetto situato a gittata, effettuando un <b>attacco a distanza con incantesimo</b> contro il bersaglio. Se il colpo va a segno, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un <b>oggetto infiammabile colpito prende fuoco<b> se non indossato o trasportato in quel momento.<br><b>Trucchetto potenziato:</b> I danni aumentano di <b>1d10</b> quando l'incantatore raggiunge il 5º livello (<b>2d10</b>), l'11º livello (<b>3d10</b>) e il 17º livello (<b>4d10</b>).",
+      "description": "L'incantatore scaglia una scintilla di fuoco verso una creatura o un oggetto situato a gittata, effettuando un <b>attacco a distanza con incantesimo</b> contro il bersaglio. Se il colpo va a segno, il bersaglio subisce <b>1d10 danni da fuoco</b>. Un <b>oggetto infiammabile colpito prende fuoco</b> se non indossato o trasportato in quel momento.<br><b>Trucchetto potenziato:</b> I danni aumentano di <b>1d10</b> quando l'incantatore raggiunge il 5º livello (<b>2d10</b>), l'11º livello (<b>3d10</b>) e il 17º livello (<b>4d10</b>).",
       "castingTime": "azione",
       "savingThrow": "NO",
       "saveOutcome": "",
