@@ -171,7 +171,7 @@
       "material": "",
       "toHit": false,
       "duration": "1 round",
-      "range": "incantatore",
+      "range": "Se Stesso",
       "theme": "theme-artificiere"
     },
     {
