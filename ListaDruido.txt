@@ -31,9 +31,10 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "9m/6q"
-     },
-      {
+      "range": "9m/6q",
+      "theme": "theme-druido"
+    },
+    {
       "name": "Artificio druidico",
       "level": "Trucco",
       "school": "Trasmutazione",
@@ -58,7 +59,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "9m/6q"
+      "range": "9m/6q",
+      "theme": "theme-druido"
     },
     {
       "name": "Randello incantato",
@@ -85,7 +87,8 @@
       "material": "vischio",
       "toHit": false,
       "duration": "1 min.",
-      "range": "incantatore"
+      "range": "Se stesso",
+      "theme": "theme-druido"
     },
     {
       "name": "Elementalismo",
@@ -112,7 +115,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "9m/6q"
+      "range": "9m/6q",
+      "theme": "theme-druido"
     },
     {
       "name": "Elementalismo",
@@ -139,7 +143,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "9m/6q"
+      "range": "9m/6q",
+      "theme": "theme-druido"
     },
     {
       "name": "Elementalismo",
@@ -166,7 +171,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "9m/6q"
+      "range": "9m/6q",
+      "theme": "theme-druido"
     },
     {
       "name": "Spruzzo velenoso",
@@ -193,7 +199,8 @@
       "material": "",
       "toHit": true,
       "duration": "Istante",
-      "range": "9m/6q"
+      "range": "9m/6q",
+      "theme": "theme-druido"
     },
     {
       "name": "Riparare",
@@ -220,7 +227,8 @@
       "material": "due calamite",
       "toHit": false,
       "duration": "Istante",
-      "range": "contatto"
+      "range": "contatto",
+      "theme": "theme-druido"
     },
     {
       "name": "Luce splendente",
@@ -247,7 +255,8 @@
       "material": "",
       "toHit": true,
       "duration": "Istante",
-      "range": "18m/12q"
+      "range": "18m/12q",
+      "theme": "theme-druido"
     },
     {
       "name": "Protezione dal bene e dal male",
@@ -274,7 +283,8 @@
       "material": "un'ampolla di acqua santa del valore di 25 mo o più, che l'incantesimo consuma",
       "toHit": false,
       "duration": "10 min.",
-      "range": "contatto"
+      "range": "contatto",
+      "theme": "theme-druido"
     },
     {
       "name": "Coltello di ghiaccio",
@@ -328,7 +338,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "contatto"
+      "range": "contatto",
+      "theme": "theme-druido"
     },
     {
       "name": "Parola guaritrice",
@@ -355,7 +366,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "18m/12q"
+      "range": "18m/12q",
+      "theme": "theme-druido"
     },
     {
       "name": "Localizza animali o vegetali",
@@ -382,7 +394,8 @@
       "material": "un ciuffo di peli di un segugio",
       "toHit": false,
       "duration": "Istante",
-      "range": "incantatore"
+      "range": "Se Stesso",
+      "theme": "theme-druido"
     },
     {
       "name": "Amicizia con gli animali",
@@ -409,7 +422,8 @@
       "material": "un boccone di cibo",
       "toHit": false,
       "duration": "24 ore",
-      "range": "9m/6q"
+      "range": "9m/6q",
+      "theme": "theme-druido"
     },
     {
       "name": "Bagliore lunare",
@@ -463,7 +477,8 @@
       "material": "incenso bruciato del valore di 10 mo o più, che l'incantesimo consuma",
       "toHit": false,
       "duration": "Istante",
-      "range": "3m/2q"
+      "range": "3m/2q",
+      "theme": "theme-druido"
     },
     {
       "name": "Trova famiglio",
@@ -490,7 +505,8 @@
       "material": "incenso bruciato del valore di 10 mo o più, che l'incantesimo consuma",
       "toHit": false,
       "duration": "Istante",
-      "range": "3m/2q"
+      "range": "3m/2q",
+      "theme": "theme-druido"
     },
     {
       "name": "Trova famiglio",
@@ -517,6 +533,8 @@
       "material": "incenso bruciato del valore di 10 mo o più, che l'incantesimo consuma",
       "toHit": false,
       "duration": "Istante",
-      "range": "3m/2q"
-    }  ]
+      "range": "3m/2q",
+      "theme": "theme-druido"
+    }
+  ]
 }
