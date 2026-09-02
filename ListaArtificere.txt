@@ -31,7 +31,8 @@
       "material": "",
       "toHit": true,
       "duration": "Istante",
-      "range": "36m/24q"
+      "range": "36m/24q",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Mano magica",
@@ -58,7 +59,8 @@
       "material": "",
       "toHit": false,
       "duration": "1 min.",
-      "range": "9m/6q"
+      "range": "9m/6q",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Riparare",
@@ -85,7 +87,8 @@
       "material": "due calamite",
       "toHit": false,
       "duration": "Istante",
-      "range": "contatto"
+      "range": "contatto",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Prestidigitazione",
@@ -112,7 +115,8 @@
       "material": "",
       "toHit": false,
       "duration": "1 ora",
-      "range": "3m/2q"
+      "range": "3m/2q",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Prestidigitazione",
@@ -139,7 +143,8 @@
       "material": "",
       "toHit": false,
       "duration": "1 ora",
-      "range": "3m/2q"
+      "range": "3m/2q",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Scudo",
@@ -166,7 +171,8 @@
       "material": "",
       "toHit": false,
       "duration": "1 round",
-      "range": "incantatore"
+      "range": "incantatore",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Onda tonante",
@@ -193,7 +199,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "incantatore"
+      "range": "incantatore",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Catapulta",
@@ -220,7 +227,8 @@
       "material": "",
       "toHit": false,
       "duration": "Istante",
-      "range": "18m/12q"
+      "range": "18m/12q",
+      "theme": "theme-artificiere"
     },
     {
       "name": "Salto",
@@ -247,7 +255,8 @@
       "material": "la zampa posteriore di una cavalletta",
       "toHit": false,
       "duration": "1 min.",
-      "range": "contatto"
+      "range": "contatto",
+      "theme": "theme-artificiere"
     }
   ]
 }
