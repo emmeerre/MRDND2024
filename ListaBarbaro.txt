@@ -20,7 +20,7 @@
       "pageNumber": "1/1",
       "hideTable": false,
       "description": "Per la durata dell'incantesimo, l'incantatore comprende le bestie e può comunicare verbalmente con loro usando una qualunque abilità dell'azione di Influenza.<br>Nella maggior parte dei casi hanno ben poco da dire su temi che esulano dalla sopravvivenza o dallo spirito di squadra, ma almeno possono fornire informazioni su luoghi e mostri nelle vicinanze, oltre a tutto ciò che hanno notato nel corso dell'ultima giornata.",
-      "castingTime": "1 Azione",
+      "castingTime": "10 min",
       "savingThrow": "NO",
       "saveOutcome": "",
       "components": {
@@ -47,7 +47,7 @@
       "pageNumber": "1/1",
       "hideTable": false,
       "description": "<b>Percezione condivisa:</b> Puoi percepire attraverso i sensi della bestia e mantenere contemporaneamente i tuoi Sensi speciali: Ottieni i benefici di eventuali sensi speciali posseduti dalla bestia (come la vista cieca o l'olfatto acuto).",
-      "castingTime": "1 Azione",
+      "castingTime": "10 min",
       "savingThrow": "NO",
       "saveOutcome": "",
       "components": {
