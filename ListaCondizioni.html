@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Condizioni e Atteggiamenti — Glossario in Carte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ============ FONDAMENTA ============ */
+:root{
+  --paper:#EAE1CC; --paper-2:#E2D7BC; --card:#FCF8EE;
+  --ink:#231C11; --ink-2:#6A5D44; --ink-3:#8B7D5E;
+  --line:#C4B694; --line-2:#A79369;
+  --acc:#96341B; --gold:#8A6D2E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'EB Garamond',Georgia,serif; color:var(--ink);
+  background-color:var(--paper);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+[hidden]{display:none!important}
+::selection{background:var(--gold);color:var(--card)}
+svg{display:block}
+
+/* ============ TESTATA ============ */
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.masthead{text-align:center;padding:46px 20px 26px}
+.orn{color:var(--gold);margin:0 auto 14px;width:190px}
+.orn svg{width:190px;height:14px}
+h1{
+  font-family:Cinzel,serif;font-weight:700;font-size:clamp(30px,4.6vw,46px);
+  letter-spacing:.06em;line-height:1.1;
+}
+h1::after{content:'';display:block;width:64px;height:2px;background:var(--acc);margin:14px auto 0}
+.sub{max-width:640px;margin:14px auto 0;font-size:17.5px;font-style:italic;color:var(--ink-2);line-height:1.5}
+.meta{
+  margin-top:18px;font-family:Cinzel,serif;font-weight:600;font-size:11px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+}
+.meta b{color:var(--ink);font-weight:700}
+.meta i{font-style:normal;color:var(--line-2)}
+
+/* ============ BARRA STRUMENTI ============ */
+.toolbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(234,225,204,.93);backdrop-filter:blur(6px);
+  border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+}
+.toolbar-in{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0}
+.search{position:relative;flex:1 1 220px;min-width:200px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--ink-3);pointer-events:none}
+.search input{
+  width:100%;padding:9px 12px 9px 34px;font:500 15px 'EB Garamond',serif;color:var(--ink);
+  background:#FFFEF8;border:1px solid var(--line-2);border-radius:2px;
+}
+.search input:focus{outline:none;border-color:var(--ink)}
+.search input::placeholder{color:var(--ink-3);font-style:italic}
+#chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{
+  font-family:Cinzel,serif;font-weight:600;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  padding:7px 11px;border:1px solid var(--line-2);border-radius:2px;background:transparent;
+  color:var(--ink-2);cursor:pointer;transition:.18s;
+}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.spacer{flex:1}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:Cinzel,serif;font-weight:600;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:9px 14px;border:1px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);
+  cursor:pointer;transition:.18s;white-space:nowrap;
+}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--acc);border-color:var(--acc)}
+.btn .bi{display:inline-flex}
+.bi svg{width:14px;height:14px}
+
+/* ============ GRIGLIA CARD (SCHERMO) ============ */
+main{padding:30px 0 60px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{
+  position:relative;background:var(--card);border:1px solid var(--line-2);
+  padding:18px 18px 12px;cursor:pointer;
+  box-shadow:0 1px 0 rgba(60,48,20,.10),0 6px 14px -10px rgba(60,48,20,.25);
+  transition:transform .22s ease,box-shadow .22s ease,border-color .18s;
+  animation:rise .5s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.card{animation:none}}
+.card:hover{transform:translateY(-3px);box-shadow:0 2px 0 rgba(60,48,20,.08),0 14px 22px -12px rgba(60,48,20,.35)}
+.cnr{position:absolute;width:9px;height:9px;border:0 solid var(--gold);transition:.25s;pointer-events:none}
+.cnr.tl{top:6px;left:6px;border-top-width:2px;border-left-width:2px}
+.cnr.tr{top:6px;right:6px;border-top-width:2px;border-right-width:2px}
+.cnr.bl{bottom:6px;left:6px;border-bottom-width:2px;border-left-width:2px}
+.cnr.br{bottom:6px;right:6px;border-bottom-width:2px;border-right-width:2px}
+.card:hover .cnr{width:14px;height:14px;border-color:var(--acc)}
+.card-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cat{font-family:Cinzel,serif;font-weight:700;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc)}
+.num{font-style:italic;font-size:13px;color:var(--ink-3)}
+.card h3{font-family:Cinzel,serif;font-weight:700;font-size:20px;line-height:1.25;margin:6px 0 2px}
+.rule{height:1px;background:var(--line);margin:9px 0 11px;position:relative}
+.rule::after{content:'';position:absolute;left:50%;top:-2.5px;width:5px;height:5px;transform:translateX(-50%) rotate(45deg);background:var(--gold)}
+.card p{font-size:15.5px;line-height:1.52;color:#3A3122}
+/* elenco effetti (condizioni, pericoli, influenza) */
+.eff{list-style:none;margin-top:2px}
+.eff li{position:relative;padding-left:15px;margin-top:8px;font-size:15px;line-height:1.45;color:#3A3122}
+.eff li::before{content:'';position:absolute;left:2px;top:8px;width:5px;height:5px;transform:rotate(45deg);background:var(--gold)}
+.eff b{font-family:Cinzel,serif;font-weight:700;font-size:12px;letter-spacing:.05em;color:var(--ink)}
+.eff b::after{content:' — ';color:var(--ink-3);font-weight:400}
+.note{margin-top:9px;font-size:13.5px;font-style:italic;color:var(--ink-2);border-left:2px solid var(--gold);padding-left:9px}
+.card-foot{
+  margin-top:14px;display:flex;justify-content:space-between;align-items:center;
+  font-family:Cinzel,serif;font-weight:600;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+}
+.tools{display:flex;gap:4px;opacity:0;transition:.2s}
+.card:hover .tools,.card:focus-within .tools{opacity:1}
+.tool-btn{
+  display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+  border:1px solid var(--line-2);border-radius:2px;background:transparent;color:var(--ink-2);cursor:pointer;transition:.15s;
+}
+.tool-btn svg{width:13px;height:13px}
+.tool-btn:hover{border-color:var(--ink);color:var(--ink)}
+.tool-btn.arm{border-color:var(--acc);color:var(--acc);font-family:Cinzel,serif;font-size:8px;font-weight:700;letter-spacing:.05em;padding:0 5px;width:auto}
+.card.sel{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc),0 6px 14px -10px rgba(60,48,20,.3)}
+.card.sel .cnr{border-color:var(--acc)}
+.stamp{
+  position:absolute;top:12px;right:10px;display:none;transform:rotate(-9deg);
+  border:2px solid var(--acc);color:var(--acc);background:rgba(252,248,238,.88);
+  font-family:Cinzel,serif;font-weight:700;font-size:9.5px;letter-spacing:.14em;padding:3px 8px;pointer-events:none;
+}
+.card.sel .stamp{display:block;animation:stampIn .32s cubic-bezier(.2,1.6,.4,1)}
+@keyframes stampIn{0%{transform:rotate(-9deg) scale(2.1);opacity:0}55%{opacity:1}100%{transform:rotate(-9deg) scale(1)}}
+.empty{text-align:center;padding:70px 20px;color:var(--ink-2)}
+.empty .orn{margin-bottom:10px}
+.empty p{font-size:17px;font-style:italic}
+.empty .btn{margin-top:16px}
+
+/* ============ PIÈDE ============ */
+footer{
+  border-top:1px solid var(--line-2);padding:20px;text-align:center;
+  font-size:13.5px;font-style:italic;color:var(--ink-2);line-height:1.6;
+}
+
+/* ============ FINESTRE ============ */
+.overlay{position:fixed;inset:0;z-index:100;background:rgba(24,18,9,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+.panel{
+  position:relative;width:min(580px,94vw);max-height:88vh;overflow:auto;
+  background:var(--card);border:1px solid var(--line-2);padding:24px 26px 22px;
+  box-shadow:0 30px 60px -20px rgba(20,14,5,.5);
+}
+.panel::before{content:'';position:absolute;inset:6px;border:1px solid var(--line);pointer-events:none}
+.panel>*{position:relative}
+.panel h2{font-family:Cinzel,serif;font-weight:700;font-size:19px;letter-spacing:.04em;padding-right:30px}
+.panel .lead{font-size:14.5px;font-style:italic;color:var(--ink-2);margin-top:4px;line-height:1.45}
+.x{
+  position:absolute;top:14px;right:14px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border:1px solid transparent;background:none;color:var(--ink-2);cursor:pointer;border-radius:2px;
+}
+.x:hover{border-color:var(--ink);color:var(--ink)}
+.x svg{width:14px;height:14px}
+label.f{display:block;margin:15px 0 5px;font-family:Cinzel,serif;font-weight:600;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-2)}
+input.fld,textarea.fld{
+  width:100%;padding:9px 11px;font:500 15px 'EB Garamond',serif;color:var(--ink);
+  background:#FFFEF8;border:1px solid var(--line-2);border-radius:2px;resize:vertical;
+}
+input.fld:focus,textarea.fld:focus{outline:none;border-color:var(--ink)}
+.frow{display:flex;gap:12px}
+.frow>div{flex:1}
+.panel .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
+.hint{font-size:13px;color:var(--ink-2);line-height:1.5;margin-top:6px}
+.hint code{font-family:inherit;font-style:italic;background:var(--paper-2);padding:1px 5px;border-radius:2px}
+.datasec{margin-top:22px;border-top:1px dashed var(--line);padding-top:16px}
+.datasec h3{font-family:Cinzel,serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
+.seg{display:flex;gap:0;margin-top:6px;border:1px solid var(--ink);border-radius:2px;overflow:hidden;width:fit-content}
+.seg button{
+  font-family:Cinzel,serif;font-weight:600;font-size:12px;padding:9px 16px;background:transparent;
+  border:none;border-right:1px solid var(--ink);color:var(--ink);cursor:pointer;transition:.15s;
+}
+.seg button:last-child{border-right:none}
+.seg button.on{background:var(--ink);color:var(--paper)}
+.opt{display:flex;align-items:flex-start;gap:11px;margin-top:15px;cursor:pointer;user-select:none}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.box{
+  flex:0 0 17px;height:17px;margin-top:2px;border:1px solid var(--ink);border-radius:2px;background:#FFFEF8;
+  display:flex;align-items:center;justify-content:center;transition:.15s;
+}
+.box svg{width:11px;height:11px;color:var(--paper);opacity:0;transition:.15s}
+.opt input:checked~.box{background:var(--ink)}
+.opt input:checked~.box svg{opacity:1}
+.opt .t b{font-family:Cinzel,serif;font-size:12px;letter-spacing:.06em;display:block}
+.opt .t span{font-size:13.5px;color:var(--ink-2);line-height:1.4;display:block;margin-top:2px}
+
+/* ============ AVVISI ============ */
+#toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  background:var(--ink);color:var(--paper);border-left:3px solid var(--acc);
+  padding:11px 18px;font-size:14.5px;box-shadow:0 10px 24px -8px rgba(20,14,5,.5);
+  animation:tIn .3s cubic-bezier(.2,.9,.3,1);max-width:88vw;
+}
+@keyframes tIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.toast.out{opacity:0;transform:translateY(8px);transition:.3s}
+
+#printArea{display:none}
+
+/* ============ STAMPA ============ */
+@page{size:A4;margin:0}
+@media print{
+  html,body{background:#fff}
+  body>:not(#printArea){display:none!important}
+  #printArea{display:block}
+  .sheet{
+    display:grid;grid-template-columns:repeat(var(--c),1fr);grid-template-rows:repeat(var(--r),1fr);
+    width:210mm;height:296.6mm;padding:10mm;break-after:page;page-break-after:always;
+  }
+  .sheet:last-child{break-after:auto;page-break-after:auto}
+  .sheet[data-f="2-3"]{--fsT:5.6mm;--fsD:3.5mm;--fsS:2.4mm}
+  .sheet[data-f="2-4"]{--fsT:4.9mm;--fsD:3.1mm;--fsS:2.3mm}
+  .sheet[data-f="2-5"]{--fsT:4.2mm;--fsD:2.7mm;--fsS:2.1mm}
+  .sheet[data-f="3-5"]{--fsT:3.6mm;--fsD:2.4mm;--fsS:1.9mm}
+  .pcard{
+    position:relative;min-height:0;overflow:hidden;background:#fff;
+    border:.4mm solid #1F1A12;padding:3.5mm 4mm;
+    display:flex;flex-direction:column;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .pcard::before{content:'';position:absolute;inset:1.2mm;border:.2mm solid #1F1A12;pointer-events:none}
+  .sheet.cut .pcard{border:.3mm dashed #888;background:transparent}
+  .sheet.cut .pcard::before{display:none}
+  .pcard.blank{border:none}
+  .pcard.blank::before{display:none}
+  .sheet.cut .pcard.blank{border:.3mm dashed #aaa}
+  .p-head{display:flex;justify-content:space-between;align-items:baseline;gap:2mm}
+  .p-cat,.p-num{font-family:Cinzel,serif;font-weight:700;font-size:var(--fsS);letter-spacing:.16em;color:#4A4232;text-transform:uppercase}
+  .p-term{font-family:Cinzel,serif;font-weight:700;font-size:var(--fsT);line-height:1.18;margin-top:1.2mm}
+  .p-rule{border-top:.25mm solid #1F1A12;margin:1.4mm 0 1.8mm;position:relative}
+  .p-rule::after{content:'';position:absolute;left:50%;top:-1mm;width:1.8mm;height:1.8mm;transform:translateX(-50%) rotate(45deg);background:#8A6D2E}
+  .p-def{font-family:'EB Garamond',serif;font-size:var(--fsD);line-height:1.42;color:#1c160d;flex:1}
+  .p-note{font-family:'EB Garamond',serif;font-style:italic;font-size:var(--fsS);color:#5A5240;margin-top:1.4mm;padding-left:1.6mm;border-left:.4mm solid #8A6D2E}
+  .p-foot{margin-top:1.6mm;display:flex;justify-content:space-between;font-family:Cinzel,serif;font-weight:600;font-size:calc(var(--fsS)*.85);letter-spacing:.15em;color:#7A7059;text-transform:uppercase}
+  /* elenco effetti in stampa */
+  .p-eff{list-style:none;margin-top:.5mm;flex:1}
+  .p-eff li{position:relative;padding-left:2.4mm;margin-top:.9mm;font-size:calc(var(--fsD)*.94);line-height:1.38;color:#1c160d}
+  .p-eff li::before{content:'';position:absolute;left:0;top:1.3mm;width:1.3mm;height:1.3mm;transform:rotate(45deg);background:#8A6D2E}
+  .p-eff b{font-family:Cinzel,serif;font-weight:700;font-size:calc(var(--fsS)*1.06);letter-spacing:.04em;color:#1F1A12}
+  .p-eff b::after{content:' — ';color:#7A7059}
+  /* card dense: molte voci, font ridotto automaticamente */
+  .pcard.dense .p-term{font-size:calc(var(--fsT)*.9)}
+  .pcard.dense .p-def{font-size:calc(var(--fsD)*.84);line-height:1.32}
+  .pcard.dense .p-eff li{font-size:calc(var(--fsD)*.8);line-height:1.28;margin-top:.6mm}
+  .pcard.dense .p-eff b{font-size:calc(var(--fsS)*.95)}
+  .pcard.dense .p-note{font-size:calc(var(--fsS)*.9)}
+  /* flashcard */
+  .pcard.flash-front{align-items:center;text-align:center}
+  .pf-term{font-family:Cinzel,serif;font-weight:700;font-size:calc(var(--fsT)*1.3);line-height:1.2;margin:auto 0;padding:0 2mm}
+  .pf-dia{width:2.4mm;height:2.4mm;transform:rotate(45deg);border:.3mm solid #8A6D2E;margin:0 auto}
+  .pf-hint{font-family:'EB Garamond',serif;font-style:italic;font-size:var(--fsS);color:#5A5240}
+  .flash-back .p-term{font-size:calc(var(--fsT)*.72);margin-top:.8mm}
+}
+@media (max-width:640px){
+  .masthead{padding-top:34px}
+  .frow{flex-direction:column;gap:0}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="orn">
+    <svg viewBox="0 0 190 14" fill="none" stroke="currentColor" stroke-width="1.2">
+      <path d="M4 7h70M116 7h70"/>
+      <path d="M95 1.5 100.5 7 95 12.5 89.5 7Z"/>
+      <circle cx="95" cy="7" r="1.4" fill="currentColor" stroke="none"/>
+    </svg>
+  </div>
+  <h1>Glossario in Carte</h1>
+  <p class="sub">Condizioni, atteggiamenti e pericoli del System Reference Document, composti come carte da ritagliare, tenere accanto al personaggio e studiare come flashcard.</p>
+  <div class="meta">
+    <span><b id="stTerms">0</b> voci</span><i>·</i>
+    <span><b id="stCats">0</b> capitoli</span><i>·</i>
+    <span id="stSel">nessuna selezione</span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="wrap toolbar-in">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="text" placeholder="Cerca una voce…  ( tasto / )">
+    </div>
+    <div id="chips"></div>
+    <div class="spacer"></div>
+    <button class="btn" id="btnSettings"><span class="bi" data-ic="sliders"></span>Impostazioni</button>
+    <button class="btn" id="btnImport"><span class="bi" data-ic="upload"></span>Importa</button>
+    <button class="btn" id="btnNew"><span class="bi" data-ic="plus"></span>Nuova voce</button>
+    <button class="btn primary" id="btnPrint"><span class="bi" data-ic="printer"></span><span id="btnPrintLbl">Stampa tutte</span></button>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="grid"></div>
+  <div class="empty" id="empty" hidden>
+    <div class="orn"><svg viewBox="0 0 190 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 7h70M116 7h70"/><path d="M95 1.5 100.5 7 95 12.5 89.5 7Z"/></svg></div>
+    <p id="emptyTxt">Nessuna voce corrisponde alla ricerca.</p>
+    <button class="btn" id="btnSeed" hidden><span class="bi" data-ic="rotate"></span>Ripristina il glossario predefinito</button>
+  </div>
+</main>
+
+<footer class="wrap">
+  Basato sulle regole liberate del <em>System Reference Document 5.2</em>, rilasciate sotto licenza CC BY 4.0 — testi condensati in forma breve per la consultazione al tavolo.<br>
+  Clicca su una card per timbrarla; nella finestra di stampa arrivano solo le carte selezionate (o tutte, se non ne hai scelta nessuna).
+</footer>
+
+<!-- ═══ finestra: nuova / modifica voce ═══ -->
+<div class="overlay" id="mEdit" hidden>
+  <div class="panel">
+    <button class="x" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h2 id="mEditTitle">Nuova voce</h2>
+    <p class="lead" id="mEditLead">Una scheda del glossario: termine, capitolo e testo asciutto.</p>
+    <div class="frow">
+      <div>
+        <label class="f" for="fTerm">Termine</label>
+        <input class="fld" id="fTerm" type="text" placeholder="Es. Pietrificato">
+      </div>
+      <div>
+        <label class="f" for="fCat">Capitolo</label>
+        <input class="fld" id="fCat" type="text" list="catList" placeholder="Es. Condizione">
+        <datalist id="catList"></datalist>
+      </div>
+    </div>
+    <label class="f" for="fDef">Introduzione <span style="text-transform:none;letter-spacing:0">(facoltativa)</span></label>
+    <textarea class="fld" id="fDef" rows="3" placeholder="Una o due frasi di inquadramento, prima degli effetti."></textarea>
+    <label class="f" for="fEff">Effetti <span style="text-transform:none;letter-spacing:0">(una riga per effetto — «Nome: testo»)</span></label>
+    <textarea class="fld" id="fEff" rows="4" placeholder="Velocità 0: La tua velocità è 0 e non può aumentare."></textarea>
+    <label class="f" for="fNote">Nota a margine <span style="text-transform:none;letter-spacing:0">(facoltativa)</span></label>
+    <input class="fld" id="fNote" type="text" placeholder="Es. Vedi anche: Indebolimento">
+    <div class="acts">
+      <button class="btn" data-close>Annulla</button>
+      <button class="btn primary" id="btnSaveEdit"><span class="bi" data-ic="check"></span>Salva la voce</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ finestra: importazione e gestione dati ═══ -->
+<div class="overlay" id="mImport" hidden>
+  <div class="panel">
+    <button class="x" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h2>Importa il tuo glossario</h2>
+    <p class="lead">Incolla qui le tue voci: vengono trasformate in carte in un lampo.</p>
+    <textarea class="fld" id="impText" rows="8" placeholder="Pietrificato | Condizione
+• Pietra: Tu e il tuo equipaggiamento diventate pietra…
+Nota: Vedi anche: Incapacitato
+
+Oppure, semplice:
+Copertura: La copertura fornisce protezione…"></textarea>
+    <p class="hint">Blocchi separati da una riga vuota. Testa: <code>Termine | Capitolo | intro</code> oppure <code>Termine: testo</code>. Righe che iniziano con <code>•</code> diventano effetti puntati; una riga <code>Nota: …</code> diventa la nota a margine.</p>
+    <div class="frow" style="margin-top:14px">
+      <label class="opt" style="flex:1">
+        <input type="radio" name="impMode" value="append" checked><span class="box" data-ic="check"></span>
+        <span class="t"><b>Aggiungi alle voci attuali</b><span>Le nuove carte si affiancano alle esistenti.</span></span>
+      </label>
+      <label class="opt" style="flex:1">
+        <input type="radio" name="impMode" value="replace"><span class="box" data-ic="check"></span>
+        <span class="t"><b>Sostituisci tutto</b><span>Il glossario attuale viene rimpiazzato.</span></span>
+      </label>
+    </div>
+    <div class="acts">
+      <button class="btn" data-close>Annulla</button>
+      <button class="btn primary" id="btnRunImport"><span class="bi" data-ic="upload"></span>Carica le voci</button>
+    </div>
+    <div class="datasec">
+      <h3>Gestione dei dati</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" id="btnExport"><span class="bi" data-ic="download"></span>Scarica backup .txt</button>
+        <button class="btn" id="btnReset"><span class="bi" data-ic="rotate"></span>Ripristina i predefiniti</button>
+      </div>
+      <p class="hint">Ogni modifica è salvata automaticamente in questo browser.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ finestra: impostazioni di stampa ═══ -->
+<div class="overlay" id="mSettings" hidden>
+  <div class="panel">
+    <button class="x" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h2>Impostazioni di stampa</h2>
+    <p class="lead">Foglio A4, margini di 10&nbsp;mm gestiti automaticamente.</p>
+    <label class="f">Formato delle carte</label>
+    <div class="seg" id="segF">
+      <button data-f="2-3">2×3</button><button data-f="2-4">2×4</button><button data-f="2-5">2×5</button><button data-f="3-5">3×5</button>
+    </div>
+    <p class="hint">Carte per foglio: 6 (grandi) · 8 (medie) · 10 (compatte) · 15 (da tasca). Le condizioni con molti effetti — Pietrificato, Privo di sensi, Influenza — sono leggibili meglio nei formati 2×3 e 2×4.</p>
+    <label class="opt">
+      <input type="checkbox" id="optCut"><span class="box" data-ic="check"></span>
+      <span class="t"><b>Cornice di ritaglio</b><span>Bordo tratteggiato: utile se poi ritagli le carte con le forbici.</span></span>
+    </label>
+    <label class="opt">
+      <input type="checkbox" id="optFlash"><span class="box" data-ic="check"></span>
+      <span class="t"><b>Modalità flashcard fronte / retro</b><span>Fronte: solo il termine. Retro: effetti e definizione, già specchiati colonna per colonna. Nella finestra di stampa scegli «Fronte/retro — gira sul lato lungo».</span></span>
+    </label>
+    <div class="acts">
+      <button class="btn primary" data-close><span class="bi" data-ic="check"></span>Fatto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ finestra: conferma ═══ -->
+<div class="overlay" id="mConfirm" hidden>
+  <div class="panel" style="width:min(440px,94vw)">
+    <h2 id="cfmTitle">Confermi?</h2>
+    <p class="lead" id="cfmText"></p>
+    <div class="acts">
+      <button class="btn" data-close>Annulla</button>
+      <button class="btn primary" id="cfmOk"><span class="bi" data-ic="check"></span>Confermo</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div id="toasts"></div>
+
+<script>
+/* ════════════════ ICONE ════════════════ */
+const ICONS={
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  printer:'<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7"/>',
+  sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  pencil:'<path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+  trash:'<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  rotate:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>'
+};
+const ic=n=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]||''}</svg>`;
+document.querySelectorAll('.bi[data-ic]').forEach(el=>el.innerHTML=ic(el.dataset.ic));
+document.querySelectorAll('.box[data-ic]').forEach(el=>el.innerHTML=ic('check'));
+
+/* ════════════════ GLOSSARIO PREDEFINITO — Condizioni, atteggiamenti e pericoli (SRD 5.2) ════════════════
+   Struttura voce: t=termine, c=capitolo, d=introduzione, e=effetti [[nome, testo], …], note=margine */
+const SEED=[
+{t:'Condizione',c:'Condizione',
+ d:'Uno stato di gioco temporaneo: la descrizione indica gli effetti su chi ne è affetto e le modalità per terminarlo. Le 15 condizioni del glossario: accecato, affascinato, afferrato, assordato, avvelenato, incapacitato, indebolimento, invisibile, paralizzato, pietrificato, prono, privo di sensi, spaventato, stordito, trattenuto.',
+ note:'Non si accumulano più istanze della stessa condizione: ce l\u2019hai o non ce l\u2019hai. Unica eccezione: l\u2019indebolimento.'},
+{t:'Accecato',c:'Condizione',
+ e:[['Vista annullata','Non sei in grado di vedere e fallisci automaticamente ogni prova di caratteristica che richieda l\u2019uso della vista.']]},
+{t:'Affascinato',c:'Condizione',
+ e:[['Nessun attacco','Non puoi attaccare chi ti ha affascinato né bersagliarlo con abilità o effetti magici dannosi.'],['Vantaggio sociale','Chi ti ha affascinato ha vantaggio su ogni prova di caratteristica effettuata per interagire socialmente con te.']]},
+{t:'Afferrato',c:'Condizione',
+ e:[['Velocità 0','La tua velocità è 0 e non può aumentare.'],['Attacchi penalizzati','Svantaggio ai tuoi tiri per colpire contro qualsiasi bersaglio diverso da chi ti afferra.'],['Movibile','Chi ti afferra può trascinarti o spostarti, ma ogni 30 cm di movimento gli costano 30 cm extra, a meno che tu non sia di taglia Minuscola o più piccolo di due o più taglie rispetto a lui.']]},
+{t:'Assordato',c:'Condizione',
+ e:[['Udito annullato','Non sei in grado di sentire e fallisci automaticamente ogni prova di caratteristica che richieda l\u2019uso dell\u2019udito.']]},
+{t:'Avvelenato',c:'Condizione',
+ e:[['Svantaggio','Svantaggio ai tiri per colpire e alle prove di caratteristica.']]},
+{t:'Incapacitato',c:'Condizione',
+ e:[['Inattività','Non puoi effettuare azioni, azioni bonus o reazioni.'],['Nessuna concentrazione','La tua concentrazione è interrotta.'],['Senza parole','Non puoi parlare.'],['Sorpresa','Se sei incapaciato quando tiri per l\u2019iniziativa, subisci svantaggio al tiro.']]},
+{t:'Indebolimento',c:'Condizione',
+ e:[['Livelli cumulativi','Ogni volta che la ricevi ottieni 1 livello; muori quando raggiungi il 6°.'],['Prove con d20','Il risultato di ogni prova è ridotto del doppio del tuo livello di indebolimento.'],['Velocità ridotta','La tua velocità cala di 1,5 metri per ogni livello.'],['Recupero','Con un riposo lungo perdi 1 livello. Al livello 0 la condizione termina.']]},
+{t:'Invisibile',c:'Condizione',
+ e:[['Sorpresa','Se sei invisibile quando tiri per l\u2019iniziativa, hai vantaggio al tiro.'],['Occultamento','Non sei toccato da effetti che richiedano di vedere il bersaglio, a meno che chi li crea non riesca in qualche modo a vederti. Anche il tuo equipaggiamento è occultato.'],['Attacchi','I tiri per colpire contro di te hanno vantaggio e i tuoi hanno vantaggio; nessun beneficio nei confronti di una creatura che riesce a vederti.']]},
+{t:'Paralizzato',c:'Condizione',
+ e:[['Incapacitato','Hai la condizione «incapacitato».'],['Velocità 0','La tua velocità è 0 e non può aumentare.'],['Tiri salvezza','Fallisci automaticamente i tiri salvezza su Forza e Destrezza.'],['Attacchi','I tiri per colpire contro di te hanno vantaggio.'],['Critici automatici','Ogni tiro che ti colpisce è un colpo critico se l\u2019attaccante si trova entro 1,5 metri.']]},
+{t:'Pietrificato',c:'Condizione',
+ e:[['Pietra','Tu e il tuo equipaggiamento non magico diventate una sostanza solida inanimata (di solito pietra). Smetti di invecchiare e il tuo peso viene decuplicato.'],['Incapacitato','Hai la condizione «incapacitato».'],['Velocità 0','La tua velocità è 0 e non può aumentare.'],['Attacchi','I tiri per colpire contro di te hanno vantaggio.'],['Tiri salvezza','Fallisci automaticamente i tiri salvezza su Forza e Destrezza.'],['Danni','Sei resistente a tutti i danni.'],['Veleni','Sei immune alla condizione «avvelenato».']]},
+{t:'Privo di sensi',c:'Condizione',
+ e:[['Inerte','Hai le condizioni «incapacitato» e «prono» e lasci cadere ciò che impugni; quando la condizione termina, resti prono.'],['Velocità 0','La tua velocità è 0 e non può aumentare.'],['Attacchi','I tiri per colpire contro di te hanno vantaggio.'],['Tiri salvezza','Fallisci automaticamente i tiri salvezza su Forza e Destrezza.'],['Critici automatici','Ogni tiro che ti colpisce è un colpo critico se l\u2019attaccante si trova entro 1,5 metri.'],['Ignaro','Non sei consapevole di ciò che ti circonda.']]},
+{t:'Prono',c:'Condizione',
+ e:[['Movimento limitato','Puoi solo strisciare, o spendere metà della tua velocità (arrotondata per difetto) per rialzarti e terminare la condizione. Con velocità 0 non puoi rialzarti.'],['Attacchi','Svantaggio ai tuoi tiri per colpire. Un attacco contro di te ha vantaggio entro 1,5 metri, altrimenti svantaggio.']]},
+{t:'Spaventato',c:'Condizione',
+ e:[['Paura in vista','Svantaggio alle prove di caratteristica e ai tiri per colpire finché la fonte della tua paura è nel tuo campo visivo.'],['Non avvicinarti','Non puoi avvicinarti volontariamente alla fonte della tua paura.']]},
+{t:'Stordito',c:'Condizione',
+ e:[['Incapacitato','Hai la condizione «incapacitato».'],['Tiri salvezza','Fallisci automaticamente i tiri salvezza su Forza e Destrezza.'],['Attacchi','I tiri per colpire contro di te hanno vantaggio.']]},
+{t:'Trattenuto',c:'Condizione',
+ e:[['Velocità 0','La tua velocità è 0 e non può aumentare.'],['Attacchi','I tiri per colpire contro di te hanno vantaggio; i tuoi subiscono svantaggio.'],['Tiri salvezza','Svantaggio ai tiri salvezza su Destrezza.']]},
+{t:'Atteggiamento',c:'Atteggiamento',
+ d:'Ogni mostro ha un atteggiamento iniziale verso i personaggi giocanti: amichevole, ostile o indifferente.',
+ note:'Vedi anche: Amichevole, Ostile, Indifferente, Influenza.'},
+{t:'Amichevole',c:'Atteggiamento',
+ d:'La creatura ha un\u2019opinione positiva del personaggio, che dispone di vantaggio su una prova di caratteristica per influenzarla.',
+ note:'Vedi anche: Influenza.'},
+{t:'Indifferente',c:'Atteggiamento',
+ d:'La creatura non ha alcun desiderio di aiutare o ostacolare i personaggi. È l\u2019atteggiamento predefinito dei mostri.',
+ note:'Vedi anche: Influenza.'},
+{t:'Ostile',c:'Atteggiamento',
+ d:'La creatura ha un\u2019opinione negativa del personaggio, che subisce svantaggio su una prova di caratteristica per influenzarla.',
+ note:'Vedi anche: Influenza.'},
+{t:'Pericolo',c:'Pericolo',
+ d:'Un rischio ambientale. I pericoli definiti nel glossario: caduta, disidratazione, in fiamme, malnutrizione e soffocamento.'},
+{t:'Disidratazione',c:'Pericolo',
+ e:[['Effetto','Una creatura che beve meno della metà dell\u2019acqua necessaria in un giorno ottiene 1 livello di indebolimento alla fine della giornata.'],['Recupero','L\u2019indebolimento da disidratazione si rimuove solo bevendo l\u2019intero fabbisogno in un giorno.']],
+ note:'Acqua al giorno: Minuscola 1 L · Piccola e Media 4 L · Grande 16 L · Enorme 64 L · Mastodontica 256 L. Vedi anche: Indebolimento.'},
+{t:'In fiamme',c:'Pericolo',
+ e:[['Danni','1d4 danni da fuoco all\u2019inizio di ogni tuo turno.'],['Estinzione','Con un\u2019azione puoi estinguere le fiamme assumendo la condizione prono e rotolando a terra. Le fiamme si spengono anche se sommerse o soffocate.']]},
+{t:'Malnutrizione',c:'Pericolo',
+ e:[['Meno della metà','Chi mangia meno della metà del fabbisogno giornaliero deve superare un tiro salvezza su Costituzione CD 10, o ottiene 1 livello di indebolimento a fine giornata.'],['Digiuno','Senza cibo per 5 giorni: 1 livello automatico al quinto giorno, più 1 a ogni giorno successivo.'],['Recupero','L\u2019indebolimento da malnutrizione si rimuove solo mangiando l\u2019intero fabbisogno in un giorno.']],
+ note:'Cibo al giorno: Minuscola 125 g · Piccola e Media 0,5 kg · Grande 2 kg · Enorme 8 kg · Mastodontica 32 kg. Vedi anche: Indebolimento.'},
+{t:'Soffocamento',c:'Pericolo',
+ e:[['Trattenere il fiato','Puoi trattenere il fiato per 1 + modificatore di Costituzione minuti (minimo 30 secondi).'],['Senza fiato','Senza fiato o mentre soffochi, ottieni 1 livello di indebolimento alla fine di ogni tuo turno.'],['Respiro','Appena torni a respirare, rimuovi tutti i livelli di indebolimento ottenuti dal soffocamento.']]},
+{t:'Influenza',c:'Azione',
+ d:'Con l\u2019azione Influenza esorti un mostro a fare qualcosa: lo inganni, lo intimorisci, lo intratteni o lo persuadi gentilmente. Il GM valuta la sua reazione:',
+ e:[['Ben disposto','Se la richiesta si allinea ai desideri del mostro, la soddisfa nel modo che preferisce, senza alcuna prova.'],['Maldisposto','Se la richiesta è sgradita o contraria al suo allineamento, si rifiuta, senza alcuna prova.'],['Esitante','Prova di caratteristica influenzata dal suo atteggiamento, con CD 15 o pari al suo punteggio di Intelligenza (il più alto dei due). Se fallisci, devi attendere 24 ore prima di esortarlo di nuovo allo stesso modo.']],
+ note:'Prove: Carisma (Inganno, Intimidire, Intrattenere, Persuasione); Saggezza (Addestrare animali) per bestie e mostruosità. Vedi anche: Atteggiamento.'},
+{t:'Copertura',c:'Regole',
+ d:'Protezione per un bersaglio che si trova dietro di essa. Mezza copertura: +2 alla CA e ai tiri salvezza su Destrezza. Tre quarti di copertura: +5. Copertura totale: il bersaglio non può essere bersagliato direttamente.',
+ note:'Se il bersaglio gode di più gradi di copertura, vale solo il più protettivo.'},
+{t:'Incontro',c:'Regole',
+ d:'Una scena di un\u2019avventura che appartiene ad almeno uno dei tre pilastri del gioco: interazioni sociali, esplorazione o combattimento.'},
+{t:'Maledizioni',c:'Regole',
+ d:'Alcuni effetti di gioco maledicono creature e oggetti: l\u2019effetto che la infligge ne definisce le conseguenze.',
+ note:'Si rimuovono con rimuovi maledizione, ristorare superiore o altre magie adatte.'},
+{t:'Sorpresa',c:'Regole',
+ d:'Una creatura colta alla sprovvista all\u2019inizio del combattimento è sorpresa: subisce svantaggio al tiro per l\u2019iniziativa.'},
+{t:'Terreno difficile',c:'Regole',
+ e:[['Costo','Ogni 30 cm di movimento costano 30 cm extra: attraversare 1,5 metri di terreno difficile costa 3 metri di movimento.'],['Non cumulativo','Uno spazio è terreno difficile o non lo è: i gradi non si sommano.']],
+ note:'È terreno difficile: lo spazio di una creatura non minuscola (nemica o alleata), mobili a misura, neve alta, ghiaccio, detriti, sottobosco, liquido fino agli stinchi o alla vita, aperture strette, pendenze di 20° o più.'},
+{t:'Tipi di danno',c:'Regole',
+ d:'Gli attacchi e gli effetti dannosi infliggono uno di 13 tipi di danno: acido, contundente, forza, freddo, fulmine, fuoco, necrotico, perforante, psichico, radioso, tagliente, tuono, veleno.',
+ note:'I tipi di danno non seguono regole particolari; resistenze, vulnerabilità e immunità vi fanno riferimento. Esempi: contundente = stritolamento e cadute; radioso = energia sacra; tuono = suono concussivo.'}
+];
+
+/* ════════════════ STATO E PERSISTENZA ════════════════ */
+const LS='srd-cards-v2', LSS='srd-cards-settings';
+const uid=()=>'v'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const seedData=()=>SEED.map((s,i)=>({id:uid(),n:i+1,t:s.t,c:s.c,d:s.d||'',e:s.e||[],note:s.note||''}));
+
+function load(){
+  try{const raw=localStorage.getItem(LS);if(raw){const d=JSON.parse(raw);if(Array.isArray(d)&&d.length)return d;}}catch(e){}
+  const d=seedData();try{localStorage.setItem(LS,JSON.stringify(d))}catch(e){} return d;
+}
+function loadSettings(){
+  const def={f:'2-4',cut:false,flash:false};
+  try{const raw=localStorage.getItem(LSS);if(raw)return Object.assign(def,JSON.parse(raw));}catch(e){}
+  return def;
+}
+let data=load(), selected=new Set(), state={q:'',cat:'Tutte'}, settings=loadSettings();
+let editId=null, confirmCb=null;
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(data))}catch(e){}};
+const saveSet=()=>{try{localStorage.setItem(LSS,JSON.stringify(settings))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const $=id=>document.getElementById(id);
+const maxN=()=>data.reduce((m,d)=>Math.max(m,d.n),0);
+
+/* ════════════════ AVVISI ════════════════ */
+function toast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  $('toasts').appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),320)},2800);
+}
+
+/* ════════════════ RENDERING GRIGLIA ════════════════ */
+function cats(){return[...new Set(data.map(d=>d.c))].sort((a,b)=>a.localeCompare(b,'it'));}
+function renderChips(){
+  const list=['Tutte',...cats()];
+  $('chips').innerHTML=list.map(c=>`<button class="chip${state.cat===c?' on':''}" data-chip="${esc(c)}">${esc(c)}</button>`).join('');
+  $('catList').innerHTML=cats().map(c=>`<option value="${esc(c)}">`).join('');
+}
+function filtered(){
+  const q=state.q.trim().toLowerCase();
+  return data.filter(d=>
+    (state.cat==='Tutte'||d.c===state.cat)&&
+    (!q||(d.t+' '+d.d+' '+(d.e||[]).map(x=>x.join(' ')).join(' ')+' '+d.c).toLowerCase().includes(q))
+  );
+}
+function effectsHTML(d,cls){
+  if(!d.e||!d.e.length)return'';
+  return `<ul class="${cls}">`+d.e.map(x=>`<li>${x[0]?`<b>${esc(x[0])}</b>`:''}${x[0]?' ':' '}${esc(x[1])}</li>`).join('')+`</ul>`;
+}
+function renderGrid(){
+  const list=filtered();
+  $('emptyTxt').textContent=data.length?'Nessuna voce corrisponde alla ricerca.':'Il glossario è vuoto: aggiungi una voce o importa il tuo testo.';
+  $('btnSeed').hidden=!!data.length;
+  $('empty').hidden=!!list.length;
+  $('grid').innerHTML=list.map((d,i)=>`
+    <article class="card${selected.has(d.id)?' sel':''}" data-id="${d.id}" style="animation-delay:${Math.min(i*30,420)}ms">
+      <i class="cnr tl"></i><i class="cnr tr"></i><i class="cnr bl"></i><i class="cnr br"></i>
+      <div class="stamp">Da stampare</div>
+      <div class="card-head"><span class="cat">${esc(d.c)}</span><span class="num">n. ${d.n}</span></div>
+      <h3>${esc(d.t)}</h3>
+      <div class="rule"></div>
+      ${d.d?`<p>${esc(d.d)}</p>`:''}
+      ${effectsHTML(d,'eff')}
+      ${d.note?`<p class="note">${esc(d.note)}</p>`:''}
+      <div class="card-foot">
+        <span>Glossario SRD · CC BY 4.0</span>
+        <span class="tools">
+          <button class="tool-btn" data-act="edit" aria-label="Modifica" title="Modifica">${ic('pencil')}</button>
+          <button class="tool-btn" data-act="del" aria-label="Elimina" title="Elimina">${ic('trash')}</button>
+        </span>
+      </div>
+    </article>`).join('');
+  updateStats();
+}
+function updateStats(){
+  $('stTerms').textContent=data.length;
+  $('stCats').textContent=cats().length;
+  $('stSel').textContent=selected.size?`${selected.size} ${selected.size===1?'voce selezionata':'voci selezionate'}`:'nessuna selezione';
+  $('btnPrintLbl').textContent=selected.size?`Stampa · ${selected.size}`:'Stampa tutte';
+}
+
+/* ════════════════ SELEZIONE E AZIONI SU CARD ════════════════ */
+function toggleSel(id){
+  if(selected.has(id))selected.delete(id);else selected.add(id);
+  const el=document.querySelector(`.card[data-id="${id}"]`);
+  if(el)el.classList.toggle('sel',selected.has(id));
+  updateStats();
+}
+ $('grid').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-act]');
+  const card=e.target.closest('.card');
+  if(!card)return;
+  const id=card.dataset.id;
+  if(btn){
+    e.stopPropagation();
+    if(btn.dataset.act==='edit')openEdit(id);
+    else if(btn.dataset.act==='del'){
+      if(btn.classList.contains('arm')){
+        data=data.filter(d=>d.id!==id);selected.delete(id);save();
+        renderChips();renderGrid();toast('Voce eliminata.');
+      }else{
+        btn.classList.add('arm');btn.textContent='Sicuro?';
+        setTimeout(()=>{if(btn.isConnected){btn.classList.remove('arm');btn.innerHTML=ic('trash');}},2500);
+      }
+    }
+    return;
+  }
+  toggleSel(id);
+});
+
+/* ════════════════ FINESTRE ════════════════ */
+function openM(id){$(id).hidden=false;document.body.style.overflow='hidden';}
+function closeM(id){$(id).hidden=true;document.body.style.overflow='';}
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{if(e.target===ov)closeM(ov.id);});
+  ov.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeM(ov.id)));
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){document.querySelectorAll('.overlay:not([hidden])').forEach(ov=>closeM(ov.id));}
+  if(e.key==='/'&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();$('q').focus();}
+});
+
+/* ── nuova / modifica ── */
+function parseEffLines(txt){
+  return txt.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).map(l=>{
+    const bl=l.replace(/^[•*\-]\s*/,'');
+    const c2=bl.indexOf(':');
+    return (c2>0&&c2<=40)?[bl.slice(0,c2).trim(),bl.slice(c2+1).trim()]:['',bl];
+  });
+}
+function openEdit(id){
+  editId=id||null;
+  const d=id?data.find(x=>x.id===id):null;
+  $('mEditTitle').textContent=d?'Modifica voce':'Nuova voce';
+  $('mEditLead').textContent=d?'Rifinisci il testo: la card si aggiorna subito.':'Una scheda del glossario: termine, capitolo e testo asciutto.';
+  $('fTerm').value=d?d.t:'';$('fCat').value=d?d.c:(state.cat!=='Tutte'?state.cat:'');
+  $('fDef').value=d?(d.d||''):'';
+  $('fEff').value=d&&d.e?d.e.map(x=>x[0]?`${x[0]}: ${x[1]}`:x[1]).join('\n'):'';
+  $('fNote').value=d?(d.note||''):'';
+  openM('mEdit');$('fTerm').focus();
+}
+ $('btnNew').addEventListener('click',()=>openEdit(null));
+ $('btnSaveEdit').addEventListener('click',()=>{
+  const t=$('fTerm').value.trim(),c=$('fCat').value.trim()||'Varie',
+        d=$('fDef').value.trim(),e=parseEffLines($('fEff').value),note=$('fNote').value.trim();
+  if(!t||(!d&&!e.length)){toast('Servono almeno un termine e un testo (o degli effetti).');return;}
+  if(editId){
+    const v=data.find(x=>x.id===editId);Object.assign(v,{t,c,d,e,note});
+    toast('Voce aggiornata.');
+  }else{
+    data.push({id:uid(),n:maxN()+1,t,c,d,e,note});
+    toast(`«${t}» aggiunta al glossario.`);
+  }
+  save();closeM('mEdit');renderChips();renderGrid();
+});
+
+/* ── importazione (supporta effetti «•» e «Nota:») ── */
+function parseImport(txt){
+  const out=[];
+  for(const raw of txt.split(/\r?\n\s*\r?\n/)){
+    let lines=raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    if(!lines.length)continue;
+    lines[0]=lines[0].replace(/^[-•*]\s*/,'');
+    let term='',cat='',def='',effects=[],note='',rest;
+    const pipe=lines[0].split('|').map(s=>s.trim());
+    if(pipe.length>=2&&pipe[0]&&pipe[1]){
+      term=pipe[0];cat=pipe[1];def=pipe.slice(2).join(' — ');rest=lines.slice(1);
+    }else{
+      const ci=lines[0].indexOf(':');
+      const headOK=ci>1&&ci<=48&&lines[0].slice(0,ci).split(/\s+/).length<=6&&!/^https?:/.test(lines[0]);
+      if(headOK){
+        term=lines[0].slice(0,ci).replace(/[.]$/,'').trim();
+        def=lines[0].slice(ci+1).trim();rest=lines.slice(1);
+      }else{term=lines[0].replace(/[.:]$/,'');rest=lines.slice(1);}
+    }
+    for(const L of rest||[]){
+      const bl=L.replace(/^[•*]\s*/,'').replace(/^-\s+/,'');
+      if(bl!==L){ // riga con pallino → effetto
+        const c2=bl.indexOf(':');
+        if(c2>0&&c2<=40)effects.push([bl.slice(0,c2).trim(),bl.slice(c2+1).trim()]);
+        else effects.push(['',bl]);
+        continue;
+      }
+      if(/^(Nota|Notes?)\s*:\s*/i.test(L)){note=L.replace(/^(Nota|Notes?)\s*:\s*/i,'');continue;}
+      def=(def?def+' ':'')+L;
+    }
+    term=(term||'').replace(/[\s.·]+$/,'').trim();def=def.trim();
+    if(term&&(def||effects.length))out.push({t:term,c:cat||'Varie',d:def,e:effects,note});
+  }
+  return out;
+}
+ $('btnImport').addEventListener('click',()=>{$('impText').value='';openM('mImport');});
+ $('btnRunImport').addEventListener('click',()=>{
+  const list=parseImport($('impText').value);
+  if(!list.length){toast('Nessuna voce riconosciuta nel testo.');return;}
+  const replace=document.querySelector('input[name="impMode"]:checked').value==='replace';
+  if(replace){data=list.map((v,i)=>({id:uid(),n:i+1,...v}));}
+  else{let k=maxN();data=data.concat(list.map(v=>({id:uid(),n:++k,...v})));}
+  save();closeM('mImport');renderChips();renderGrid();
+  toast(`${list.length} ${list.length===1?'voce importata':'voci importate'}${replace?' (glossario sostituito)':''}.`);
+});
+
+/* ── gestione dati ── */
+ $('btnExport').addEventListener('click',()=>{
+  const txt=data.map(d=>{
+    const rows=[`${d.t} | ${d.c}${(d.d&&(!d.e||!d.e.length))?' | '+d.d:''}`];
+    if(d.d&&d.e&&d.e.length)rows.push(d.d);
+    (d.e||[]).forEach(x=>rows.push(`• ${x[0]?x[0]+': ':''}${x[1]}`));
+    if(d.note)rows.push(`Nota: ${d.note}`);
+    return rows.join('\n');
+  }).join('\n\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+  a.download='glossario-srd-condizioni.txt';a.click();URL.revokeObjectURL(a.href);
+  toast('Backup scaricato.');
+});
+ $('btnReset').addEventListener('click',()=>{
+  confirmCb=()=>{data=seedData();selected.clear();save();renderChips();renderGrid();toast('Glossario predefinito ripristinato.');};
+  $('cfmTitle').textContent='Ripristinare i predefiniti?';
+  $('cfmText').textContent='Le tue modifiche e le voci importate andranno perse. Puoi scaricare prima un backup.';
+  openM('mConfirm');
+});
+ $('btnSeed').addEventListener('click',()=>{
+  data=seedData();save();renderChips();renderGrid();toast('Glossario predefinito ripristinato.');
+});
+ $('cfmOk').addEventListener('click',()=>{closeM('mConfirm');if(confirmCb)confirmCb();confirmCb=null;});
+
+/* ── impostazioni stampa ── */
+const FMT={'2-3':[2,3],'2-4':[2,4],'2-5':[2,5],'3-5':[3,5]};
+function syncSettingsUI(){
+  document.querySelectorAll('#segF button').forEach(b=>b.classList.toggle('on',b.dataset.f===settings.f));
+  $('optCut').checked=settings.cut;$('optFlash').checked=settings.flash;
+}
+ $('btnSettings').addEventListener('click',()=>{syncSettingsUI();openM('mSettings');});
+ $('segF').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-f]');if(!b)return;
+  settings.f=b.dataset.f;saveSet();syncSettingsUI();
+});
+ $('optCut').addEventListener('change',e=>{settings.cut=e.target.checked;saveSet();});
+ $('optFlash').addEventListener('change',e=>{settings.flash=e.target.checked;saveSet();});
+
+/* ── ricerca ── */
+ $('q').addEventListener('input',e=>{state.q=e.target.value;renderGrid();});
+ $('chips').addEventListener('click',e=>{
+  const c=e.target.closest('[data-chip]');if(!c)return;
+  state.cat=c.dataset.chip;renderChips();renderGrid();
+});
+
+/* ════════════════ STAMPA ════════════════ */
+function buildSheets(items,s,side){
+  const C=s.cols,R=s.rows,per=C*R,pages=[];
+  const total=Math.max(1,Math.ceil(items.length/per));
+  for(let i=0;i<total;i++){
+    const page=items.slice(i*per,(i+1)*per);
+    let cells;
+    if(side==='front'){
+      cells=page.concat(Array(per-page.length).fill(null));
+    }else{
+      cells=[];
+      for(let r=0;r<R;r++){
+        const row=page.slice(r*C,(r+1)*C);
+        cells.push(...Array(C-row.length).fill(null),...row.slice().reverse());
+      }
+    }
+    pages.push(cells);
+  }
+  return pages;
+}
+/* card «dense»: molti effetti o testo lungo → font ridotto automaticamente */
+function isLong(d){
+  const effLen=(d.e||[]).reduce((a,x)=>a+x[0].length+x[1].length,0);
+  return (d.e&&d.e.length>=4)||effLen>430||((d.d||'').length+(d.note||'').length>430);
+}
+function printCardHTML(d,num,s,side){
+  const dense=isLong(d)?' dense':'';
+  const body=(withFoot)=>`
+    ${d.d?`<p class="p-def">${esc(d.d)}</p>`:''}
+    ${effectsHTML(d,'p-eff')}
+    ${d.note?`<p class="p-note">${esc(d.note)}</p>`:''}
+    ${withFoot?`<div class="p-foot"><span>Glossario SRD</span><span>CC BY 4.0</span></div>`:''}`;
+  if(s.mode==='flash'){
+    if(side==='front')return`
+      <div class="pcard flash-front${dense}">
+        <div class="p-cat">${esc(d.c)}</div>
+        <div class="pf-term">${esc(d.t)}</div>
+        <div class="pf-dia"></div>
+        <div class="pf-hint">n. ${num} · la definizione è sul retro</div>
+      </div>`;
+    return`
+      <div class="pcard flash-back${dense}">
+        <div class="p-head"><span class="p-cat">${esc(d.t)}</span><span class="p-num">n. ${num}</span></div>
+        <div class="p-rule"></div>
+        ${body(false)}
+      </div>`;
+  }
+  return`
+    <div class="pcard${dense}">
+      <div class="p-head"><span class="p-cat">${esc(d.c)}</span><span class="p-num">n. ${num}</span></div>
+      <div class="p-term">${esc(d.t)}</div>
+      <div class="p-rule"></div>
+      ${body(true)}
+    </div>`;
+}
+const blankHTML=()=>`<div class="pcard blank"></div>`;
+
+function doPrint(){
+  const sel=data.filter(d=>selected.has(d.id));
+  const list=sel.length?sel:data.slice();
+  if(!list.length){toast('Il glossario è vuoto: niente da stampare.');return;}
+  if(!sel.length)toast(`Nessuna selezione: stampo tutte le ${list.length} voci.`);
+  const [cols,rows]=FMT[settings.f];
+  const s={cols,rows,cut:settings.cut,mode:settings.flash?'flash':'full'};
+  const numById=new Map(data.map(d=>[d.id,d.n]));
+  const el=$('printArea');el.innerHTML='';
+  const build=(items,side)=>{
+    buildSheets(items.map(d=>({d,num:numById.get(d.id)})),s,side).forEach(cells=>{
+      const sh=document.createElement('div');
+      sh.className='sheet'+(s.cut?' cut':'');
+      sh.dataset.f=settings.f;
+      sh.style.setProperty('--c',cols);sh.style.setProperty('--r',rows);
+      sh.innerHTML=cells.map(c=>c?printCardHTML(c.d,c.num,s,side):blankHTML()).join('');
+      el.appendChild(sh);
+    });
+  };
+  build(list,'front');
+  if(settings.flash)build(list,'back');
+  window.print();
+}
+window.addEventListener('afterprint',()=>{$('printArea').innerHTML='';});
+ $('btnPrint').addEventListener('click',()=>{doPrint();});
+
+/* ════════════════ AVVIO ════════════════ */
+renderChips();renderGrid();
+</script>
+</body>
+</html>
