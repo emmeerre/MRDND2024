@@ -345,37 +345,42 @@
     </div>
 
     <!-- MODALE WEBRTC P2P TEMPO REALE -->
-    <div id="p2p-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-card">
-            <div class="section-title">
-                <span>📡 Stanza Live P2P (WebRTC 30-50ms)</span>
-                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px;" onclick="R20.closeP2PModal()">✖</button>
-            </div>
-            <p style="font-size: 12px; color: #bbb; margin-bottom: 12px; line-height: 1.4;">
-                Connetti 2 o più dispositivi in tempo reale a costo zero. Lo stato viene <b>salvato automaticamente in locale dall'Host</b> ad ogni movimento.
-            </p>
+    <!-- MODALE P2P AGGIORNATA CON GESTIONE PERMESSI -->
+	<div id="p2p-modal" class="modal-overlay" style="display: none;">
+		<div class="modal-card" style="width: 480px;">
+			<div class="section-title">
+				<span>📡 Connessione & Permessi Giocatori</span>
+				<button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px;" onclick="R20.closeP2PModal()">✖</button>
+			</div>
 
-            <div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 10px;">
-                <div style="font-size: 12px; font-weight: bold; color: #00c3ff; margin-bottom: 6px;">Opzione 1: Fai da Host (Master)</div>
-                <div class="form-row">
-                    <label>Codice Stanza:</label>
-                    <input type="text" id="p2p-host-room" placeholder="es. tavolo-dnd-1" style="flex: 1.5;">
-                    <button class="btn btn-success" style="padding: 4px 8px; font-size: 11px;" onclick="R20.startHostP2P()">Crea Stanza</button>
-                </div>
-            </div>
+			<div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px;">
+				<div style="font-size: 12px; font-weight: bold; color: #00c3ff; margin-bottom: 6px;">Crea Stanza (Host / Master)</div>
+				<div class="form-row">
+					<input type="text" id="p2p-host-room" placeholder="es. tavolo1" style="flex: 1.5;">
+					<button class="btn btn-success" style="padding: 4px 8px; font-size: 11px;" onclick="R20.startHostP2P()">Crea Stanza</button>
+				</div>
+				<button class="btn btn-block" id="btn-copy-invite" style="background:#2980b9; display:none; margin-top:6px;" onclick="R20.copyInviteLink()">
+					📋 Copia Link Invito per Giocatori
+				</button>
+			</div>
 
-            <div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333;">
-                <div style="font-size: 12px; font-weight: bold; color: #f39c12; margin-bottom: 6px;">Opzione 2: Entra come Giocatore / 2° Schermo</div>
-                <div class="form-row">
-                    <label>Codice Stanza Host:</label>
-                    <input type="text" id="p2p-join-room" placeholder="es. tavolo-dnd-1" style="flex: 1.5;">
-                    <button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px;" onclick="R20.joinClientP2P()">Unisciti</button>
-                </div>
-            </div>
+			<div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px;">
+				<div style="font-size: 12px; font-weight: bold; color: #f39c12; margin-bottom: 6px;">Entra come Giocatore</div>
+				<div class="form-row">
+					<input type="text" id="p2p-join-room" placeholder="es. tavolo1" style="flex: 1.5;">
+					<button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px;" onclick="R20.joinClientP2P()">Unisciti</button>
+				</div>
+			</div>
 
-            <div id="p2p-status-msg" style="font-size: 12px; margin-top: 10px; text-align: center; color: #aaa;"></div>
-        </div>
-    </div>
+			<!-- LISTA PERMESSI GIOCATORI CONNESSI (VISIBILE ALL'HOST) -->
+			<div id="p2p-host-clients-panel" style="display: none; background: #14151a; padding: 8px; border-radius: 6px; border: 1px solid #2ecc71;">
+				<div style="font-size: 11px; font-weight: bold; color: #2ecc71; margin-bottom: 6px;">👥 Dispositivi Collegati (Gestione Permessi):</div>
+				<div id="p2p-connected-players-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto;"></div>
+			</div>
+
+			<div id="p2p-status-msg" style="font-size: 11px; margin-top: 8px; text-align: center; color: #aaa;"></div>
+		</div>
+	</div>
 
     <!-- SCRIPT DEI 7 MODULI -->
     <script src="js/1-math-geom.js"></script>
