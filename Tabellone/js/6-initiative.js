@@ -254,3 +254,8 @@ R20.handleInitDrop = function(e, targetIndex) {
 };
 
 R20.handleInitDragEnd = function() {
+    R20.draggedInitIndex = null;
+    document.querySelectorAll('.init-row').forEach(r => {
+        r.classList.remove('init-dragging', 'init-drag-over');
+    });
+};
