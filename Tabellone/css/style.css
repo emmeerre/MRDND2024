@@ -492,7 +492,7 @@ body {
     z-index: 1000; display: none; pointer-events: none; border: 2px solid #fff;
 }
 
-/* MODALE CLOUD */
+/* MODALE P2P */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -511,6 +511,7 @@ body {
     max-width: 90vw;
     box-shadow: 0 8px 30px rgba(0,0,0,0.9);
 }
+
 /* --- BARRA GIOCATORI IN BASSO (ROLL20 DOCK) --- */
 #players-bottom-dock {
     position: absolute;
@@ -538,18 +539,3 @@ body {
 
 /* SCHEDA GESTIONE GIOCATORI */
 .player-manage-card {
-    background: #1c1d24;
-    border: 1px solid #3d4050;
-    border-radius: 6px;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.player-manage-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    font-weight: bold;
-}
