@@ -26,15 +26,12 @@ body {
     overflow: hidden;
 }
 
+/* --- VIEWPORT & MAPPA (GRIGLIA SINCRONIZZATA CON LO ZOOM) --- */
 #viewport {
     flex: 1;
     position: relative;
     overflow: auto;
-    background-color: #24252e;
-    background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-    background-size: var(--grid-size) var(--grid-size);
+    background-color: #121316; /* Sfondo scuro per l'area esterna al tabellone */
     cursor: default;
 }
 
@@ -51,6 +48,13 @@ body {
     top: 0;
     left: 0;
     transform-origin: 0 0;
+    /* La griglia è ora disegnata SUL tavolo da gioco: scala insieme a pedine e nebbia! */
+    background-color: #24252e;
+    background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
 }
 
 #map-svg {
