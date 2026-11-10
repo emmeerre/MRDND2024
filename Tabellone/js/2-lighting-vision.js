@@ -14,6 +14,12 @@ R20.toggleVisionAccordion = function() {
 };
 
 R20.toggleSceneLight = function() {
+    // Blocco permessi: solo il Master o chi ha l'edit mappa può cambiare la luce
+    if (R20.canIEditMap && !R20.canIEditMap()) {
+        alert("Solo il Master può cambiare giorno e notte!");
+        return;
+    }
+
     R20.sceneLighting = R20.sceneLighting === 'bright' ? 'dark' : 'bright';
     const btn = document.getElementById('btn-scene-light');
     if (btn) {
@@ -26,6 +32,7 @@ R20.toggleSceneLight = function() {
         R20.broadcast({ type: 'SCENE_LIGHT', lighting: R20.sceneLighting });
     }
 };
+
 
 R20.updateVision = function() {
     const fogCanvas = document.getElementById('fog-canvas');
