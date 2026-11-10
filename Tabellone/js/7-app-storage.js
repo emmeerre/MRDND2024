@@ -2,23 +2,58 @@ window.R20 = window.R20 || {};
 
 R20.zoom = 1.0;
 
-// --- STATO WEBRTC P2P & NETWORKING ---
+// Ruolo locale del dispositivo (di default ha accesso completo da Host/Master)
+R20.myRole = {
+    canEdit: true,
+    tokenControl: 'all' // 'all', 'none' oppure l'ID specifico della pedina (es. 1)
+};
+
+// Stato della rete WebRTC P2P
 R20.p2p = {
     peer: null,
     isHost: false,
-    connections: [], // per l'Host: lista di tutti i client connessi
-    hostConn: null,  // per il Client: connessione verso l'Host
+    connections: [], // Per l'Host: lista dei client connessi
+    hostConn: null,  // Per il Client: connessione verso l'Host
     roomId: null
 };
 
 // ============================================================================
-// 1. MOTORE DI SINCRONIZZAZIONE WEBRTC IN TEMPO REALE (< 50ms)
+// 1. CONFIGURAZIONE ICE: STUN + TURN GRATUITI PER IL 4G / CELLULARE
+// ============================================================================
+R20.ICE_CONFIG = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:openrelay.metered.ca:80" },
+        {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443?transport=tcp",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        }
+    ]
+};
+
+// ============================================================================
+// 2. RETE WEBRTC P2P: HOST, CLIENT E GESTIONE PERMESSI
 // ============================================================================
 
 R20.openP2PModal = function() {
     document.getElementById('p2p-modal').style.display = 'flex';
     document.getElementById('p2p-host-room').value = localStorage.getItem('r20_last_room') || 'tavolo-dnd-' + Math.floor(100 + Math.random() * 900);
     document.getElementById('p2p-join-room').value = localStorage.getItem('r20_last_room') || '';
+    if (R20.p2p.isHost) {
+        document.getElementById('p2p-host-clients-panel').style.display = 'block';
+        R20.renderConnectedPlayersPanel();
+    }
 };
 
 R20.closeP2PModal = function() {
@@ -26,7 +61,7 @@ R20.closeP2PModal = function() {
 };
 
 /**
- * AVVIA COME HOST (Master)
+ * AVVIO HOST (MASTER)
  */
 R20.startHostP2P = function() {
     const rawRoom = document.getElementById('p2p-host-room').value.trim();
@@ -42,37 +77,46 @@ R20.startHostP2P = function() {
     if (R20.p2p.peer) R20.p2p.peer.destroy();
 
     try {
-        const peer = new Peer(roomId);
+        const peer = new Peer(roomId, { config: R20.ICE_CONFIG });
         R20.p2p.peer = peer;
         R20.p2p.isHost = true;
         R20.p2p.roomId = rawRoom;
         R20.p2p.connections = [];
 
-        peer.on('open', (id) => {
+        peer.on('open', () => {
             statusMsg.innerText = `✔ Stanza attiva! Codice: ${rawRoom}`;
             statusMsg.style.color = "#2ecc71";
+            const btnCopy = document.getElementById('btn-copy-invite');
+            if (btnCopy) btnCopy.style.display = 'block';
+            document.getElementById('p2p-host-clients-panel').style.display = 'block';
             R20.updateP2PStatusBadge(`🟢 Host (${rawRoom}) - 0 connessi`, "#2ecc71");
-            R20.addChatMessage("Rete P2P", `Stanza Host aperta con codice: <b>${rawRoom}</b>`);
-            setTimeout(R20.closeP2PModal, 1200);
+            R20.addChatMessage("Rete P2P", `Stanza Host aperta: <b>${rawRoom}</b>`);
+            R20.renderConnectedPlayersPanel();
         });
 
-        // Quando un giocatore si collega all'Host
         peer.on('connection', (conn) => {
+            // Assegna dati e permessi base al dispositivo che si connette
+            conn.playerInfo = {
+                id: conn.peer,
+                name: 'Dispositivo ' + (R20.p2p.connections.length + 1),
+                canEdit: false,        // Di default il giocatore NON può modificare i muri
+                tokenControl: 'all'    // Di default può muovere tutte le pedine (modificabile dal Master)
+            };
             R20.p2p.connections.push(conn);
 
             conn.on('open', () => {
                 R20.updateHostConnectionsCount();
-                // Spedisci subito l'intero stato del tavolo aggiornato al nuovo arrivato
-                conn.send({
-                    type: 'FULL_SYNC',
-                    state: R20.getGameState()
-                });
-                R20.addChatMessage("Rete P2P", "Un dispositivo si è unito al tavolo!");
+                R20.renderConnectedPlayersPanel();
+
+                // Spedisce subito lo stato completo e i permessi assegnati
+                conn.send({ type: 'FULL_SYNC', state: R20.getGameState() });
+                R20.sendPermissionsToClient(conn);
+                R20.addChatMessage("Rete P2P", `Dispositivo connesso (${conn.playerInfo.name})!`);
             });
 
             conn.on('data', (data) => {
-                R20.handleNetworkMessage(data, false);
-                // L'Host fa da ponte: rimanda il dato a tutti gli altri giocatori collegati
+                R20.handleNetworkMessage(data);
+                // L'Host fa da tramite e inoltra a tutti gli altri peer
                 R20.broadcast(data, conn);
                 R20.autoSave();
             });
@@ -80,60 +124,63 @@ R20.startHostP2P = function() {
             conn.on('close', () => {
                 R20.p2p.connections = R20.p2p.connections.filter(c => c !== conn);
                 R20.updateHostConnectionsCount();
+                R20.renderConnectedPlayersPanel();
             });
         });
 
         peer.on('error', (err) => {
             if (err.type === 'unavailable-id') {
-                statusMsg.innerText = "❌ Codice già in uso! Scegline un altro o entra come giocatore.";
+                statusMsg.innerText = "❌ Codice occupato! Se hai appena ricaricato, aspetta 30 sec o cambia nome.";
             } else {
-                statusMsg.innerText = `Errore Peer: ${err.type}`;
+                statusMsg.innerText = `Errore: ${err.type}`;
             }
             statusMsg.style.color = "#e74c3c";
         });
     } catch (e) {
-        statusMsg.innerText = "Errore creazione peer: " + e.message;
+        statusMsg.innerText = "Errore: " + e.message;
         statusMsg.style.color = "#e74c3c";
     }
 };
 
 /**
- * ENTRA COME GIOCATORE / 2° DISPOSITIVO
+ * AVVIO CLIENT (GIOCATORE / CELLULARE)
  */
-R20.joinClientP2P = function() {
-    const rawRoom = document.getElementById('p2p-join-room').value.trim();
+R20.joinClientP2P = function(roomOverride = null) {
+    const rawRoom = roomOverride || document.getElementById('p2p-join-room').value.trim();
     const statusMsg = document.getElementById('p2p-status-msg');
     if (!rawRoom) return;
 
     const hostRoomId = 'r20vtt-' + rawRoom.toLowerCase().replace(/[^a-z0-9_-]/g, '');
     localStorage.setItem('r20_last_room', rawRoom);
 
-    statusMsg.innerText = "⏳ Connessione all'Host...";
-    statusMsg.style.color = "#f39c12";
+    if (statusMsg) {
+        statusMsg.innerText = "⏳ Connessione in corso (STUN/TURN 4G)...";
+        statusMsg.style.color = "#f39c12";
+    }
 
     if (R20.p2p.peer) R20.p2p.peer.destroy();
 
     try {
-        const peer = new Peer();
+        const peer = new Peer({ config: R20.ICE_CONFIG });
         R20.p2p.peer = peer;
         R20.p2p.isHost = false;
         R20.p2p.roomId = rawRoom;
 
         peer.on('open', () => {
-            const conn = peer.connect(hostRoomId);
+            const conn = peer.connect(hostRoomId, { reliable: true });
             R20.p2p.hostConn = conn;
 
             conn.on('open', () => {
-                statusMsg.innerText = `✔ Connesso all'Host ${rawRoom}!`;
-                statusMsg.style.color = "#2ecc71";
+                if (statusMsg) {
+                    statusMsg.innerText = `✔ Connesso a ${rawRoom}!`;
+                    statusMsg.style.color = "#2ecc71";
+                }
                 R20.updateP2PStatusBadge(`🟢 Connesso (${rawRoom})`, "#00c3ff");
                 R20.addChatMessage("Rete P2P", `Connesso alla stanza: <b>${rawRoom}</b>`);
-                setTimeout(R20.closeP2PModal, 1000);
+                setTimeout(R20.closeP2PModal, 800);
             });
 
-            conn.on('data', (data) => {
-                R20.handleNetworkMessage(data, false);
-            });
+            conn.on('data', (data) => R20.handleNetworkMessage(data));
 
             conn.on('close', () => {
                 R20.updateP2PStatusBadge("🔴 Disconnesso", "#e74c3c");
@@ -141,14 +188,22 @@ R20.joinClientP2P = function() {
             });
         });
 
-        peer.on('error', (err) => {
-            statusMsg.innerText = `Errore di connessione: stanza non trovata o non attiva.`;
-            statusMsg.style.color = "#e74c3c";
+        peer.on('error', () => {
+            if (statusMsg) {
+                statusMsg.innerText = "❌ Host non trovato. Assicurati che il Master abbia premuto 'Crea Stanza'!";
+                statusMsg.style.color = "#e74c3c";
+            }
         });
     } catch (e) {
-        statusMsg.innerText = "Errore: " + e.message;
-        statusMsg.style.color = "#e74c3c";
+        if (statusMsg) statusMsg.innerText = "Errore: " + e.message;
     }
+};
+
+R20.copyInviteLink = function() {
+    const url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(R20.p2p.roomId);
+    navigator.clipboard.writeText(url).then(() => {
+        alert("Link copiato negli appunti!\nCondividilo con il secondo dispositivo:\n" + url);
+    });
 };
 
 R20.updateHostConnectionsCount = function() {
@@ -165,7 +220,7 @@ R20.updateP2PStatusBadge = function(text, color) {
 };
 
 /**
- * TRASMETTE UN EVENTO LIVE AGLI ALTRI DISPOSITIVI
+ * TRASMISSIONE EVENTI AGLI ALTRI DISPOSITIVI
  */
 R20.broadcast = function(msg, excludeConn = null) {
     if (R20.p2p.isHost) {
@@ -181,7 +236,7 @@ R20.broadcast = function(msg, excludeConn = null) {
 };
 
 /**
- * RICEVE ED ESEGUE IL MESSAGGIO LIVE DALL'ALTRO DISPOSITIVO
+ * RICEZIONE ED ESECUZIONE DEI MESSAGGI DI RETE
  */
 R20.handleNetworkMessage = function(data) {
     if (!data || !data.type) return;
@@ -189,6 +244,10 @@ R20.handleNetworkMessage = function(data) {
     switch (data.type) {
         case 'FULL_SYNC':
             R20.loadGameState(data.state, false);
+            break;
+
+        case 'SET_PERMISSIONS':
+            R20.applyClientPermissions(data.role);
             break;
 
         case 'TOKEN_MOVE': {
@@ -271,7 +330,90 @@ R20.handleNetworkMessage = function(data) {
 };
 
 // ============================================================================
-// 2. SALVATAGGIO AUTOMATICO CONTINUO & LOCALSTORAGE
+// 3. APPLICAZIONE DEI PERMESSI (EDIT MAPPA E CONTROLLO PEDINE)
+// ============================================================================
+
+R20.applyClientPermissions = function(role) {
+    R20.myRole = role;
+
+    // Se l'Host revoca l'edit mappa, nasconde la scheda Mappa sul cellulare del giocatore
+    const editTabBtn = document.querySelector(".tab-btn[onclick*='edit-tab']");
+    if (editTabBtn) {
+        editTabBtn.style.display = role.canEdit ? 'block' : 'none';
+        if (!role.canEdit && document.getElementById('edit-tab').classList.contains('active')) {
+            R20.switchTab('token-tab');
+        }
+    }
+
+    let msg = `Permessi aggiornati: Edit Mappa [${role.canEdit ? 'Sì' : 'No'}], `;
+    if (role.tokenControl === 'all') msg += `Controllo: [Tutte le Pedine]`;
+    else if (role.tokenControl === 'none') msg += `Controllo: [Nessuna - Solo Spettatore]`;
+    else {
+        const t = R20.tokens.find(tok => tok.id == role.tokenControl);
+        msg += `Controllo: [Solo ${t ? t.name : role.tokenControl}]`;
+    }
+    R20.addChatMessage("Permessi", msg);
+};
+
+R20.sendPermissionsToClient = function(conn) {
+    if (conn && conn.open) {
+        conn.send({
+            type: 'SET_PERMISSIONS',
+            role: {
+                canEdit: conn.playerInfo.canEdit,
+                tokenControl: conn.playerInfo.tokenControl
+            }
+        });
+    }
+};
+
+R20.renderConnectedPlayersPanel = function() {
+    const container = document.getElementById('p2p-connected-players-list');
+    if (!container) return;
+
+    if (R20.p2p.connections.length === 0) {
+        container.innerHTML = '<div style="font-size:11px; color:#888;">Nessun giocatore attualmente connesso.</div>';
+        return;
+    }
+
+    container.innerHTML = R20.p2p.connections.map((conn, idx) => {
+        const info = conn.playerInfo;
+        const tokensOptions = `
+            <option value="all" ${info.tokenControl === 'all' ? 'selected' : ''}>Tutte le pedine</option>
+            <option value="none" ${info.tokenControl === 'none' ? 'selected' : ''}>Nessuna (Spettatore)</option>
+            ${R20.tokens.map(t => `<option value="${t.id}" ${info.tokenControl == t.id ? 'selected' : ''}>Solo: ${t.name}</option>`).join('')}
+        `;
+
+        return `
+            <div style="background:#1e1f26; padding:6px; border-radius:4px; font-size:11px; display:flex; flex-direction:column; gap:4px;">
+                <div style="font-weight:bold; color:#00c3ff;">📱 ${info.name}</div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <label>Edit Mappa:</label>
+                    <select onchange="R20.updatePlayerPerm(${idx}, 'canEdit', this.value === 'yes')" style="background:#111; color:#fff; border:1px solid #444; font-size:10px;">
+                        <option value="no" ${!info.canEdit ? 'selected' : ''}>No</option>
+                        <option value="yes" ${info.canEdit ? 'selected' : ''}>Sì</option>
+                    </select>
+
+                    <label style="margin-left:4px;">Pedina:</label>
+                    <select onchange="R20.updatePlayerPerm(${idx}, 'tokenControl', this.value)" style="background:#111; color:#fff; border:1px solid #444; font-size:10px; flex:1;">
+                        ${tokensOptions}
+                    </select>
+                </div>
+            </div>
+        `;
+    }).join('');
+};
+
+R20.updatePlayerPerm = function(connIdx, field, value) {
+    const conn = R20.p2p.connections[connIdx];
+    if (conn) {
+        conn.playerInfo[field] = value;
+        R20.sendPermissionsToClient(conn);
+    }
+};
+
+// ============================================================================
+// 4. AUTOSALVATAGGIO CONTINUO & BACKUP JSON
 // ============================================================================
 
 R20.autoSave = function() {
@@ -279,45 +421,9 @@ R20.autoSave = function() {
         const state = R20.getGameState();
         localStorage.setItem('roll20_scenario_save', JSON.stringify(state));
     } catch (e) {
-        console.warn("Autosave storage full or disabled:", e);
+        console.warn("Autosave locale non riuscito:", e);
     }
 };
-
-// ============================================================================
-// 3. ZOOM & CONTROLLI GENERALI
-// ============================================================================
-
-R20.setZoom = function(val) {
-    R20.zoom = Math.max(0.3, Math.min(2.5, Math.round(val * 100) / 100));
-    const board = document.getElementById('board');
-    const boardWrapper = document.getElementById('board-wrapper');
-    if (board && boardWrapper) {
-        board.style.transform = `scale(${R20.zoom})`;
-        boardWrapper.style.width = `${2600 * R20.zoom}px`;
-        boardWrapper.style.height = `${2600 * R20.zoom}px`;
-    }
-    const lbl = document.getElementById('zoom-label');
-    if (lbl) lbl.innerText = `${Math.round(R20.zoom * 100)}%`;
-};
-
-R20.changeZoom = function(delta) {
-    R20.setZoom(R20.zoom + delta);
-};
-
-R20.switchTab = function(tabId) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-    const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
-    if (activeBtn) activeBtn.classList.add('active');
-
-    const content = document.getElementById(tabId);
-    if (content) content.classList.add('active');
-};
-
-// ============================================================================
-// 4. BACKUP ED ESPORTAZIONE FILE JSON
-// ============================================================================
 
 R20.getGameState = function() {
     return {
@@ -442,10 +548,43 @@ R20.loadGameState = function(state, shouldBroadcast = true) {
 };
 
 // ============================================================================
-// 5. AVVIO & RECUPERO AUTOMATICO DALLA MEMORIA LOCALE
+// 5. ZOOM & CAMBIO SCHEDE UI
 // ============================================================================
+
+R20.setZoom = function(val) {
+    R20.zoom = Math.max(0.3, Math.min(2.5, Math.round(val * 100) / 100));
+    const board = document.getElementById('board');
+    const boardWrapper = document.getElementById('board-wrapper');
+    if (board && boardWrapper) {
+        board.style.transform = `scale(${R20.zoom})`;
+        boardWrapper.style.width = `${2600 * R20.zoom}px`;
+        boardWrapper.style.height = `${2600 * R20.zoom}px`;
+    }
+    const lbl = document.getElementById('zoom-label');
+    if (lbl) lbl.innerText = `${Math.round(R20.zoom * 100)}%`;
+};
+
+R20.changeZoom = function(delta) {
+    R20.setZoom(R20.zoom + delta);
+};
+
+R20.switchTab = function(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+    if (activeBtn) activeBtn.classList.add('active');
+
+    const content = document.getElementById(tabId);
+    if (content) content.classList.add('active');
+};
+
+// ============================================================================
+// 6. AVVIO, EVENTI & CONTROLLO INIZIALE
+// ============================================================================
+
 window.addEventListener('DOMContentLoaded', () => {
-    // Genera pulsanti condizioni
+    // Genera icone status
     const statusPicker = document.getElementById('status-picker');
     if (statusPicker) {
         R20.STATUSES.forEach(icon => {
@@ -489,13 +628,20 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Movimento tastiera con trasmissione Live
+    // Movimento tastiera (rispetta i permessi assegnati)
     window.addEventListener('keydown', (e) => {
         if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
         if (!R20.selectedTokenId) return;
 
         const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
         if (!tok) return;
+
+        // Se il giocatore non ha il permesso di muovere questa pedina, blocca il tasto
+        if (R20.myRole && R20.myRole.tokenControl !== 'all') {
+            if (R20.myRole.tokenControl === 'none' || R20.myRole.tokenControl != tok.id) {
+                return;
+            }
+        }
 
         let nextX = tok.x;
         let nextY = tok.y;
@@ -513,7 +659,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 tok.y = nextY;
                 R20.updateTokenVisuals(tok);
                 R20.updateVision();
-                // Trasmetti la mossa in diretta agli altri dispositivi
                 R20.broadcast({ type: 'TOKEN_MOVE', id: tok.id, x: tok.x, y: tok.y });
             } else {
                 R20.triggerCollisionAlert(tok);
@@ -521,7 +666,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // RECUPERO AUTOMATICO: se c'era una sessione salvata, la ricarica subito
+    // RECUPERO AUTOMATICO: Ricarica l'ultima sessione salvata
     const saved = localStorage.getItem('roll20_scenario_save');
     if (saved) {
         try {
@@ -534,4 +679,19 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     R20.setZoom(1.0);
+
+    // CONNESSIONE AUTOMATICA DA LINK: se l'URL ha ?room=... (es. aperto dal cellulare)
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomParam = urlParams.get('room');
+    if (roomParam) {
+        R20.addChatMessage("Rete P2P", `Connessione automatica alla stanza: <b>${roomParam}</b>...`);
+        R20.joinClientP2P(roomParam);
+    }
+});
+
+// Chiusura pulita della connessione al refresh/chiusura scheda
+window.addEventListener('beforeunload', () => {
+    if (R20.p2p && R20.p2p.peer) {
+        R20.p2p.peer.destroy();
+    }
 });
