@@ -1,10 +1,8 @@
 window.R20 = window.R20 || {};
 
 R20.GRID_SIZE = 50;
+R20.MAP_SIZE = 6000; // Nuova dimensione della mappa a 6000px
 
-/**
- * Calcola l'intersezione raggio-segmento
- */
 R20.getRayIntersection = function(ox, oy, rdx, rdy, p1, p2) {
     const sdx = p2[0] - p1[0];
     const sdy = p2[1] - p1[1];
@@ -21,11 +19,11 @@ R20.getRayIntersection = function(ox, oy, rdx, rdy, p1, p2) {
 };
 
 /**
- * Calcola il poligono di visibilità raycasting 2D e i muri intercettati
+ * Raycasting con 64 divisioni per un cerchio perfetto anche con raggio 3000px
  */
 R20.computeVisibilityPolygon = function(ox, oy, radius) {
     const segments = [];
-    const CIRCLE_DIVS = 36;
+    const CIRCLE_DIVS = 64; // Aumentato da 36 a 64 per un cerchio liscio a 3000px
     for (let i = 0; i < CIRCLE_DIVS; i++) {
         const a1 = (i / CIRCLE_DIVS) * Math.PI * 2;
         const a2 = ((i + 1) / CIRCLE_DIVS) * Math.PI * 2;
@@ -91,9 +89,6 @@ R20.computeVisibilityPolygon = function(ox, oy, radius) {
     };
 };
 
-/**
- * Algoritmo Point-in-Polygon (Raycasting test)
- */
 R20.isPointInsidePolygon = function(point, vs) {
     if (!vs || vs.length < 3) return false;
     const x = point[0], y = point[1];
@@ -108,10 +103,15 @@ R20.isPointInsidePolygon = function(point, vs) {
 };
 
 /**
- * Controllo collisione considerando la taglia (size) della pedina
+ * Controllo collisioni con contenimento entro la mappa 6000x6000
  */
 R20.canTokenMoveTo = function(x, y, size = 1) {
     const span = size * R20.GRID_SIZE;
+    // Contenimento entro i confini della mappa
+    if (x < 0 || y < 0 || x + span > R20.MAP_SIZE || y + span > R20.MAP_SIZE) {
+        return false;
+    }
+
     const testPoints = [
         [x + span / 2, y + span / 2],
         [x + 8, y + 8],
