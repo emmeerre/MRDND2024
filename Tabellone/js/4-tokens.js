@@ -5,7 +5,6 @@ R20.selectedTokenId = null;
 
 R20.STATUSES = ['💀', '🩸', '🔥', '🛡️', '⚡', '💤', '🏹', '👁️', '❄️', '☣️', '⭐', '🔗', '⏳', '❌'];
 
-// Controllo permessi
 R20.canIControlToken = function(tokenId) {
     if (!R20.myRole) return true;
     if (R20.p2p && R20.p2p.isHost) return true;
@@ -15,7 +14,6 @@ R20.canIControlToken = function(tokenId) {
     return R20.myRole.tokenControl == tokenId;
 };
 
-// Pedine iniziali di default
 R20.getDefaultTokens = function() {
     return [
         R20.makeToken(1, 'Guerriero', 'G', 32, 32, 16, '#c0392b', 150, 250, [
@@ -33,9 +31,6 @@ R20.getDefaultTokens = function() {
     ];
 };
 
-/**
- * Modello Costruttore Pedina
- */
 R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, initBonus = '1d20+2', visionRadius = 350, hasDarkvision = false, darkvisionRange = 300, size = 1, imgUrl = '') {
     return {
         id, name, symbol, hp, maxHp, ac, color, x, y,
@@ -51,9 +46,6 @@ R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, 
     };
 };
 
-/**
- * Inizializza il rendering DOM di tutte le pedine
- */
 R20.initTokens = function() {
     const container = document.getElementById('tokens-container');
     if (!container) return;
@@ -96,9 +88,6 @@ R20.initTokens = function() {
     if (R20.renderPlayersTabAndDock) R20.renderPlayersTabAndDock();
 };
 
-/**
- * Aggiorna la grafica della singola pedina
- */
 R20.updateTokenVisuals = function(tok) {
     const el = tok.el;
     if (!el) return;
@@ -138,9 +127,6 @@ R20.updateTokenVisuals = function(tok) {
     }
 };
 
-/**
- * Gestione eventi Mouse / Touch / Drag & Drop
- */
 R20.setupTokenEvents = function(tok) {
     const el = tok.el;
     let isDragging = false;
@@ -181,9 +167,7 @@ R20.setupTokenEvents = function(tok) {
         if (R20.isEditMode) return;
         if (e.target.closest('.bubble') || e.target.closest('.hp-popover')) return;
 
-        if (!R20.canIControlToken(tok.id)) {
-            return;
-        }
+        if (!R20.canIControlToken(tok.id)) return;
 
         R20.selectToken(tok.id);
         isDragging = true;
@@ -371,11 +355,7 @@ R20.updateCurrentTokenProps = function() {
     if (R20.broadcast) {
         R20.broadcast({
             type: 'TOKEN_UPDATE_ALL',
-            token: {
-                ...tok,
-                statuses: Array.from(tok.statuses),
-                el: null
-            }
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
         });
     }
 };
@@ -385,7 +365,10 @@ R20.handleTokenImageUpload = function(e) {
     if (!file) return;
 
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-    if (!tok || !R20.canIControlToken(tok.id)) return;
+    if (!tok || !R20.canIControlToken(tok.id)) {
+        alert("Non puoi modificare l'immagine di questa pedina!");
+        return;
+    }
 
     const reader = new FileReader();
     reader.onload = function(evt) {
@@ -563,10 +546,12 @@ R20.executeSpecificAttack = function(tokId, atkId) {
     }
 
     detail += `<div style="font-size:10px; color:#888; margin-top:2px;">Esecuzioni: <b>${atk.count}</b></div>`;
-    if (R20.addChatMessage) R20.addChatMessage(`⚔️ ${tok.name} usa ${atk.name || 'Attacco'}`, detail, mainTotal);
+    const atkTitle = `⚔️ ${tok.name} usa ${atk.name || 'Attacco'}`;
+    if (R20.addChatMessage) R20.addChatMessage(atkTitle, detail, mainTotal);
     if (R20.switchTab) R20.switchTab('chat-tab');
 
     if (R20.broadcast) {
+        R20.broadcast({ type: 'CHAT_MSG', title: atkTitle, detail, total: mainTotal });
         R20.broadcast({
             type: 'TOKEN_UPDATE_ALL',
             token: { ...tok, statuses: Array.from(tok.statuses), el: null }
@@ -584,9 +569,11 @@ R20.resetAttackCounter = function(e, tokId, atkId) {
 
     atk.count = 0;
     R20.renderTokenAttacksList(tok);
-    if (R20.addChatMessage) R20.addChatMessage("Contatore Azzerato", `Il contatore di <b>${atk.name}</b> (${tok.name}) è stato azzerato.`);
+    const msg = `Il contatore di <b>${atk.name}</b> (${tok.name}) è stato azzerato.`;
+    if (R20.addChatMessage) R20.addChatMessage("Contatore Azzerato", msg);
 
     if (R20.broadcast) {
+        R20.broadcast({ type: 'CHAT_MSG', title: "Contatore Azzerato", detail: msg, total: null });
         R20.broadcast({
             type: 'TOKEN_UPDATE_ALL',
             token: { ...tok, statuses: Array.from(tok.statuses), el: null }
@@ -615,7 +602,10 @@ R20.toggleStatus = function(icon) {
 R20.deleteCurrentToken = function() {
     if (!R20.selectedTokenId) return;
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-    if (!tok || !R20.canIControlToken(tok.id)) return;
+    if (!tok || !R20.canIControlToken(tok.id)) {
+        alert("Non hai i permessi per eliminare questa pedina!");
+        return;
+    }
 
     const delId = R20.selectedTokenId;
     const idx = R20.tokens.findIndex(t => t.id === delId);
@@ -631,9 +621,6 @@ R20.deleteCurrentToken = function() {
     }
 };
 
-/**
- * Aggiunta pedina: sbloccata e funzionante al 100%
- */
 R20.spawnToken = function() {
     if (R20.myRole && !R20.myRole.isHost && R20.myRole.tokenControl === 'none') {
         alert("Non hai i permessi per aggiungere nuove pedine al tavolo!");
