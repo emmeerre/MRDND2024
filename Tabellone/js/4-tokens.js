@@ -120,6 +120,20 @@ R20.setupTokenEvents = function(tok) {
     hpInput.addEventListener('blur', () => { hpPopover.style.display = 'none'; });
 
     el.addEventListener('pointerdown', (e) => {
+		el.addEventListener('pointerdown', (e) => {
+        if (R20.isEditMode) return;
+        if (e.target.closest('.bubble') || e.target.closest('.hp-popover')) return;
+
+        // CONTROLLO PERMESSI: Se il giocatore ha una pedina assegnata specifica e prova a toccarne un'altra
+        if (R20.myRole && R20.myRole.tokenControl !== 'all') {
+            if (R20.myRole.tokenControl === 'none' || R20.myRole.tokenControl !== tok.id) {
+                // Non hai il permesso di muovere questa pedina!
+                return;
+            }
+        }
+
+        R20.selectToken(tok.id);
+        // ... resto del codice pointerdown invariato ...
         if (R20.isEditMode) return;
         if (e.target.closest('.bubble') || e.target.closest('.hp-popover')) return;
 
