@@ -5,11 +5,23 @@ R20.selectedTokenId = null;
 
 R20.STATUSES = ['💀', '🩸', '🔥', '🛡️', '⚡', '💤', '🏹', '👁️', '❄️', '☣️', '⭐', '🔗', '⏳', '❌'];
 
+// Fallback di sicurezza per la verifica permessi se non ancora definita
+R20.canIControlToken = R20.canIControlToken || function(tokenId) {
+    if (!R20.myRole) return true;
+    if (R20.myRole.isHost) return true;
+    if (R20.myRole.tokenControl === 'all') return true;
+    if (R20.myRole.tokenControl === 'none') return false;
+    return R20.myRole.tokenControl == tokenId;
+};
+
+/**
+ * Modello Costruttore Pedina
+ */
 R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, initBonus = '1d20+2', visionRadius = 350, hasDarkvision = false, darkvisionRange = 300, size = 1, imgUrl = '') {
     return {
         id, name, symbol, hp, maxHp, ac, color, x, y,
         size: Math.max(1, parseInt(size) || 1), // 1=Media(1x1), 2=Grande(2x2), 3=Enorme(3x3), 4=Mastodontica(4x4)
-        imgUrl: imgUrl || '',                   // Immagine personalizzata Base64 o URL
+        imgUrl: imgUrl || '',                   // Immagine avatar personalizzata (base64 o URL)
         initBonus,
         attacks: attacks || [
             { id: Date.now(), name: 'Spada Lunga', hitFormula: '1d20+5', damageFormula: '1d8+3', count: 0 }
@@ -20,6 +32,9 @@ R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, 
     };
 };
 
+/**
+ * Inizializza il rendering DOM di tutte le pedine
+ */
 R20.initTokens = function() {
     const container = document.getElementById('tokens-container');
     if (!container) return;
@@ -54,13 +69,17 @@ R20.initTokens = function() {
         R20.updateTokenVisuals(tok);
     });
 
-    R20.renderPolygons();
-    R20.updatePolygonsSidebar();
-    R20.updateVision();
+    if (R20.renderPolygons) R20.renderPolygons();
+    if (R20.updatePolygonsSidebar) R20.updatePolygonsSidebar();
+    if (R20.updateVision) R20.updateVision();
     R20.renderTokenListView();
-    R20.renderInitiative();
+    if (R20.renderInitiative) R20.renderInitiative();
+    if (R20.renderPlayersTabAndDock) R20.renderPlayersTabAndDock();
 };
 
+/**
+ * Aggiorna la grafica della singola pedina
+ */
 R20.updateTokenVisuals = function(tok) {
     const el = tok.el;
     if (!el) return;
@@ -72,23 +91,37 @@ R20.updateTokenVisuals = function(tok) {
     el.style.top = `${tok.y}px`;
     el.classList.toggle('selected', tok.id === R20.selectedTokenId);
 
-    el.querySelector('.token-name').innerText = tok.name;
-    const avatar = el.querySelector('.token-avatar');
-    avatar.style.backgroundColor = tok.color;
-    avatar.innerHTML = tok.imgUrl ? `<img src="${tok.imgUrl}" alt="${tok.name}">` : tok.symbol;
+    const nameEl = el.querySelector('.token-name');
+    if (nameEl) nameEl.innerText = tok.name;
 
-    el.querySelector('.bubble-hp').innerText = tok.hp;
-    el.querySelector('.bubble-ac').innerText = tok.ac;
+    const avatar = el.querySelector('.token-avatar');
+    if (avatar) {
+        avatar.style.backgroundColor = tok.color;
+        avatar.innerHTML = tok.imgUrl ? `<img src="${tok.imgUrl}" alt="${tok.name}">` : tok.symbol;
+    }
+
+    const hpBubble = el.querySelector('.bubble-hp');
+    if (hpBubble) hpBubble.innerText = tok.hp;
+
+    const acBubble = el.querySelector('.bubble-ac');
+    if (acBubble) acBubble.innerText = tok.ac;
 
     const percent = Math.max(0, Math.min(100, (tok.hp / tok.maxHp) * 100));
     const bar = el.querySelector('.token-hp-bar');
-    bar.style.width = `${percent}%`;
-    bar.style.backgroundColor = percent > 50 ? '#2ecc71' : percent > 25 ? '#f39c12' : '#e74c3c';
+    if (bar) {
+        bar.style.width = `${percent}%`;
+        bar.style.backgroundColor = percent > 50 ? '#2ecc71' : percent > 25 ? '#f39c12' : '#e74c3c';
+    }
 
-    el.querySelector('.token-statuses').innerHTML = 
-        Array.from(tok.statuses).map(s => `<span class="status-badge">${s}</span>`).join('');
+    const statusesEl = el.querySelector('.token-statuses');
+    if (statusesEl) {
+        statusesEl.innerHTML = Array.from(tok.statuses).map(s => `<span class="status-badge">${s}</span>`).join('');
+    }
 };
 
+/**
+ * Gestione eventi Mouse / Touch / Drag & Drop
+ */
 R20.setupTokenEvents = function(tok) {
     const el = tok.el;
     let isDragging = false;
@@ -97,42 +130,43 @@ R20.setupTokenEvents = function(tok) {
 
     const hpBubble = el.querySelector('.bubble-hp');
     const hpPopover = el.querySelector('.hp-popover');
-    const hpInput = hpPopover.querySelector('input');
+    const hpInput = hpPopover ? hpPopover.querySelector('input') : null;
 
-    hpBubble.addEventListener('click', (e) => {
-        e.stopPropagation();
-        R20.selectToken(tok.id);
-        hpPopover.style.display = 'block';
-        hpInput.value = '';
-        hpInput.focus();
-    });
+    if (hpBubble && hpPopover && hpInput) {
+        hpBubble.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!R20.canIControlToken(tok.id)) {
+                alert("Non puoi modificare i punti ferita di una pedina che non controlli!");
+                return;
+            }
+            R20.selectToken(tok.id);
+            hpPopover.style.display = 'block';
+            hpInput.value = '';
+            hpInput.focus();
+        });
 
-    hpInput.addEventListener('keydown', (e) => {
-        e.stopPropagation();
-        if (e.key === 'Enter') {
-            R20.applyHpMath(tok, hpInput.value);
-            hpPopover.style.display = 'none';
-        } else if (e.key === 'Escape') {
-            hpPopover.style.display = 'none';
-        }
-    });
+        hpInput.addEventListener('keydown', (e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter') {
+                R20.applyHpMath(tok, hpInput.value);
+                hpPopover.style.display = 'none';
+            } else if (e.key === 'Escape') {
+                hpPopover.style.display = 'none';
+            }
+        });
 
-    hpInput.addEventListener('blur', () => { hpPopover.style.display = 'none'; });
+        hpInput.addEventListener('blur', () => { hpPopover.style.display = 'none'; });
+    }
 
-el.addEventListener('pointerdown', (e) => {
+    el.addEventListener('pointerdown', (e) => {
         if (R20.isEditMode) return;
         if (e.target.closest('.bubble') || e.target.closest('.hp-popover')) return;
 
-        // Se non ho il permesso di muovere questa pedina, blocco l'interazione
+        // VERIFICA PERMESSI: se non ho il controllo di questa pedina, blocco il tocco
         if (!R20.canIControlToken(tok.id)) {
-            R20.addChatMessage("Permesso Negato", `Non hai il controllo di <b>${tok.name}</b>.`);
+            if (R20.addChatMessage) R20.addChatMessage("Permesso Negato", `Non hai il controllo di <b>${tok.name}</b>.`);
             return;
         }
-
-        R20.selectToken(tok.id);
-        // ... resto del codice pointerdown invariato ...
-        if (R20.isEditMode) return;
-        if (e.target.closest('.bubble') || e.target.closest('.hp-popover')) return;
 
         R20.selectToken(tok.id);
         isDragging = true;
@@ -155,7 +189,7 @@ el.addEventListener('pointerdown', (e) => {
         tok.y = coords.y - startDragY;
         el.style.left = `${tok.x}px`;
         el.style.top = `${tok.y}px`;
-        R20.updateVision();
+        if (R20.updateVision) R20.updateVision();
     });
 
     el.addEventListener('pointerup', (e) => {
@@ -164,6 +198,7 @@ el.addEventListener('pointerdown', (e) => {
         el.classList.remove('dragging');
         el.releasePointerCapture(e.pointerId);
 
+        // Snap alla griglia
         const targetX = Math.max(0, Math.round(tok.x / R20.GRID_SIZE) * R20.GRID_SIZE);
         const targetY = Math.max(0, Math.round(tok.y / R20.GRID_SIZE) * R20.GRID_SIZE);
 
@@ -177,8 +212,12 @@ el.addEventListener('pointerdown', (e) => {
         }
 
         R20.updateTokenVisuals(tok);
-        R20.updateVision();
-		R20.broadcast({ type: 'TOKEN_MOVE', id: tok.id, x: tok.x, y: tok.y });
+        if (R20.updateVision) R20.updateVision();
+
+        // Invia movimento in tempo reale via WebSocket
+        if (R20.broadcast) {
+            R20.broadcast({ type: 'TOKEN_MOVE', id: tok.id, x: tok.x, y: tok.y });
+        }
     });
 };
 
@@ -190,22 +229,28 @@ R20.triggerCollisionAlert = function(tok) {
     }
 };
 
+/**
+ * Seleziona una pedina o torna alla lista completa
+ */
 R20.selectToken = function(id) {
     R20.selectedTokenId = id;
     R20.tokens.forEach(t => R20.updateTokenVisuals(t));
-    R20.updateVision();
+    if (R20.updateVision) R20.updateVision();
 
     const tok = R20.tokens.find(t => t.id === id);
+    const listView = document.getElementById('token-list-view');
+    const editorBody = document.getElementById('token-editor-body');
+
     if (tok) {
-        document.getElementById('token-list-view').style.display = 'none';
-        document.getElementById('token-editor-body').style.display = 'block';
+        if (listView) listView.style.display = 'none';
+        if (editorBody) editorBody.style.display = 'block';
         R20.fillTokenEditor(tok);
     } else {
-        document.getElementById('token-editor-body').style.display = 'none';
-        document.getElementById('token-list-view').style.display = 'block';
+        if (editorBody) editorBody.style.display = 'none';
+        if (listView) listView.style.display = 'block';
         R20.renderTokenListView();
     }
-    R20.renderInitiative();
+    if (R20.renderInitiative) R20.renderInitiative();
 };
 
 R20.renderTokenListView = function() {
@@ -236,33 +281,65 @@ R20.renderTokenListView = function() {
 };
 
 R20.fillTokenEditor = function(tok) {
-    document.getElementById('token-title').innerHTML = `Selezionato: <b>${tok.name}</b>`;
-    document.getElementById('edit-name').value = tok.name;
-    document.getElementById('edit-symbol').value = tok.symbol;
-    document.getElementById('edit-color').value = tok.color;
-    document.getElementById('edit-size').value = tok.size || 1;
+    const titleEl = document.getElementById('token-title');
+    if (titleEl) titleEl.innerHTML = `Selezionato: <b>${tok.name}</b>`;
 
-    document.getElementById('edit-hp').value = tok.hp;
-    document.getElementById('edit-maxhp').value = tok.maxHp;
-    document.getElementById('edit-ac').value = tok.ac;
-    document.getElementById('edit-init-mod').value = tok.initBonus || '1d20+2';
+    const nameInput = document.getElementById('edit-name');
+    if (nameInput) nameInput.value = tok.name;
 
-    document.getElementById('edit-vision-range').value = tok.visionRadius;
-    document.getElementById('edit-darkvision').value = tok.hasDarkvision ? 'yes' : 'no';
-    document.getElementById('edit-darkvision-range').value = tok.darkvisionRange;
+    const symbolInput = document.getElementById('edit-symbol');
+    if (symbolInput) symbolInput.value = tok.symbol;
+
+    const colorInput = document.getElementById('edit-color');
+    if (colorInput) colorInput.value = tok.color;
+
+    const sizeInput = document.getElementById('edit-size');
+    if (sizeInput) sizeInput.value = tok.size || 1;
+
+    const hpInput = document.getElementById('edit-hp');
+    if (hpInput) hpInput.value = tok.hp;
+
+    const maxHpInput = document.getElementById('edit-maxhp');
+    if (maxHpInput) maxHpInput.value = tok.maxHp;
+
+    const acInput = document.getElementById('edit-ac');
+    if (acInput) acInput.value = tok.ac;
+
+    const initInput = document.getElementById('edit-init-mod');
+    if (initInput) initInput.value = tok.initBonus || '1d20+2';
+
+    const visRange = document.getElementById('edit-vision-range');
+    if (visRange) visRange.value = tok.visionRadius;
+
+    const darkVis = document.getElementById('edit-darkvision');
+    if (darkVis) darkVis.value = tok.hasDarkvision ? 'yes' : 'no';
+
+    const darkRange = document.getElementById('edit-darkvision-range');
+    if (darkRange) darkRange.value = tok.darkvisionRange;
 
     R20.renderTokenAttacksList(tok);
 
-    const buttons = document.getElementById('status-picker').children;
-    for (let i = 0; i < buttons.length; i++) {
-        const icon = buttons[i].innerText;
-        buttons[i].classList.toggle('active', tok.statuses.has(icon));
+    const picker = document.getElementById('status-picker');
+    if (picker) {
+        const buttons = picker.children;
+        for (let i = 0; i < buttons.length; i++) {
+            const icon = buttons[i].innerText;
+            buttons[i].classList.toggle('active', tok.statuses.has(icon));
+        }
     }
 };
 
+/**
+ * Salva le modifiche dai campi input
+ */
 R20.updateCurrentTokenProps = function() {
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
     if (!tok) return;
+
+    if (!R20.canIControlToken(tok.id)) {
+        alert("Non hai i permessi per modificare questa pedina!");
+        return;
+    }
 
     tok.name = document.getElementById('edit-name').value || 'Senza Nome';
     tok.symbol = document.getElementById('edit-symbol').value || tok.name[0];
@@ -279,45 +356,73 @@ R20.updateCurrentTokenProps = function() {
     tok.darkvisionRange = Math.max(0, parseInt(document.getElementById('edit-darkvision-range').value) || 0);
 
     R20.updateTokenVisuals(tok);
-    R20.renderInitiative();
-    R20.updateVision();
-	R20.broadcast({ type: 'TOKEN_UPDATE_ALL', token: R20.getGameState().tokens.find(t => t.id === tok.id) });
+    if (R20.renderInitiative) R20.renderInitiative();
+    if (R20.updateVision) R20.updateVision();
+
+    // Sincronizza i dati completi con gli altri browser
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: {
+                ...tok,
+                statuses: Array.from(tok.statuses),
+                el: null
+            }
+        });
+    }
 };
 
 R20.handleTokenImageUpload = function(e) {
     const file = e.target.files[0];
     if (!file) return;
 
+    const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
+    if (!tok || !R20.canIControlToken(tok.id)) {
+        alert("Non hai i permessi per modificare l'immagine di questa pedina!");
+        return;
+    }
+
     const reader = new FileReader();
     reader.onload = function(evt) {
-        const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-        if (tok) {
-            tok.imgUrl = evt.target.result;
-            R20.updateTokenVisuals(tok);
-            R20.renderTokenListView();
-            R20.addChatMessage("Avatar", `Immagine caricata per <b>${tok.name}</b>.`);
+        tok.imgUrl = evt.target.result;
+        R20.updateTokenVisuals(tok);
+        R20.renderTokenListView();
+        if (R20.addChatMessage) R20.addChatMessage("Avatar", `Immagine caricata per <b>${tok.name}</b>.`);
+        if (R20.broadcast) {
+            R20.broadcast({
+                type: 'TOKEN_UPDATE_ALL',
+                token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+            });
         }
     };
     reader.readAsDataURL(file);
     e.target.value = '';
-	R20.broadcast({ type: 'TOKEN_UPDATE_ALL', token: R20.getGameState().tokens.find(t => t.id === tok.id) });
 };
 
 R20.removeTokenImage = function() {
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-    if (tok) {
-        tok.imgUrl = '';
-        R20.updateTokenVisuals(tok);
-        R20.renderTokenListView();
+    if (!tok || !R20.canIControlToken(tok.id)) return;
+
+    tok.imgUrl = '';
+    R20.updateTokenVisuals(tok);
+    R20.renderTokenListView();
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
     }
 };
 
+/**
+ * Matematica HP (+ / - / valore) stile Roll20
+ */
 R20.applyHpMath = function(tok, str) {
     if (!R20.canIControlToken(tok.id)) {
-        alert("Non puoi modificare i punti ferita di questa pedina!");
+        alert("Non puoi modificare i punti ferita di una pedina che non controlli!");
         return;
     }
-    // ... resto di applyHpMath invariato ...
+
     str = str.trim();
     if (!str) return;
 
@@ -336,9 +441,16 @@ R20.applyHpMath = function(tok, str) {
     R20.updateTokenVisuals(tok);
     R20.fillTokenEditor(tok);
     R20.renderTokenListView();
-    R20.addChatMessage("Salute", `<b>${tok.name}</b> HP: <b>${tok.hp}/${tok.maxHp}</b> (${str})`);
+    if (R20.addChatMessage) R20.addChatMessage("Salute", `<b>${tok.name}</b> HP: <b>${tok.hp}/${tok.maxHp}</b> (${str})`);
+
+    if (R20.broadcast) {
+        R20.broadcast({ type: 'TOKEN_HP', id: tok.id, hp: tok.hp });
+    }
 };
 
+/**
+ * Rendering lista attacchi
+ */
 R20.renderTokenAttacksList = function(tok) {
     const container = document.getElementById('token-attacks-list');
     if (!container) return;
@@ -372,12 +484,11 @@ R20.renderTokenAttacksList = function(tok) {
             </div>
         </div>
     `).join('');
-	R20.broadcast({ type: 'TOKEN_HP', id: tok.id, hp: tok.hp });
 };
 
 R20.addNewAttackToCurrentToken = function() {
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-    if (!tok) return;
+    if (!tok || !R20.canIControlToken(tok.id)) return;
 
     if (!tok.attacks) tok.attacks = [];
     tok.attacks.push({
@@ -389,59 +500,172 @@ R20.addNewAttackToCurrentToken = function() {
     });
 
     R20.renderTokenAttacksList(tok);
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
 };
 
 R20.removeAttackFromToken = function(tokId, atkId) {
     const tok = R20.tokens.find(t => t.id === tokId);
-    if (!tok) return;
+    if (!tok || !R20.canIControlToken(tok.id)) return;
 
     tok.attacks = tok.attacks.filter(a => a.id !== atkId);
     R20.renderTokenAttacksList(tok);
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
 };
 
 R20.updateAttackField = function(tokId, atkId, field, value) {
     const tok = R20.tokens.find(t => t.id === tokId);
-    if (!tok) return;
+    if (!tok || !R20.canIControlToken(tok.id)) return;
 
     const atk = tok.attacks.find(a => a.id === atkId);
     if (!atk) return;
 
     atk[field] = value;
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
+};
+
+R20.executeSpecificAttack = function(tokId, atkId) {
+    const tok = R20.tokens.find(t => t.id === tokId);
+    if (!tok) return;
+
+    if (!R20.canIControlToken(tokId)) {
+        alert("Non puoi eseguire attacchi con una pedina che non controlli!");
+        return;
+    }
+
+    const atk = tok.attacks.find(a => a.id === atkId);
+    if (!atk) return;
+
+    atk.count = (atk.count || 0) + 1;
+    R20.renderTokenAttacksList(tok);
+
+    let detail = '';
+    let mainTotal = null;
+
+    if (atk.hitFormula && atk.hitFormula.trim() !== '') {
+        let formula = atk.hitFormula.trim();
+        if (!formula.toLowerCase().includes('d')) {
+            formula = formula.startsWith('+') || formula.startsWith('-') ? `1d20${formula}` : `1d20+${formula}`;
+        }
+        const hitRes = R20.evaluateDiceFormula(formula);
+        detail += `<div>Tiro TxC (${formula}): ${hitRes.breakdown} = <b>${hitRes.total}</b></div>`;
+        mainTotal = hitRes.total;
+    }
+
+    if (atk.damageFormula && atk.damageFormula.trim() !== '') {
+        const dmgRes = R20.evaluateDiceFormula(atk.damageFormula.trim());
+        detail += `<div>Tiro Danni (${atk.damageFormula}): ${dmgRes.breakdown} = <b>${dmgRes.total}</b></div>`;
+        if (mainTotal === null) mainTotal = dmgRes.total;
+    }
+
+    detail += `<div style="font-size:10px; color:#888; margin-top:2px;">Esecuzioni totali: <b>${atk.count}</b></div>`;
+    if (R20.addChatMessage) R20.addChatMessage(`⚔️ ${tok.name} usa ${atk.name || 'Attacco'}`, detail, mainTotal);
+    if (R20.switchTab) R20.switchTab('chat-tab');
+
+    // Sincronizza il contatore attacchi con gli altri browser
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
+};
+
+R20.resetAttackCounter = function(e, tokId, atkId) {
+    e.stopPropagation();
+    const tok = R20.tokens.find(t => t.id === tokId);
+    if (!tok || !R20.canIControlToken(tok.id)) return;
+
+    const atk = tok.attacks.find(a => a.id === atkId);
+    if (!atk) return;
+
+    atk.count = 0;
+    R20.renderTokenAttacksList(tok);
+    if (R20.addChatMessage) R20.addChatMessage("Contatore Azzerato", `Il contatore di <b>${atk.name}</b> (${tok.name}) è stato azzerato.`);
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
 };
 
 R20.toggleStatus = function(icon) {
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-    if (!tok) return;
+    if (!tok || !R20.canIControlToken(tok.id)) return;
 
     if (tok.statuses.has(icon)) tok.statuses.delete(icon);
     else tok.statuses.add(icon);
 
     R20.updateTokenVisuals(tok);
     R20.fillTokenEditor(tok);
-	R20.broadcast({ type: 'TOKEN_UPDATE_ALL', token: R20.getGameState().tokens.find(t => t.id === tok.id) });
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_UPDATE_ALL',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
 };
 
 R20.deleteCurrentToken = function() {
     if (!R20.selectedTokenId) return;
-    const idx = R20.tokens.findIndex(t => t.id === R20.selectedTokenId);
+    const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
+    if (!tok || !R20.canIControlToken(tok.id)) {
+        alert("Non hai i permessi per eliminare questa pedina!");
+        return;
+    }
+
+    const delId = R20.selectedTokenId;
+    const idx = R20.tokens.findIndex(t => t.id === delId);
     if (idx !== -1) {
         R20.tokens[idx].el.remove();
         R20.tokens.splice(idx, 1);
     }
-    R20.removeFromInit(R20.selectedTokenId);
+    if (R20.removeFromInit) R20.removeFromInit(delId);
     R20.selectToken(null);
-	R20.broadcast({ type: 'TOKEN_DELETE', id: selectedTokenId });
+
+    if (R20.broadcast) {
+        R20.broadcast({ type: 'TOKEN_DELETE', id: delId });
+    }
 };
 
 R20.spawnToken = function() {
+    if (!R20.net.isHost && R20.myRole.tokenControl === 'none') {
+        alert("Non hai i permessi per aggiungere nuove pedine al tavolo!");
+        return;
+    }
+
     const id = Date.now();
     const colors = ['#e67e22', '#16a085', '#2980b9', '#8e44ad', '#d35400'];
     const color = colors[Math.floor(Math.random() * colors.length)];
     const tok = R20.makeToken(id, `Personaggio ${R20.tokens.length + 1}`, 'P', 25, 25, 14, color, 200, 350, [
         { id: Date.now(), name: 'Spada Corta', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 }
     ], '1d20+2', 350, false, 0, 1, '');
+
     R20.tokens.push(tok);
     R20.initTokens();
     R20.selectToken(id);
-	R20.broadcast({ type: 'TOKEN_SPAWN', token: R20.getGameState().tokens.find(t => t.id === id) });
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_SPAWN',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
 };
