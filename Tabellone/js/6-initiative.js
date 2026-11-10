@@ -71,6 +71,11 @@ R20.addSelectedToInit = function() {
 };
 
 R20.rollAllInitiative = function() {
+    if (R20.canIEditMap && !R20.canIEditMap()) {
+        alert("Solo il Master può tirare l'iniziativa per tutti!");
+        return;
+    }
+
     R20.initiativeList = R20.tokens.map(tok => {
         let formula = (tok.initBonus || '1d20+2').trim();
         if (!formula.toLowerCase().includes('d')) {
@@ -92,20 +97,13 @@ R20.rollAllInitiative = function() {
             currentTurnIndex: R20.currentTurnIndex,
             currentRound: R20.currentRound
         });
-        R20.broadcast({
-            type: 'CHAT_MSG',
-            title: "Iniziativa",
-            detail: "Tiro iniziativa completato per tutti!"
-        });
     }
 };
 
-R20.sortInitiative = function() {
-    R20.initiativeList.sort((a, b) => b.value - a.value);
-};
-
 R20.nextTurn = function() {
+    if (R20.canIEditMap && !R20.canIEditMap()) return;
     if (R20.initiativeList.length === 0) return;
+
     R20.currentTurnIndex++;
     if (R20.currentTurnIndex >= R20.initiativeList.length) {
         R20.currentTurnIndex = 0;
@@ -127,6 +125,11 @@ R20.nextTurn = function() {
 };
 
 R20.clearInitiative = function() {
+    if (R20.canIEditMap && !R20.canIEditMap()) {
+        alert("Solo il Master può azzerare l'iniziativa!");
+        return;
+    }
+
     R20.initiativeList = [];
     R20.currentTurnIndex = 0;
     R20.currentRound = 1;
@@ -140,6 +143,10 @@ R20.clearInitiative = function() {
             currentRound: R20.currentRound
         });
     }
+};
+
+R20.sortInitiative = function() {
+    R20.initiativeList.sort((a, b) => b.value - a.value);
 };
 
 R20.removeFromInit = function(tokenId) {
