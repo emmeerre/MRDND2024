@@ -315,22 +315,20 @@
         </div>
 
         <!-- 3. TAB INIZIATIVA -->
-        <div id="init-tab" class="tab-content">
+        <!-- NUOVA TAB: GESTIONE GIOCATORI E PERMESSI -->
+        <div id="players-tab" class="tab-content">
             <div class="section-box">
                 <div class="section-title">
-                    <span>Round: <b id="lbl-round" style="color: #00c3ff;">1</b></span>
-                    <button class="btn btn-success" style="padding: 2px 8px; font-size: 11px;" onclick="R20.nextTurn()">Turno Succ. ⏩</button>
+                    <span>👥 Tavolo & Permessi</span>
+                    <span id="players-online-count" style="color:#00c3ff;">1 online</span>
                 </div>
-                <div style="display: flex; gap: 6px; margin-top: 8px;">
-                    <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.addSelectedToInit()">+ Selezionato</button>
-                    <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.rollAllInitiative()">🎲 Tira x Tutti</button>
-                    <button class="btn btn-danger" style="font-size: 11px;" onclick="R20.clearInitiative()">Pulisci</button>
+                <div id="players-my-role-badge" style="background:#16171d; padding:6px 8px; border-radius:4px; font-size:11px; margin-bottom:8px; border-left:3px solid #00c3ff;">
+                    Ruolo: <b>Inizializzazione...</b>
                 </div>
-                <div style="font-size: 11px; color: #888; margin-top: 6px;">
-                    💡 Trascina le righe per riordinarle. Clicca su un personaggio per selezionarlo sulla mappa.
+                <div id="players-manager-list" style="display:flex; flex-direction:column; gap:6px;">
+                    <!-- Popolato dinamicamente da 7-app-storage.js -->
                 </div>
             </div>
-            <div id="initiative-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
         </div>
 
         <!-- 4. TAB CHAT & DADI -->
@@ -381,7 +379,8 @@
 			<div id="p2p-status-msg" style="font-size: 11px; margin-top: 8px; text-align: center; color: #aaa;"></div>
 		</div>
 	</div>
-
+	<!-- BARRA GIOCATORI IN BASSO A SINISTRA (STILE ROLL20) -->
+    <div id="players-bottom-dock"></div>
     <!-- SCRIPT DEI 7 MODULI -->
     <script src="js/1-math-geom.js"></script>
     <script src="js/2-lighting-vision.js"></script>
