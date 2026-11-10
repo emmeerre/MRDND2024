@@ -326,12 +326,12 @@
             <div class="section-box">
                 <div class="section-title">
                     <span>Round: <b id="lbl-round" style="color: #00c3ff;">1</b></span>
-                    <button class="btn btn-success" style="padding: 2px 8px; font-size: 11px;" onclick="R20.nextTurn()">Turno Succ. ⏩</button>
+                    <button class="btn btn-success" id="btn-init-next" style="padding: 2px 8px; font-size: 11px;" onclick="R20.nextTurn()">Turno Succ. ⏩</button>
                 </div>
                 <div style="display: flex; gap: 6px; margin-top: 8px;">
                     <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.addSelectedToInit()">+ Selezionato</button>
-                    <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.rollAllInitiative()">🎲 Tira x Tutti</button>
-                    <button class="btn btn-danger" style="font-size: 11px;" onclick="R20.clearInitiative()">Pulisci</button>
+                    <button class="btn" id="btn-init-roll-all" style="flex: 1; font-size: 11px;" onclick="R20.rollAllInitiative()">🎲 Tira x Tutti</button>
+                    <button class="btn btn-danger" id="btn-init-clear" style="font-size: 11px;" onclick="R20.clearInitiative()">Pulisci</button>
                 </div>
                 <div style="font-size: 11px; color: #888; margin-top: 6px;">
                     💡 Trascina le righe per riordinarle. Clicca su un personaggio per selezionarlo sulla mappa.
@@ -339,7 +339,7 @@
             </div>
             <div id="initiative-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
         </div>
-
+        
         <!-- 4. TAB GIOCATORI E GESTIONE PERMESSI -->
         <div id="players-tab" class="tab-content">
             <div class="section-box">
