@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roll20 Web Clone - Modular VTT Live</title>
+    <title>Roll20 Web Clone - Modular VTT</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- Libreria MQTT per sincronizzazione live ad alta affidabilità su WebSocket -->
+    <!-- WebRTC PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
@@ -31,7 +31,7 @@
             <button class="zoom-btn" onclick="R20.changeZoom(0.1)" title="Ingrandisci">+</button>
         </div>
 
-        <!-- BARRA GIOCATORI COLLEGATI (STILE ROLL20 IN BASSO A SINISTRA) -->
+        <!-- BARRA GIOCATORI IN BASSO A SINISTRA (STILE ROLL20) -->
         <div id="players-bottom-dock"></div>
     </div>
 
@@ -67,7 +67,7 @@
 
         <!-- 1. TAB PEDINA -->
         <div id="token-tab" class="tab-content active">
-            <!-- A. LISTA COMPLETA PEDINE (Quando nessuna è selezionata) -->
+            <!-- A. LISTA COMPLETA PEDINE -->
             <div id="token-list-view">
                 <div class="section-box">
                     <div class="section-title">
