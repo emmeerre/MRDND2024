@@ -34,7 +34,7 @@ R20.ICE_CONFIG = {
 };
 
 // ============================================================================
-// 1. GESTIONE CONNESSIONE P2P STABILE
+// 1. GESTIONE P2P ROBUSTA E PULITA (SENZA RICONNESSIONI CONTINUE)
 // ============================================================================
 
 R20.openP2PModal = function() {
@@ -65,7 +65,7 @@ R20.startHostP2P = function() {
     }
 
     try {
-        const peer = new Peer(roomId, { config: R20.ICE_CONFIG, debug: 1 });
+        const peer = new Peer(roomId, { config: R20.ICE_CONFIG });
         R20.p2p.peer = peer;
         R20.p2p.isHost = true;
         R20.p2p.roomId = rawRoom;
@@ -93,7 +93,6 @@ R20.startHostP2P = function() {
 
             conn.on('open', () => {
                 R20.updateHostConnectionsCount();
-                // Spedisce lo scenario senza causare loop
                 conn.send({ type: 'FULL_SYNC', state: R20.getGameState() });
                 R20.sendPermissionsToClient(conn);
                 R20.renderPlayersTabAndDock();
@@ -144,14 +143,13 @@ R20.joinClientP2P = function(roomOverride = null) {
     }
 
     try {
-        const peer = new Peer({ config: R20.ICE_CONFIG, debug: 1 });
+        const peer = new Peer({ config: R20.ICE_CONFIG });
         R20.p2p.peer = peer;
         R20.p2p.isHost = false;
         R20.p2p.roomId = rawRoom;
         R20.myRole.isHost = false;
 
         peer.on('open', () => {
-            // Connessione diretta senza wrapper legacy per massima stabilità
             const conn = peer.connect(hostRoomId);
             R20.p2p.hostConn = conn;
 
@@ -204,9 +202,6 @@ R20.updateP2PStatusBadge = function(text, color) {
     }
 };
 
-/**
- * TRASMETTE I DATI AGLI ALTRI DISPOSITIVI
- */
 R20.broadcast = function(msg, excludeConn = null) {
     if (R20.p2p.isHost) {
         R20.p2p.connections.forEach(conn => {
@@ -220,9 +215,6 @@ R20.broadcast = function(msg, excludeConn = null) {
     }
 };
 
-/**
- * RICEVE E APPLICA I DATI SENZA RE-INVIARLI (ZERO LOOP)
- */
 R20.handleNetworkMessage = function(data) {
     if (!data || !data.type) return;
 
@@ -299,7 +291,6 @@ R20.handleNetworkMessage = function(data) {
             break;
 
         case 'CHAT_MSG':
-            // Stampa solo a schermo, NON rimanda in rete
             R20.addChatMessage(data.title, data.detail, data.total);
             break;
 
@@ -477,7 +468,7 @@ R20.togglePlayerMapEdit = function(connIdx) {
 };
 
 // ============================================================================
-// 3. AUTOSALVATAGGIO CONTINUO & BACKUP JSON
+// 3. AUTOSALVATAGGIO & BACKUP JSON
 // ============================================================================
 
 R20.autoSave = function() {
@@ -721,7 +712,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Ricarica sessione precedente: se vuota, genera subito le pedine e la mappa di default!
+    // Ricarica la sessione precedente; se vuota, genera subito le pedine e la mappa di default
     const saved = localStorage.getItem('roll20_scenario_save');
     let loaded = false;
     if (saved) {
