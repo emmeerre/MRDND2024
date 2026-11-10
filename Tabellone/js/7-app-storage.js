@@ -6,20 +6,34 @@ R20.zoom = 1.0;
 R20.myRole = {
     isHost: false,
     canEdit: true,
-    tokenControl: 'all' // 'all', 'none' oppure id pedina (es. 1)
+    tokenControl: 'all' // 'all', 'none' o ID specifico pedina
 };
 
-R20.myClientId = 'usr_' + Math.random().toString(36).substring(2, 9);
-R20.myPlayerName = localStorage.getItem('r20_player_name') || 'Giocatore ' + R20.myClientId.substring(4);
-
-// Elenco giocatori collegati
-R20.connectedUsers = new Map();
-
-R20.net = {
-    client: null,
+// Stato WebRTC P2P
+R20.p2p = {
+    peer: null,
     isHost: false,
-    roomCode: null,
-    topic: null
+    connections: [], // Lista connessioni client per l'Host
+    hostConn: null,  // Connessione verso l'Host per il Client
+    roomId: null
+};
+
+// Server STUN/TURN per far comunicare PC e Cellulari anche su reti diverse
+R20.ICE_CONFIG = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:openrelay.metered.ca:80" },
+        {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+        }
+    ]
 };
 
 // ============================================================================
@@ -27,180 +41,190 @@ R20.net = {
 // ============================================================================
 
 R20.canIControlToken = function(tokenId) {
-    if (R20.net.isHost) return true; // Il Master controlla sempre tutto
+    if (R20.p2p.isHost) return true; // Il Master può muovere e fare tutto
     if (R20.myRole.tokenControl === 'all') return true;
     if (R20.myRole.tokenControl === 'none') return false;
     return R20.myRole.tokenControl == tokenId;
 };
 
 // ============================================================================
-// 2. RETE WEBSOCKET RESILIENTE (DOPPIO BROKER HIVEMQ + EMQX)
+// 2. RETE WEBRTC P2P SU PORTA STANDARD 443 (NESSUN BLOCCO ROUTER)
 // ============================================================================
 
 R20.openP2PModal = function() {
     document.getElementById('p2p-modal').style.display = 'flex';
     document.getElementById('p2p-host-room').value = localStorage.getItem('r20_last_room') || 'tavolo-dnd-' + Math.floor(100 + Math.random() * 900);
     document.getElementById('p2p-join-room').value = localStorage.getItem('r20_last_room') || '';
-    if (R20.net.isHost) {
-        R20.renderPlayersTabAndDock();
-    }
+    const statusMsg = document.getElementById('p2p-status-msg');
+    if (statusMsg) statusMsg.innerText = '';
 };
 
 R20.closeP2PModal = function() {
     document.getElementById('p2p-modal').style.display = 'none';
 };
 
-// Lista di server broker ridondati ad alta velocità
-const BROKER_SERVERS = [
-    { name: 'HiveMQ Europa', url: 'wss://broker.hivemq.com:8884/mqtt' },
-    { name: 'EMQX Serverless', url: 'wss://broker.emqx.io:8084/mqtt' }
-];
-
-function connectBroker(roomCode, isHost, brokerIndex = 0) {
+/**
+ * AVVIO HOST (MASTER)
+ */
+R20.startHostP2P = function() {
+    const rawRoom = document.getElementById('p2p-host-room').value.trim();
     const statusMsg = document.getElementById('p2p-status-msg');
+    if (!rawRoom) return;
 
-    // 1. Verifica che la libreria MQTT sia effettivamente presente nel browser
-    if (typeof mqtt === 'undefined') {
-        if (statusMsg) {
-            statusMsg.innerHTML = "❌ Libreria di rete non caricata!<br>Premi <b>Ctrl + F5</b> per forzare l'aggiornamento di Chrome.";
-            statusMsg.style.color = "#e74c3c";
-        }
-        return;
+    const roomId = 'r20vtt-' + rawRoom.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    localStorage.setItem('r20_last_room', rawRoom);
+
+    statusMsg.innerText = "⏳ Creazione stanza in corso...";
+    statusMsg.style.color = "#f39c12";
+
+    if (R20.p2p.peer) {
+        try { R20.p2p.peer.destroy(); } catch(e) {}
     }
 
-    if (brokerIndex >= BROKER_SERVERS.length) {
-        if (statusMsg) {
-            statusMsg.innerText = "❌ Impossibile raggiungere i server di rete. Controlla la connessione.";
-            statusMsg.style.color = "#e74c3c";
-        }
-        return;
-    }
+    try {
+        const peer = new Peer(roomId, {
+            config: R20.ICE_CONFIG,
+            debug: 1
+        });
 
-    const currentBroker = BROKER_SERVERS[brokerIndex];
+        R20.p2p.peer = peer;
+        R20.p2p.isHost = true;
+        R20.p2p.roomId = rawRoom;
+        R20.p2p.connections = [];
+        R20.myRole.isHost = true;
+
+        peer.on('open', () => {
+            statusMsg.innerText = `✔ Stanza attiva! Codice: ${rawRoom}`;
+            statusMsg.style.color = "#2ecc71";
+            const btnCopy = document.getElementById('btn-copy-invite');
+            if (btnCopy) btnCopy.style.display = 'block';
+            R20.updateP2PStatusBadge(`🟢 Host (${rawRoom}) - 0 conn`, "#2ecc71");
+            R20.addChatMessage("Rete Live", `Stanza Master aperta: <b>${rawRoom}</b>`);
+            R20.renderPlayersTabAndDock();
+            setTimeout(R20.closeP2PModal, 1000);
+        });
+
+        peer.on('connection', (conn) => {
+            // Assegna dati e permessi base al dispositivo connesso
+            conn.playerInfo = {
+                id: conn.peer,
+                name: 'Giocatore ' + (R20.p2p.connections.length + 1),
+                canEdit: false,        // Di default non modifica la mappa
+                tokenControl: 'all'    // Di default controlla tutte le pedine
+            };
+            R20.p2p.connections.push(conn);
+
+            conn.on('open', () => {
+                R20.updateHostConnectionsCount();
+                // Spedisce stato del tavolo e i permessi
+                conn.send({ type: 'FULL_SYNC', state: R20.getGameState() });
+                R20.sendPermissionsToClient(conn);
+                R20.addChatMessage("Presenza", `📱 <b>${conn.playerInfo.name}</b> si è connesso!`);
+                R20.renderPlayersTabAndDock();
+            });
+
+            conn.on('data', (data) => {
+                R20.handleNetworkMessage(data);
+                // Il Master fa da ponte e rimanda agli altri giocatori
+                R20.broadcast(data, conn);
+                R20.autoSave();
+            });
+
+            conn.on('close', () => {
+                R20.p2p.connections = R20.p2p.connections.filter(c => c !== conn);
+                R20.updateHostConnectionsCount();
+                R20.renderPlayersTabAndDock();
+            });
+        });
+
+        peer.on('error', (err) => {
+            if (err.type === 'unavailable-id') {
+                statusMsg.innerText = "❌ Codice occupato da una sessione precedente! Cambia numero (es. " + rawRoom + "-1).";
+            } else {
+                statusMsg.innerText = `Errore: ${err.type}`;
+            }
+            statusMsg.style.color = "#e74c3c";
+        });
+
+    } catch (e) {
+        statusMsg.innerText = "Errore: " + e.message;
+        statusMsg.style.color = "#e74c3c";
+    }
+};
+
+/**
+ * AVVIO CLIENT (GIOCATORE / SECONDO DISPOSITIVO)
+ */
+R20.joinClientP2P = function(roomOverride = null) {
+    const rawRoom = roomOverride || document.getElementById('p2p-join-room').value.trim();
+    const statusMsg = document.getElementById('p2p-status-msg');
+    if (!rawRoom) return;
+
+    const hostRoomId = 'r20vtt-' + rawRoom.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    localStorage.setItem('r20_last_room', rawRoom);
+
     if (statusMsg) {
-        statusMsg.innerText = `⏳ Connessione a ${currentBroker.name}...`;
+        statusMsg.innerText = "⏳ Ricerca Host in corso...";
         statusMsg.style.color = "#f39c12";
     }
 
-    if (R20.net.client) {
-        try { R20.net.client.end(true); } catch(e) {}
+    if (R20.p2p.peer) {
+        try { R20.p2p.peer.destroy(); } catch(e) {}
     }
 
-    const cleanRoom = roomCode.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    const topic = `mrdnd2024/room/${cleanRoom}`;
-    R20.net.roomCode = cleanRoom;
-    R20.net.topic = topic;
-    R20.net.isHost = isHost;
-    R20.myRole.isHost = isHost;
-    R20.connectedUsers.clear();
+    try {
+        const peer = new Peer({ config: R20.ICE_CONFIG, debug: 1 });
+        R20.p2p.peer = peer;
+        R20.p2p.isHost = false;
+        R20.p2p.roomId = rawRoom;
+        R20.myRole.isHost = false;
 
-    localStorage.setItem('r20_last_room', cleanRoom);
+        peer.on('open', () => {
+            const conn = peer.connect(hostRoomId, { reliable: true });
+            R20.p2p.hostConn = conn;
 
-    let isConnected = false;
-
-    // Timeout di 4 secondi: se il server non risponde, prova automaticamente il server successivo
-    const timeoutTimer = setTimeout(() => {
-        if (!isConnected) {
-            console.warn(`Timeout su ${currentBroker.name}, tentativo con il server di riserva...`);
-            try { client.end(true); } catch(e) {}
-            connectBroker(roomCode, isHost, brokerIndex + 1);
-        }
-    }, 4500);
-
-    const client = mqtt.connect(currentBroker.url, {
-        clientId: R20.myClientId,
-        clean: true,
-        connectTimeout: 4000,
-        reconnectPeriod: 2500
-    });
-
-    R20.net.client = client;
-
-    client.on('connect', () => {
-        isConnected = true;
-        clearTimeout(timeoutTimer);
-
-        client.subscribe(topic, { qos: 0 }, (err) => {
-            if (!err) {
+            conn.on('open', () => {
                 if (statusMsg) {
-                    statusMsg.innerText = `✔ Connesso con successo (${currentBroker.name})!`;
+                    statusMsg.innerText = `✔ Connesso a ${rawRoom}!`;
                     statusMsg.style.color = "#2ecc71";
                 }
-
-                R20.connectedUsers.set(R20.myClientId, {
-                    id: R20.myClientId,
-                    name: isHost ? 'Master (Tu)' : R20.myPlayerName + ' (Tu)',
-                    isHost: isHost,
-                    canEdit: isHost ? true : R20.myRole.canEdit,
-                    tokenControl: isHost ? 'all' : R20.myRole.tokenControl,
-                    lastSeen: Date.now()
-                });
-
-                if (isHost) {
-                    R20.updateP2PStatusBadge(`🟢 Host (${cleanRoom})`, "#2ecc71");
-                    const btnCopy = document.getElementById('btn-copy-invite');
-                    if (btnCopy) btnCopy.style.display = 'block';
-                    R20.addChatMessage("Rete Live", `Stanza Master aperta: <b>${cleanRoom}</b>`);
-                } else {
-                    R20.updateP2PStatusBadge(`🟢 Connesso (${cleanRoom})`, "#00c3ff");
-                    R20.addChatMessage("Rete Live", `Connesso alla stanza: <b>${cleanRoom}</b>`);
-                }
-
-                // Annuncio di presenza
-                R20.broadcast({
-                    type: 'HEARTBEAT',
-                    user: {
-                        id: R20.myClientId,
-                        name: R20.myPlayerName,
-                        isHost: isHost
-                    }
-                });
-
-                if (!isHost) {
-                    R20.broadcast({ type: 'REQUEST_FULL_SYNC', clientId: R20.myClientId });
-                }
-
+                R20.updateP2PStatusBadge(`🟢 Connesso (${rawRoom})`, "#00c3ff");
+                R20.addChatMessage("Rete Live", `Connesso alla stanza: <b>${rawRoom}</b>`);
                 R20.renderPlayersTabAndDock();
-                setTimeout(R20.closeP2PModal, 700);
+                setTimeout(R20.closeP2PModal, 800);
+            });
+
+            conn.on('data', (data) => R20.handleNetworkMessage(data));
+
+            conn.on('close', () => {
+                R20.updateP2PStatusBadge("🔴 Disconnesso", "#e74c3c");
+                R20.addChatMessage("Rete Live", "Disconnesso dall'Host.");
+                R20.renderPlayersTabAndDock();
+            });
+        });
+
+        peer.on('error', () => {
+            if (statusMsg) {
+                statusMsg.innerText = "❌ Stanza non trovata. Assicurati che il Master abbia premuto 'Crea Stanza'!";
+                statusMsg.style.color = "#e74c3c";
             }
         });
-    });
 
-    client.on('message', (receivedTopic, payload) => {
-        try {
-            const data = JSON.parse(payload.toString());
-            if (data.senderId === R20.myClientId) return;
-            R20.handleNetworkMessage(data);
-        } catch(e) {
-            console.error(e);
-        }
-    });
-
-    client.on('error', (err) => {
-        if (!isConnected) {
-            clearTimeout(timeoutTimer);
-            connectBroker(roomCode, isHost, brokerIndex + 1);
-        }
-    });
-}
-
-R20.startHostP2P = function() {
-    const raw = document.getElementById('p2p-host-room').value.trim();
-    if (!raw) return;
-    connectBroker(raw, true, 0);
-};
-
-R20.joinClientP2P = function(roomOverride = null) {
-    const raw = roomOverride || document.getElementById('p2p-join-room').value.trim();
-    if (!raw) return;
-    connectBroker(raw, false, 0);
+    } catch (e) {
+        if (statusMsg) statusMsg.innerText = "Errore: " + e.message;
+    }
 };
 
 R20.copyInviteLink = function() {
-    const url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(R20.net.roomCode);
+    const url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(R20.p2p.roomId);
     navigator.clipboard.writeText(url).then(() => {
-        alert("Link copiato negli appunti!\nCondividilo con il cellulare o un altro browser:\n" + url);
+        alert("Link copiato negli appunti!\nIncollalo sull'altro dispositivo:\n" + url);
     });
+};
+
+R20.updateHostConnectionsCount = function() {
+    const count = R20.p2p.connections.length;
+    R20.updateP2PStatusBadge(`🟢 Host (${R20.p2p.roomId}) - ${count} conn`, "#2ecc71");
 };
 
 R20.updateP2PStatusBadge = function(text, color) {
@@ -211,79 +235,37 @@ R20.updateP2PStatusBadge = function(text, color) {
     }
 };
 
-R20.broadcast = function(msg) {
-    if (R20.net.client && R20.net.client.connected) {
-        msg.senderId = R20.myClientId;
-        R20.net.client.publish(R20.net.topic, JSON.stringify(msg));
-        if (R20.net.isHost) R20.autoSave();
+/**
+ * TRASMETTE UN EVENTO LIVE AGLI ALTRI
+ */
+R20.broadcast = function(msg, excludeConn = null) {
+    if (R20.p2p.isHost) {
+        R20.p2p.connections.forEach(conn => {
+            if (conn !== excludeConn && conn.open) {
+                conn.send(msg);
+            }
+        });
+        R20.autoSave();
+    } else if (R20.p2p.hostConn && R20.p2p.hostConn.open) {
+        R20.p2p.hostConn.send(msg);
     }
 };
 
 // ============================================================================
-// 3. GESTIONE DEI MESSAGGI LIVE
+// 3. SMISTAMENTO DEI MESSAGGI LIVE
 // ============================================================================
 
 R20.handleNetworkMessage = function(data) {
     if (!data || !data.type) return;
 
     switch (data.type) {
-        case 'HEARTBEAT': {
-            const u = data.user;
-            if (!R20.connectedUsers.has(u.id)) {
-                R20.connectedUsers.set(u.id, {
-                    id: u.id,
-                    name: u.name,
-                    isHost: u.isHost,
-                    canEdit: false,
-                    tokenControl: 'all',
-                    lastSeen: Date.now()
-                });
-                R20.addChatMessage("Presenza", `👋 <b>${u.name}</b> è online.`);
-            } else {
-                const existing = R20.connectedUsers.get(u.id);
-                existing.lastSeen = Date.now();
-                existing.name = u.name;
-            }
-            R20.renderPlayersTabAndDock();
+        case 'FULL_SYNC':
+            R20.loadGameState(data.state, false);
             break;
-        }
 
-        case 'REQUEST_FULL_SYNC': {
-            if (R20.net.isHost) {
-                const peerInfo = R20.connectedUsers.get(data.clientId) || { canEdit: false, tokenControl: 'all' };
-                R20.broadcast({
-                    type: 'FULL_SYNC',
-                    targetClientId: data.clientId,
-                    state: R20.getGameState(),
-                    role: {
-                        canEdit: peerInfo.canEdit,
-                        tokenControl: peerInfo.tokenControl
-                    }
-                });
-            }
+        case 'SET_PERMISSIONS':
+            R20.applyClientPermissions(data.role);
             break;
-        }
-
-        case 'FULL_SYNC': {
-            if (!R20.net.isHost && (data.targetClientId === R20.myClientId || !data.targetClientId)) {
-                R20.loadGameState(data.state, false);
-                if (data.role) R20.applyClientPermissions(data.role);
-            }
-            break;
-        }
-
-        case 'SET_PERMISSIONS': {
-            if (data.targetClientId === R20.myClientId) {
-                R20.applyClientPermissions(data.role);
-            }
-            const u = R20.connectedUsers.get(data.targetClientId);
-            if (u) {
-                u.canEdit = data.role.canEdit;
-                u.tokenControl = data.role.tokenControl;
-                R20.renderPlayersTabAndDock();
-            }
-            break;
-        }
 
         case 'TOKEN_MOVE': {
             const tok = R20.tokens.find(t => t.id === data.id);
@@ -291,7 +273,7 @@ R20.handleNetworkMessage = function(data) {
                 tok.x = data.x;
                 tok.y = data.y;
                 R20.updateTokenVisuals(tok);
-                R20.updateVision();
+                if (R20.updateVision) R20.updateVision();
             }
             break;
         }
@@ -317,7 +299,7 @@ R20.handleNetworkMessage = function(data) {
                 R20.updateTokenVisuals(R20.tokens[idx]);
                 if (R20.selectedTokenId === data.token.id) R20.fillTokenEditor(R20.tokens[idx]);
                 R20.renderTokenListView();
-                R20.updateVision();
+                if (R20.updateVision) R20.updateVision();
             }
             break;
         }
@@ -336,20 +318,20 @@ R20.handleNetworkMessage = function(data) {
 
         case 'POLY_SYNC':
             R20.polygons = data.polygons || [];
-            R20.renderPolygons();
-            R20.updatePolygonsSidebar();
-            R20.updateVision();
+            if (R20.renderPolygons) R20.renderPolygons();
+            if (R20.updatePolygonsSidebar) R20.updatePolygonsSidebar();
+            if (R20.updateVision) R20.updateVision();
             break;
 
         case 'INIT_SYNC':
             R20.initiativeList = data.list || [];
             R20.currentTurnIndex = data.currentTurnIndex || 0;
             R20.currentRound = data.currentRound || 1;
-            R20.renderInitiative();
+            if (R20.renderInitiative) R20.renderInitiative();
             break;
 
         case 'CHAT_MSG':
-            R20.addChatMessage(data.title, data.detail, data.total);
+            if (R20.addChatMessage) R20.addChatMessage(data.title, data.detail, data.total);
             break;
 
         case 'SCENE_LIGHT':
@@ -359,19 +341,20 @@ R20.handleNetworkMessage = function(data) {
                 btnLight.innerText = R20.sceneLighting === 'bright' ? '☀️ Giorno' : '🌙 Buio';
                 btnLight.className = R20.sceneLighting === 'bright' ? 'btn btn-warning' : 'btn';
             }
-            R20.updateVision();
+            if (R20.updateVision) R20.updateVision();
             break;
     }
 };
 
 // ============================================================================
-// 4. GESTIONE PERMESSI & DOCK ROLL20
+// 4. RENDERING PANNELLO GIOCATORI & DOCK STILE ROLL20
 // ============================================================================
 
 R20.applyClientPermissions = function(role) {
     R20.myRole.canEdit = role.canEdit;
     R20.myRole.tokenControl = role.tokenControl;
 
+    // Disabilita la scheda Mappa se il giocatore non ha i permessi di edit
     const editTabBtn = document.querySelector(".tab-btn[onclick*='edit-tab']");
     if (editTabBtn) {
         editTabBtn.style.display = role.canEdit ? 'block' : 'none';
@@ -383,10 +366,23 @@ R20.applyClientPermissions = function(role) {
     R20.renderPlayersTabAndDock();
 };
 
+R20.sendPermissionsToClient = function(conn) {
+    if (conn && conn.open) {
+        conn.send({
+            type: 'SET_PERMISSIONS',
+            role: {
+                canEdit: conn.playerInfo.canEdit,
+                tokenControl: conn.playerInfo.tokenControl
+            }
+        });
+    }
+};
+
 R20.renderPlayersTabAndDock = function() {
+    // 1. Aggiorna badge stato
     const roleBadge = document.getElementById('players-my-role-badge');
     if (roleBadge) {
-        if (R20.net.isHost) {
+        if (R20.p2p.isHost) {
             roleBadge.innerHTML = `👑 Sei il <b>Master (Host)</b>: Hai il controllo completo su tutto.`;
             roleBadge.style.borderLeftColor = "#f1c40f";
         } else {
@@ -401,129 +397,120 @@ R20.renderPlayersTabAndDock = function() {
         }
     }
 
+    // 2. Contatore utenti online
     const countEl = document.getElementById('players-online-count');
-    if (countEl) countEl.innerText = `${R20.connectedUsers.size} connessi`;
+    const totalOnline = R20.p2p.isHost ? (R20.p2p.connections.length + 1) : (R20.p2p.hostConn ? 2 : 1);
+    if (countEl) countEl.innerText = `${totalOnline} online`;
 
+    // 3. Renderizza la scheda "👥 Giocatori" a destra
     const listContainer = document.getElementById('players-manager-list');
     if (listContainer) {
-        const users = Array.from(R20.connectedUsers.values());
+        let html = `
+            <div class="player-manage-card">
+                <div class="player-manage-header">
+                    <span>👑 Master (Host) ${R20.p2p.isHost ? '(Tu)' : ''}</span>
+                    <span style="color:#f1c40f; font-size:10px;">● Online</span>
+                </div>
+            </div>
+        `;
 
-        listContainer.innerHTML = users.map(u => {
-            const isMe = u.id === R20.myClientId;
+        if (R20.p2p.isHost) {
+            if (R20.p2p.connections.length === 0) {
+                html += '<div style="font-size:11px; color:#888; margin-top:4px;">Nessun altro giocatore connesso. Clicca su "Copia Link Invito" per invitare un secondo dispositivo!</div>';
+            } else {
+                html += R20.p2p.connections.map((conn, idx) => {
+                    const info = conn.playerInfo;
+                    const tokenOpts = `
+                        <option value="all" ${info.tokenControl === 'all' ? 'selected' : ''}>Tutte le pedine</option>
+                        <option value="none" ${info.tokenControl === 'none' ? 'selected' : ''}>Nessuna (Spettatore)</option>
+                        ${R20.tokens.map(t => `<option value="${t.id}" ${info.tokenControl == t.id ? 'selected' : ''}>Solo: ${t.name}</option>`).join('')}
+                    `;
 
-            const tokenOpts = `
-                <option value="all" ${u.tokenControl === 'all' ? 'selected' : ''}>Tutte le pedine</option>
-                <option value="none" ${u.tokenControl === 'none' ? 'selected' : ''}>Nessuna (Spettatore)</option>
-                ${R20.tokens.map(t => `<option value="${t.id}" ${u.tokenControl == t.id ? 'selected' : ''}>Solo: ${t.name}</option>`).join('')}
-            `;
-
-            return `
+                    return `
+                        <div class="player-manage-card">
+                            <div class="player-manage-header">
+                                <span>📱 ${info.name}</span>
+                                <span style="color:#2ecc71; font-size:10px;">● Online</span>
+                            </div>
+                            <div style="display:flex; gap:6px; align-items:center; font-size:11px; margin-top:4px;">
+                                <label>Pedina:</label>
+                                <select onchange="R20.updatePlayerPerm(${idx}, 'tokenControl', this.value)" style="background:#111; color:#fff; border:1px solid #555; padding:2px; font-size:11px; flex:1;">
+                                    ${tokenOpts}
+                                </select>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-top:2px;">
+                                <span>Modifica Mappa:</span>
+                                <button class="btn ${info.canEdit ? 'btn-success' : 'btn-danger'}" style="padding:2px 8px; font-size:10px;" onclick="R20.togglePlayerMapEdit(${idx})">
+                                    ${info.canEdit ? 'Abilitata' : 'Bloccata'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        } else {
+            html += `
                 <div class="player-manage-card">
                     <div class="player-manage-header">
-                        <span>${u.isHost ? '👑' : '📱'} ${u.name} ${isMe ? '(Tu)' : ''}</span>
-                        <span style="color:${u.isHost ? '#f1c40f' : '#2ecc71'}; font-size:10px;">● Online</span>
+                        <span>📱 Tu (Giocatore)</span>
+                        <span style="color:#2ecc71; font-size:10px;">● Connesso</span>
                     </div>
-
-                    ${R20.net.isHost && !isMe ? `
-                        <div style="display:flex; gap:6px; align-items:center; font-size:11px; margin-top:4px;">
-                            <label>Pedina:</label>
-                            <select onchange="R20.changeUserTokenControl('${u.id}', this.value)" style="background:#111; color:#fff; border:1px solid #555; padding:2px; font-size:11px; flex:1;">
-                                ${tokenOpts}
-                            </select>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-top:2px;">
-                            <span>Modifica Mappa:</span>
-                            <button class="btn ${u.canEdit ? 'btn-success' : 'btn-danger'}" style="padding:2px 8px; font-size:10px;" onclick="R20.toggleUserMapEdit('${u.id}')">
-                                ${u.canEdit ? 'Abilitata' : 'Bloccata'}
-                            </button>
-                        </div>
-                    ` : `
-                        <div style="font-size:11px; color:#aaa;">
-                            Controllo: <b>${u.tokenControl === 'all' ? 'Tutte' : (u.tokenControl === 'none' ? 'Spettatore' : 'Pedina specifica')}</b>
-                            | Mappa: <b>${u.canEdit ? 'Sì' : 'No'}</b>
-                        </div>
-                    `}
                 </div>
             `;
-        }).join('');
+        }
+
+        listContainer.innerHTML = html;
     }
 
+    // 4. Renderizza il dock in basso a sinistra (stile Roll20)
     const dock = document.getElementById('players-bottom-dock');
     if (dock) {
-        dock.innerHTML = Array.from(R20.connectedUsers.values()).map(u => {
-            let badgeColor = "#00c3ff";
-            let assignedName = "Tutte";
-            if (u.tokenControl === 'none') assignedName = "Spettatore";
-            else if (u.tokenControl !== 'all') {
-                const t = R20.tokens.find(tok => tok.id == u.tokenControl);
-                if (t) { assignedName = t.name; badgeColor = t.color; }
-            }
-            return `
-                <div class="player-dock-chip ${u.isHost ? 'is-master' : ''}">
-                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${badgeColor};"></span>
-                    <span>${u.name}</span>
-                    <span style="color:#aaa; font-size:9px;">[${assignedName}]</span>
-                </div>
-            `;
-        }).join('');
+        let dockHtml = `
+            <div class="player-dock-chip is-master">
+                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#f1c40f;"></span>
+                <span>Master</span>
+            </div>
+        `;
+
+        if (R20.p2p.isHost) {
+            dockHtml += R20.p2p.connections.map(conn => {
+                let badgeColor = "#00c3ff";
+                let assignedName = "Tutte";
+                if (conn.playerInfo.tokenControl === 'none') assignedName = "Spettatore";
+                else if (conn.playerInfo.tokenControl !== 'all') {
+                    const t = R20.tokens.find(tok => tok.id == conn.playerInfo.tokenControl);
+                    if (t) { assignedName = t.name; badgeColor = t.color; }
+                }
+                return `
+                    <div class="player-dock-chip">
+                        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${badgeColor};"></span>
+                        <span>${conn.playerInfo.name}</span>
+                        <span style="color:#aaa; font-size:9px;">[${assignedName}]</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        dock.innerHTML = dockHtml;
     }
 };
 
-R20.changeUserTokenControl = function(targetClientId, tokenControlValue) {
-    const u = R20.connectedUsers.get(targetClientId);
-    if (!u) return;
-
-    u.tokenControl = tokenControlValue;
-    R20.broadcast({
-        type: 'SET_PERMISSIONS',
-        targetClientId: targetClientId,
-        role: {
-            canEdit: u.canEdit,
-            tokenControl: u.tokenControl
-        }
-    });
-    R20.renderPlayersTabAndDock();
-};
-
-R20.toggleUserMapEdit = function(targetClientId) {
-    const u = R20.connectedUsers.get(targetClientId);
-    if (!u) return;
-
-    u.canEdit = !u.canEdit;
-    R20.broadcast({
-        type: 'SET_PERMISSIONS',
-        targetClientId: targetClientId,
-        role: {
-            canEdit: u.canEdit,
-            tokenControl: u.tokenControl
-        }
-    });
-    R20.renderPlayersTabAndDock();
-};
-
-// Heartbeat di presenza ogni 3 secondi
-setInterval(() => {
-    if (R20.net.client && R20.net.client.connected) {
-        R20.broadcast({
-            type: 'HEARTBEAT',
-            user: {
-                id: R20.myClientId,
-                name: R20.myRole.isHost ? 'Master' : R20.myPlayerName,
-                isHost: R20.myRole.isHost
-            }
-        });
-
-        const now = Date.now();
-        let changed = false;
-        R20.connectedUsers.forEach((u, id) => {
-            if (id !== R20.myClientId && (now - u.lastSeen > 9000)) {
-                R20.connectedUsers.delete(id);
-                changed = true;
-            }
-        });
-        if (changed) R20.renderPlayersTabAndDock();
+R20.updatePlayerPerm = function(connIdx, field, value) {
+    const conn = R20.p2p.connections[connIdx];
+    if (conn) {
+        conn.playerInfo[field] = value;
+        R20.sendPermissionsToClient(conn);
+        R20.renderPlayersTabAndDock();
     }
-}, 3000);
+};
+
+R20.togglePlayerMapEdit = function(connIdx) {
+    const conn = R20.p2p.connections[connIdx];
+    if (conn) {
+        conn.playerInfo.canEdit = !conn.playerInfo.canEdit;
+        R20.sendPermissionsToClient(conn);
+        R20.renderPlayersTabAndDock();
+    }
+};
 
 // ============================================================================
 // 5. AUTOSALVATAGGIO CONTINUO & BACKUP JSON
@@ -596,7 +583,7 @@ R20.exportGameData = function() {
     a.click();
     URL.revokeObjectURL(url);
 
-    R20.addChatMessage("Backup", "File JSON scaricato e salvataggio locale aggiornato.");
+    if (R20.addChatMessage) R20.addChatMessage("Backup", "File JSON scaricato e salvataggio locale aggiornato.");
 };
 
 R20.triggerImportGameData = function() {
@@ -762,7 +749,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 tok.x = nextX;
                 tok.y = nextY;
                 R20.updateTokenVisuals(tok);
-                R20.updateVision();
+                if (R20.updateVision) R20.updateVision();
                 R20.broadcast({ type: 'TOKEN_MOVE', id: tok.id, x: tok.x, y: tok.y });
             } else {
                 R20.triggerCollisionAlert(tok);
@@ -770,7 +757,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Ricarica sessione salvata
     const saved = localStorage.getItem('roll20_scenario_save');
     if (saved) {
         try {
@@ -785,11 +771,16 @@ window.addEventListener('DOMContentLoaded', () => {
     R20.setZoom(1.0);
     R20.renderPlayersTabAndDock();
 
-    // Connessione automatica con link ?room=...
     const urlParams = new URLSearchParams(window.location.search);
     const roomParam = urlParams.get('room');
     if (roomParam) {
-        R20.addChatMessage("Rete Live", `Connessione automatica alla stanza: <b>${roomParam}</b>...`);
+        if (R20.addChatMessage) R20.addChatMessage("Rete Live", `Connessione automatica alla stanza: <b>${roomParam}</b>...`);
         R20.joinClientP2P(roomParam);
+    }
+});
+
+window.addEventListener('beforeunload', () => {
+    if (R20.p2p && R20.p2p.peer) {
+        try { R20.p2p.peer.destroy(); } catch(e) {}
     }
 });
