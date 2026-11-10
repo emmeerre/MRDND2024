@@ -2,23 +2,20 @@ window.R20 = window.R20 || {};
 
 R20.zoom = 1.0;
 
-// Ruolo locale del dispositivo
 R20.myRole = {
     isHost: false,
     canEdit: true,
-    tokenControl: 'all' // 'all', 'none' o ID specifico pedina
+    tokenControl: 'all'
 };
 
-// Stato WebRTC P2P
 R20.p2p = {
     peer: null,
     isHost: false,
-    connections: [], // Lista connessioni client per l'Host
-    hostConn: null,  // Connessione verso l'Host per il Client
+    connections: [],
+    hostConn: null,
     roomId: null
 };
 
-// Server STUN/TURN per far comunicare PC e Cellulari anche su reti diverse
 R20.ICE_CONFIG = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
@@ -37,18 +34,7 @@ R20.ICE_CONFIG = {
 };
 
 // ============================================================================
-// 1. VERIFICA DEI PERMESSI LOCALI
-// ============================================================================
-
-R20.canIControlToken = function(tokenId) {
-    if (R20.p2p.isHost) return true; // Il Master può muovere e fare tutto
-    if (R20.myRole.tokenControl === 'all') return true;
-    if (R20.myRole.tokenControl === 'none') return false;
-    return R20.myRole.tokenControl == tokenId;
-};
-
-// ============================================================================
-// 2. RETE WEBRTC P2P SU PORTA STANDARD 443 (NESSUN BLOCCO ROUTER)
+// 1. WEBRTC P2P CON FILTRO ANTI-LOOP RICORSIVO
 // ============================================================================
 
 R20.openP2PModal = function() {
@@ -63,9 +49,6 @@ R20.closeP2PModal = function() {
     document.getElementById('p2p-modal').style.display = 'none';
 };
 
-/**
- * AVVIO HOST (MASTER)
- */
 R20.startHostP2P = function() {
     const rawRoom = document.getElementById('p2p-host-room').value.trim();
     const statusMsg = document.getElementById('p2p-status-msg');
@@ -74,7 +57,7 @@ R20.startHostP2P = function() {
     const roomId = 'r20vtt-' + rawRoom.toLowerCase().replace(/[^a-z0-9_-]/g, '');
     localStorage.setItem('r20_last_room', rawRoom);
 
-    statusMsg.innerText = "⏳ Creazione stanza in corso...";
+    statusMsg.innerText = "⏳ Creazione stanza...";
     statusMsg.style.color = "#f39c12";
 
     if (R20.p2p.peer) {
@@ -82,11 +65,7 @@ R20.startHostP2P = function() {
     }
 
     try {
-        const peer = new Peer(roomId, {
-            config: R20.ICE_CONFIG,
-            debug: 1
-        });
-
+        const peer = new Peer(roomId, { config: R20.ICE_CONFIG, debug: 1 });
         R20.p2p.peer = peer;
         R20.p2p.isHost = true;
         R20.p2p.roomId = rawRoom;
@@ -98,34 +77,30 @@ R20.startHostP2P = function() {
             statusMsg.style.color = "#2ecc71";
             const btnCopy = document.getElementById('btn-copy-invite');
             if (btnCopy) btnCopy.style.display = 'block';
-            R20.updateP2PStatusBadge(`🟢 Host (${rawRoom}) - 0 conn`, "#2ecc71");
-            R20.addChatMessage("Rete Live", `Stanza Master aperta: <b>${rawRoom}</b>`);
+            R20.updateP2PStatusBadge(`🟢 Host (${rawRoom})`, "#2ecc71");
             R20.renderPlayersTabAndDock();
-            setTimeout(R20.closeP2PModal, 1000);
+            setTimeout(R20.closeP2PModal, 900);
         });
 
         peer.on('connection', (conn) => {
-            // Assegna dati e permessi base al dispositivo connesso
             conn.playerInfo = {
                 id: conn.peer,
                 name: 'Giocatore ' + (R20.p2p.connections.length + 1),
-                canEdit: false,        // Di default non modifica la mappa
-                tokenControl: 'all'    // Di default controlla tutte le pedine
+                canEdit: false,
+                tokenControl: 'all'
             };
             R20.p2p.connections.push(conn);
 
             conn.on('open', () => {
                 R20.updateHostConnectionsCount();
-                // Spedisce stato del tavolo e i permessi
+                // Spedisce subito lo stato completo al nuovo client
                 conn.send({ type: 'FULL_SYNC', state: R20.getGameState() });
                 R20.sendPermissionsToClient(conn);
-                R20.addChatMessage("Presenza", `📱 <b>${conn.playerInfo.name}</b> si è connesso!`);
                 R20.renderPlayersTabAndDock();
             });
 
             conn.on('data', (data) => {
                 R20.handleNetworkMessage(data);
-                // Il Master fa da ponte e rimanda agli altri giocatori
                 R20.broadcast(data, conn);
                 R20.autoSave();
             });
@@ -139,22 +114,18 @@ R20.startHostP2P = function() {
 
         peer.on('error', (err) => {
             if (err.type === 'unavailable-id') {
-                statusMsg.innerText = "❌ Codice occupato da una sessione precedente! Cambia numero (es. " + rawRoom + "-1).";
+                statusMsg.innerText = "❌ Codice occupato da una sessione precedente! Scegli un altro nome o numero.";
             } else {
                 statusMsg.innerText = `Errore: ${err.type}`;
             }
             statusMsg.style.color = "#e74c3c";
         });
-
     } catch (e) {
         statusMsg.innerText = "Errore: " + e.message;
         statusMsg.style.color = "#e74c3c";
     }
 };
 
-/**
- * AVVIO CLIENT (GIOCATORE / SECONDO DISPOSITIVO)
- */
 R20.joinClientP2P = function(roomOverride = null) {
     const rawRoom = roomOverride || document.getElementById('p2p-join-room').value.trim();
     const statusMsg = document.getElementById('p2p-status-msg');
@@ -189,27 +160,24 @@ R20.joinClientP2P = function(roomOverride = null) {
                     statusMsg.style.color = "#2ecc71";
                 }
                 R20.updateP2PStatusBadge(`🟢 Connesso (${rawRoom})`, "#00c3ff");
-                R20.addChatMessage("Rete Live", `Connesso alla stanza: <b>${rawRoom}</b>`);
                 R20.renderPlayersTabAndDock();
-                setTimeout(R20.closeP2PModal, 800);
+                setTimeout(R20.closeP2PModal, 700);
             });
 
             conn.on('data', (data) => R20.handleNetworkMessage(data));
 
             conn.on('close', () => {
                 R20.updateP2PStatusBadge("🔴 Disconnesso", "#e74c3c");
-                R20.addChatMessage("Rete Live", "Disconnesso dall'Host.");
                 R20.renderPlayersTabAndDock();
             });
         });
 
         peer.on('error', () => {
             if (statusMsg) {
-                statusMsg.innerText = "❌ Stanza non trovata. Assicurati che il Master abbia premuto 'Crea Stanza'!";
+                statusMsg.innerText = "❌ Stanza non trovata. Assicurati che l'Host sia online!";
                 statusMsg.style.color = "#e74c3c";
             }
         });
-
     } catch (e) {
         if (statusMsg) statusMsg.innerText = "Errore: " + e.message;
     }
@@ -236,7 +204,7 @@ R20.updateP2PStatusBadge = function(text, color) {
 };
 
 /**
- * TRASMETTE UN EVENTO LIVE AGLI ALTRI
+ * TRASMETTE UN EVENTO LIVE (SENZA AUTO-LOOP)
  */
 R20.broadcast = function(msg, excludeConn = null) {
     if (R20.p2p.isHost) {
@@ -251,10 +219,9 @@ R20.broadcast = function(msg, excludeConn = null) {
     }
 };
 
-// ============================================================================
-// 3. SMISTAMENTO DEI MESSAGGI LIVE
-// ============================================================================
-
+/**
+ * RICEVE I MESSAGGI (CON PROTEZIONE DALLA RICORSIONE)
+ */
 R20.handleNetworkMessage = function(data) {
     if (!data || !data.type) return;
 
@@ -305,8 +272,8 @@ R20.handleNetworkMessage = function(data) {
         }
 
         case 'TOKEN_SPAWN':
-            R20.tokens.push(data.token);
             data.token.statuses = new Set(data.token.statuses || []);
+            R20.tokens.push(data.token);
             R20.initTokens();
             break;
 
@@ -331,7 +298,8 @@ R20.handleNetworkMessage = function(data) {
             break;
 
         case 'CHAT_MSG':
-            if (R20.addChatMessage) R20.addChatMessage(data.title, data.detail, data.total);
+            // Scrive il messaggio in chat MA con flag fromRemote per NON rimandarlo in loop
+            R20.addChatMessage(data.title, data.detail, data.total, true);
             break;
 
         case 'SCENE_LIGHT':
@@ -347,14 +315,13 @@ R20.handleNetworkMessage = function(data) {
 };
 
 // ============================================================================
-// 4. RENDERING PANNELLO GIOCATORI & DOCK STILE ROLL20
+// 2. GESTIONE PERMESSI & DOCK
 // ============================================================================
 
 R20.applyClientPermissions = function(role) {
     R20.myRole.canEdit = role.canEdit;
     R20.myRole.tokenControl = role.tokenControl;
 
-    // Disabilita la scheda Mappa se il giocatore non ha i permessi di edit
     const editTabBtn = document.querySelector(".tab-btn[onclick*='edit-tab']");
     if (editTabBtn) {
         editTabBtn.style.display = role.canEdit ? 'block' : 'none';
@@ -379,15 +346,14 @@ R20.sendPermissionsToClient = function(conn) {
 };
 
 R20.renderPlayersTabAndDock = function() {
-    // 1. Aggiorna badge stato
     const roleBadge = document.getElementById('players-my-role-badge');
     if (roleBadge) {
         if (R20.p2p.isHost) {
-            roleBadge.innerHTML = `👑 Sei il <b>Master (Host)</b>: Hai il controllo completo su tutto.`;
+            roleBadge.innerHTML = `👑 Sei il <b>Master (Host)</b>: Controllo totale.`;
             roleBadge.style.borderLeftColor = "#f1c40f";
         } else {
             let tokName = "Tutte le Pedine";
-            if (R20.myRole.tokenControl === 'none') tokName = "Nessuna (Solo Spettatore)";
+            if (R20.myRole.tokenControl === 'none') tokName = "Spettatore (Nessuna)";
             else if (R20.myRole.tokenControl !== 'all') {
                 const t = R20.tokens.find(tok => tok.id == R20.myRole.tokenControl);
                 tokName = t ? t.name : 'Pedina #' + R20.myRole.tokenControl;
@@ -397,18 +363,16 @@ R20.renderPlayersTabAndDock = function() {
         }
     }
 
-    // 2. Contatore utenti online
     const countEl = document.getElementById('players-online-count');
     const totalOnline = R20.p2p.isHost ? (R20.p2p.connections.length + 1) : (R20.p2p.hostConn ? 2 : 1);
     if (countEl) countEl.innerText = `${totalOnline} online`;
 
-    // 3. Renderizza la scheda "👥 Giocatori" a destra
     const listContainer = document.getElementById('players-manager-list');
     if (listContainer) {
         let html = `
             <div class="player-manage-card">
                 <div class="player-manage-header">
-                    <span>👑 Master (Host) ${R20.p2p.isHost ? '(Tu)' : ''}</span>
+                    <span>👑 Master ${R20.p2p.isHost ? '(Tu)' : ''}</span>
                     <span style="color:#f1c40f; font-size:10px;">● Online</span>
                 </div>
             </div>
@@ -416,7 +380,7 @@ R20.renderPlayersTabAndDock = function() {
 
         if (R20.p2p.isHost) {
             if (R20.p2p.connections.length === 0) {
-                html += '<div style="font-size:11px; color:#888; margin-top:4px;">Nessun altro giocatore connesso. Clicca su "Copia Link Invito" per invitare un secondo dispositivo!</div>';
+                html += '<div style="font-size:11px; color:#888; margin-top:4px;">Nessun altro connesso. Clicca su "Copia Link Invito" per invitare un secondo schermo!</div>';
             } else {
                 html += R20.p2p.connections.map((conn, idx) => {
                     const info = conn.playerInfo;
@@ -462,7 +426,6 @@ R20.renderPlayersTabAndDock = function() {
         listContainer.innerHTML = html;
     }
 
-    // 4. Renderizza il dock in basso a sinistra (stile Roll20)
     const dock = document.getElementById('players-bottom-dock');
     if (dock) {
         let dockHtml = `
@@ -513,7 +476,30 @@ R20.togglePlayerMapEdit = function(connIdx) {
 };
 
 // ============================================================================
-// 5. AUTOSALVATAGGIO CONTINUO & BACKUP JSON
+// 3. CHAT SENZA LOOP RICORSIVO
+// ============================================================================
+
+R20.addChatMessage = function(title, detail, total = null, fromRemote = false) {
+    const chatLog = document.getElementById('chat-log');
+    if (!chatLog) return;
+    const entry = document.createElement('div');
+    entry.className = 'chat-entry';
+    entry.innerHTML = `
+        <div style="font-weight:bold; color:#fff;">${title}</div>
+        <div style="color:#bbb; font-size:11px;">${detail}</div>
+        ${total !== null ? `<div style="font-weight:bold; color:#00e5ff; font-size:14px; margin-top:2px;">Totale: ${total}</div>` : ''}
+    `;
+    chatLog.appendChild(entry);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+    // Solo se il messaggio è locale lo inviamo agli altri
+    if (!fromRemote && R20.broadcast) {
+        R20.broadcast({ type: 'CHAT_MSG', title, detail, total });
+    }
+};
+
+// ============================================================================
+// 4. AUTOSALVATAGGIO CONTINUO & BACKUP JSON
 // ============================================================================
 
 R20.autoSave = function() {
@@ -583,7 +569,7 @@ R20.exportGameData = function() {
     a.click();
     URL.revokeObjectURL(url);
 
-    if (R20.addChatMessage) R20.addChatMessage("Backup", "File JSON scaricato e salvataggio locale aggiornato.");
+    R20.addChatMessage("Backup", "File JSON scaricato e salvataggio locale aggiornato.");
 };
 
 R20.triggerImportGameData = function() {
@@ -648,7 +634,7 @@ R20.loadGameState = function(state, shouldBroadcast = true) {
 };
 
 // ============================================================================
-// 6. ZOOM & SCHEDE UI
+// 5. ZOOM & SCHEDE UI
 // ============================================================================
 
 R20.setZoom = function(val) {
@@ -680,7 +666,7 @@ R20.switchTab = function(tabId) {
 };
 
 // ============================================================================
-// 7. EVENTI GLOBALI & AVVIO
+// 6. EVENTI GLOBALI & AVVIO (CON AUTOCARICAMENTO SICURO)
 // ============================================================================
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -757,24 +743,61 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Ricarica sessione: se vuota o corrotta, ripristina le pedine e i muri di default!
     const saved = localStorage.getItem('roll20_scenario_save');
+    let loaded = false;
     if (saved) {
         try {
-            R20.loadGameState(JSON.parse(saved), false);
-        } catch(e) {
-            R20.initTokens();
-        }
-    } else {
+            const parsed = JSON.parse(saved);
+            if (parsed.tokens && parsed.tokens.length > 0) {
+                R20.loadGameState(parsed, false);
+                loaded = true;
+            }
+        } catch(e) {}
+    }
+
+    if (!loaded) {
+        R20.tokens = R20.getDefaultTokens();
+        R20.polygons = [
+            {
+                id: 101,
+                name: "Muro Nord",
+                layer: "Muro",
+                blocksVision: true,
+                passable: false,
+                color: "#1c2229",
+                texture: "mattoni",
+                customTextureUrl: "",
+                emitsLight: false,
+                lightRadius: 0,
+                lightColor: '#f39c12',
+                points: [[200, 200], [550, 200], [550, 230], [200, 230]]
+            },
+            {
+                id: 102,
+                name: "Falò Centrale",
+                layer: "Base",
+                blocksVision: false,
+                passable: true,
+                color: "#e67e22",
+                texture: "pietra",
+                customTextureUrl: "",
+                emitsLight: true,
+                lightRadius: 280,
+                lightColor: '#e67e22',
+                points: [[130, 130], [170, 130], [170, 170], [130, 170]]
+            }
+        ];
         R20.initTokens();
     }
 
     R20.setZoom(1.0);
     R20.renderPlayersTabAndDock();
 
+    // Connessione automatica SOLO se l'URL contiene ?room=... ed è un client
     const urlParams = new URLSearchParams(window.location.search);
     const roomParam = urlParams.get('room');
     if (roomParam) {
-        if (R20.addChatMessage) R20.addChatMessage("Rete Live", `Connessione automatica alla stanza: <b>${roomParam}</b>...`);
         R20.joinClientP2P(roomParam);
     }
 });
