@@ -2,17 +2,15 @@ window.R20 = window.R20 || {};
 
 R20.rollCustomDice = function() {
     const input = document.getElementById('dice-input');
-    const val = input.value.trim();
+    const val = input ? input.value.trim() : '';
     if (!val) return;
     const res = R20.evaluateDiceFormula(val);
     const title = `🎲 Tiro Libero: ${val}`;
     const detail = res.breakdown;
     const total = res.total;
 
-    // Disegna in locale
     R20.addChatMessage(title, detail, total);
 
-    // Invia all'altro dispositivo SOLO su azione dell'utente
     if (R20.broadcast) {
         R20.broadcast({ type: 'CHAT_MSG', title, detail, total });
     }
@@ -54,7 +52,7 @@ R20.evaluateDiceFormula = function(formula) {
     return { total, breakdown: breakdownParts.join(' ') };
 };
 
-// Funzione grafica pura: NON fa broadcast per evitare loop infiniti!
+// Rendering locale puro senza broadcast ricorsivo
 R20.addChatMessage = function(title, detail, total = null) {
     const chatLog = document.getElementById('chat-log');
     if (!chatLog) return;
