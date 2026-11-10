@@ -310,17 +310,42 @@ R20.handleNetworkMessage = function(data) {
 // 2. GESTIONE PERMESSI & DOCK
 // ============================================================================
 
+// Verifica se il dispositivo ha i permessi da Master / Edit Mappa
+R20.canIEditMap = function() {
+    if (!R20.myRole) return true;
+    if (R20.p2p && R20.p2p.isHost) return true;
+    if (R20.myRole.isHost) return true;
+    return !!R20.myRole.canEdit;
+};
+
 R20.applyClientPermissions = function(role) {
     R20.myRole.canEdit = role.canEdit;
     R20.myRole.tokenControl = role.tokenControl;
 
+    // 1. Scheda Mappa: visibile solo se canEdit è abilitato
     const editTabBtn = document.querySelector(".tab-btn[onclick*='edit-tab']");
     if (editTabBtn) {
         editTabBtn.style.display = role.canEdit ? 'block' : 'none';
-        if (!role.canEdit && document.getElementById('edit-tab').classList.contains('active')) {
+        if (!role.canEdit && document.getElementById('edit-tab') && document.getElementById('edit-tab').classList.contains('active')) {
             R20.switchTab('token-tab');
         }
     }
+
+    // 2. Giorno / Notte: nascosto per i giocatori se non hanno l'edit mappa
+    const btnLight = document.getElementById('btn-scene-light');
+    if (btnLight) {
+        btnLight.style.display = role.canEdit ? 'block' : 'none';
+    }
+
+    // 3. Comandi Iniziativa Master: nascosti per i giocatori se non hanno l'edit mappa
+    const btnInitRollAll = document.getElementById('btn-init-roll-all');
+    if (btnInitRollAll) btnInitRollAll.style.display = role.canEdit ? 'block' : 'none';
+
+    const btnInitClear = document.getElementById('btn-init-clear');
+    if (btnInitClear) btnInitClear.style.display = role.canEdit ? 'block' : 'none';
+
+    const btnInitNext = document.getElementById('btn-init-next');
+    if (btnInitNext) btnInitNext.style.display = role.canEdit ? 'block' : 'none';
 
     R20.renderPlayersTabAndDock();
 };
@@ -647,6 +672,7 @@ window.addEventListener('DOMContentLoaded', () => {
             btn.innerText = icon;
             btn.onclick = () => R20.toggleStatus(icon);
             statusPicker.appendChild(btn);
+            R20.applyClientPermissions(R20.myRole);
         });
     }
 
