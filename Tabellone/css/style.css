@@ -38,30 +38,37 @@ body {
 
 #board-wrapper {
     position: relative;
-    width: 2600px;
-    height: 2600px;
+    width: 6100px;
+    height: 6000px;
 }
 
 #board {
-    width: 2600px;
-    height: 2600px;
+    width: 6000px;
+    height: 6000px;
     position: absolute;
     top: 0;
     left: 0;
     transform-origin: 0 0;
-    /* La griglia è ora disegnata SUL tavolo da gioco: scala insieme a pedine e nebbia! */
+    overflow: hidden; /* Impedisce alle pedine o testi di sbordare fuori nel vuoto */
     background-color: #24252e;
     background-image: 
         linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
     background-size: var(--grid-size) var(--grid-size);
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
 }
 
 #map-svg {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0; left: 0; width: 6000px; height: 6000px;
     z-index: 10;
+}
+
+#fog-canvas {
+    position: absolute;
+    top: 0; left: 0; width: 6000px; height: 6000px;
+    pointer-events: none;
+    z-index: 25;
 }
 
 .poly-shape { transition: stroke 0.15s; }
@@ -88,12 +95,7 @@ body {
     100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
 }
 
-#fog-canvas {
-    position: absolute;
-    top: 0; left: 0; width: 2600px; height: 2600px;
-    pointer-events: none;
-    z-index: 25;
-}
+
 
 #zoom-widget {
     position: absolute;
