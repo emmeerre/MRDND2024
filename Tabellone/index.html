@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roll20 Web Clone - Modular VTT Live</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Libreria WebRTC P2P Gratuita senza registrazione -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+<body>
+
+    <div id="edit-banner">🛠️ MODALITÀ EDIT: Visione disabilitata (Tutto visibile). Clicca per selezionare o tracciare poligoni.</div>
+
+    <!-- VIEWPORT / MAPPA -->
+    <div id="viewport">
+        <div id="board-wrapper">
+            <div id="board">
+                <svg id="map-svg"></svg>
+                <div id="light-icons-container"></div>
+                <canvas id="fog-canvas" width="2600" height="2600"></canvas>
+                <div id="tokens-container"></div>
+            </div>
+        </div>
+
+        <!-- CONTROLLI ZOOM -->
+        <div id="zoom-widget">
+            <button class="zoom-btn" onclick="R20.changeZoom(-0.1)" title="Riduci">−</button>
+            <span id="zoom-label" onclick="R20.setZoom(1.0)" title="Ripristina 100%">100%</span>
+            <button class="zoom-btn" onclick="R20.changeZoom(0.1)" title="Ingrandisci">+</button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+        <!-- Barra Superiore con Indicatore Live P2P -->
+        <div class="global-scene-bar">
+            <button class="btn" id="btn-scene-light" onclick="R20.toggleSceneLight()" style="padding: 3px 6px; font-size: 11px;">
+                🌙 Buio
+            </button>
+            <div style="display: flex; gap: 4px; align-items: center;">
+                <button class="btn" id="btn-p2p-status" style="padding: 3px 6px; font-size: 11px; background: #e67e22;" onclick="R20.openP2PModal()" title="Connetti dispositivi in tempo reale">
+                    📡 Live P2P
+                </button>
+                <button class="btn btn-success" style="padding: 3px 6px; font-size: 11px;" onclick="R20.exportGameData()" title="Scarica file JSON">
+                    💾 Backup
+                </button>
+                <button class="btn" style="padding: 3px 6px; font-size: 11px; background:#444;" onclick="R20.triggerImportGameData()" title="Carica file JSON">
+                    📂 Carica
+                </button>
+                <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="R20.importGameDataFile(event)">
+            </div>
+        </div>
+
+        <div class="tabs-header">
+            <button class="tab-btn active" onclick="R20.switchTab('token-tab')">🧙 Pedina</button>
+            <button class="tab-btn" onclick="R20.switchTab('edit-tab')">📐 Mappa</button>
+            <button class="tab-btn" onclick="R20.switchTab('init-tab')">⏱️ Iniziativa</button>
+            <button class="tab-btn" onclick="R20.switchTab('chat-tab')">💬 Dadi</button>
+        </div>
+
+        <!-- 1. TAB PEDINA -->
+        <div id="token-tab" class="tab-content active">
+            <!-- A. LISTA COMPLETA PEDINE -->
+            <div id="token-list-view">
+                <div class="section-box">
+                    <div class="section-title">
+                        <span>Tutte le Pedine (<span id="token-count">0</span>)</span>
+                        <button class="btn" style="padding: 2px 6px; font-size: 11px;" onclick="R20.spawnToken()">+ Nuova</button>
+                    </div>
+                    <div style="font-size: 11px; color: #888; margin-bottom: 8px;">
+                        Clicca su una pedina per selezionarla e aprirne la scheda.
+                    </div>
+                    <div id="tokens-roster" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                </div>
+            </div>
+
+            <!-- B. SCHEDA EDITING PEDINA SELEZIONATA -->
+            <div id="token-editor-body" style="display: none;">
+                <div class="section-box">
+                    <div class="section-title">
+                        <span id="token-title">Scheda Pedina</span>
+                        <button class="btn" style="padding: 2px 8px; font-size: 11px; background:#444;" onclick="R20.selectToken(null)">
+                            ← Lista Pedine
+                        </button>
+                    </div>
+
+                    <!-- Nome, Simbolo e Colore -->
+                    <div class="form-row">
+                        <label>Nome:</label>
+                        <input type="text" id="edit-name" style="flex: 2;" oninput="R20.updateCurrentTokenProps()">
+                        <input type="text" id="edit-symbol" maxlength="2" title="Lettera / Simbolo" style="width: 36px; text-align: center;" oninput="R20.updateCurrentTokenProps()">
+                        <input type="color" id="edit-color" title="Colore Bordo/Sfondo" oninput="R20.updateCurrentTokenProps()">
+                    </div>
+
+                    <!-- Dimensioni Token & Caricamento Immagine Avatar -->
+                    <div class="form-row">
+                        <label>Taglia (Caselle):</label>
+                        <select id="edit-size" style="flex: 1.2;" onchange="R20.updateCurrentTokenProps()">
+                            <option value="1">Media / Piccola (1x1)</option>
+                            <option value="2">Grande (2x2)</option>
+                            <option value="3">Enorme (3x3)</option>
+                            <option value="4">Mastodontica (4x4)</option>
+                        </select>
+                        <button class="btn" style="padding: 3px 6px; font-size: 11px; background:#34495e;" onclick="document.getElementById('edit-token-img-file').click()" title="Carica immagine PNG/JPG">
+                            🖼️ Immagine
+                        </button>
+                        <button class="btn btn-danger" style="padding: 3px 6px; font-size: 10px;" onclick="R20.removeTokenImage()" title="Rimuovi immagine">✖</button>
+                        <input type="file" id="edit-token-img-file" accept="image/*" style="display:none;" onchange="R20.handleTokenImageUpload(event)">
+                    </div>
+
+                    <!-- RIGA COMPATTA STATS (HP, CA, INIZIATIVA) -->
+                    <div class="compact-stat-row">
+                        <div style="display: flex; align-items: center; gap: 2px;">
+                            <span>HP:</span>
+                            <input type="number" id="edit-hp" class="compact-stat-input" style="width: 38px;" title="HP Attuali" oninput="R20.updateCurrentTokenProps()">
+                            <span>/</span>
+                            <input type="number" id="edit-maxhp" class="compact-stat-input" style="width: 38px;" title="HP Massimi" oninput="R20.updateCurrentTokenProps()">
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 2px;">
+                            <span>CA:</span>
+                            <input type="number" id="edit-ac" class="compact-stat-input" style="width: 36px;" title="Classe Armatura" oninput="R20.updateCurrentTokenProps()">
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 3px;">
+                            <span>Iniz:</span>
+                            <input type="text" id="edit-init-mod" class="compact-stat-input" style="width: 62px;" placeholder="1d20+2" title="Formula Iniziativa (es. 1d20+2)" oninput="R20.updateCurrentTokenProps()">
+                            <button class="btn btn-warning" style="padding: 2px 5px; font-size: 10px;" onclick="R20.rollCurrentTokenInitiative()" title="Tira iniziativa">🎲 Tira</button>
+                        </div>
+                    </div>
+
+                    <!-- Attacchi Multipli con Formula TxC Generica -->
+                    <div style="margin-top: 6px; border-top: 1px solid #3c3e4a; padding-top: 6px;">
+                        <div class="section-title">
+                            <span>⚔️ Attacchi & Azioni</span>
+                            <button class="btn btn-success" style="padding: 2px 8px; font-size: 11px;" onclick="R20.addNewAttackToCurrentToken()">
+                                + Aggiungi Attacco
+                            </button>
+                        </div>
+                        <div id="token-attacks-list"></div>
+                        <div style="font-size: 10px; color: #888; margin-top: 4px;">
+                            💡 TxC generico (es. <b>1d20+4</b>) | <b>Doppio clic sul contatore blu</b> 🎯 per azzerarlo.
+                        </div>
+                    </div>
+
+                    <!-- Visione Collassabile -->
+                    <div class="accordion-header" onclick="R20.toggleVisionAccordion()">
+                        <span>👁️ Vista & Scurovisione</span>
+                        <span id="vision-accordion-arrow">▼</span>
+                    </div>
+                    <div class="accordion-body" id="vision-accordion-body" style="display: none;">
+                        <div class="form-row">
+                            <label>Raggio Visione (px):</label>
+                            <input type="number" id="edit-vision-range" step="25" style="width: 80px;" oninput="R20.updateCurrentTokenProps()">
+                        </div>
+                        <div class="form-row">
+                            <label>Scurovisione (Darkvision):</label>
+                            <select id="edit-darkvision" style="flex: 1;" onchange="R20.updateCurrentTokenProps()">
+                                <option value="no">No (Cieco al buio)</option>
+                                <option value="yes">Sì (Vede nelle tenebre)</option>
+                            </select>
+                        </div>
+                        <div class="form-row" id="row-darkvision-range">
+                            <label>Raggio Scurovisione (px):</label>
+                            <input type="number" id="edit-darkvision-range" step="25" style="width: 80px;" oninput="R20.updateCurrentTokenProps()">
+                        </div>
+                    </div>
+
+                    <div style="font-size: 11px; color: #888; margin: 10px 0 4px;">CONDIZIONI / STATUS:</div>
+                    <div class="status-picker" id="status-picker"></div>
+
+                    <button class="btn btn-block" style="background:#444; margin-top: 10px;" onclick="R20.deleteCurrentToken()">
+                        🗑️ Elimina Pedina
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TAB MODALITÀ EDIT (POLIGONI, COLORI E TEXTURE) -->
+        <div id="edit-tab" class="tab-content">
+            <div class="section-box" style="border: 2px solid var(--warning);">
+                <div class="section-title">
+                    <span>Stato Modalità Edit</span>
+                    <span id="edit-status-badge" style="font-size: 11px; color: #888;">Spenta</span>
+                </div>
+                <button class="btn btn-block btn-warning" id="btn-toggle-edit" onclick="R20.toggleEditMode()">
+                    🛠️ Attiva Modalità Edit (Vedi Tutto)
+                </button>
+            </div>
+
+            <!-- Modifica Poligono Selezionato -->
+            <div class="section-box" id="box-edit-poly" style="display: none; border-left: 4px solid #f1c40f;">
+                <div class="section-title">
+                    <span>✏️ Modifica Poligono</span>
+                    <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px;" onclick="R20.deleteSelectedPolygon()">🗑️ Elimina</button>
+                </div>
+
+                <div class="form-row">
+                    <label>Nome:</label>
+                    <input type="text" id="selected-poly-name" style="flex: 2;" oninput="R20.updateSelectedPolygonProps()">
+                </div>
+
+                <div class="form-row">
+                    <label>Colore Base:</label>
+                    <input type="color" id="selected-poly-color" oninput="R20.updateSelectedPolygonProps()">
+                    <label style="margin-left: 6px;">Texture:</label>
+                    <select id="selected-poly-texture" style="flex: 1.5;" onchange="R20.updateSelectedPolygonProps()">
+                        <option value="none">Piatto</option>
+                        <option value="mattoni">🧱 Mattoni</option>
+                        <option value="pietra">🪨 Pietra</option>
+                        <option value="legno">🪵 Legno</option>
+                        <option value="erba">🌿 Erba</option>
+                        <option value="acqua">🌊 Acqua</option>
+                        <option value="custom">🖼️ Personalizzata...</option>
+                    </select>
+                </div>
+
+                <div class="form-row" id="row-custom-texture" style="display: none; background: #1a1a20; padding: 4px; border-radius: 4px;">
+                    <label style="font-size: 11px;">Carica Texture:</label>
+                    <input type="file" id="selected-poly-file" accept="image/*" style="font-size: 10px; flex: 2;" onchange="R20.handlePolygonTextureUpload(event)">
+                </div>
+
+                <div class="form-row">
+                    <label>Livello (Layer):</label>
+                    <select id="selected-poly-layer" style="flex: 2;" onchange="R20.updateSelectedPolygonProps()">
+                        <option value="Muro">Muro (Coprente/Solido)</option>
+                        <option value="Base">Base (Terreno/Area)</option>
+                        <option value="Tetto">Tetto (Copertura alta)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Trasparenza (Visione):</label>
+                    <select id="selected-poly-vision" style="flex: 2;" onchange="R20.updateSelectedPolygonProps()">
+                        <option value="opaque">Blocca Visione (Opaco - Crea Ombra)</option>
+                        <option value="transparent">Vedi Attraverso (Trasparente)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label>Attraversabile con Frecce:</label>
+                    <select id="selected-poly-passable" style="flex: 2;" onchange="R20.updateSelectedPolygonProps()">
+                        <option value="no">No (Muro Bloccante)</option>
+                        <option value="yes">Sì (Camminabile)</option>
+                    </select>
+                </div>
+
+                <div style="border-top: 1px solid #444; margin-top: 8px; padding-top: 8px;">
+                    <div class="section-title" style="margin-bottom: 6px;">🔥 Sorgente di Luce</div>
+                    <div class="form-row">
+                        <label>Emette Luce:</label>
+                        <select id="selected-poly-emits-light" style="flex: 1;" onchange="R20.updateSelectedPolygonProps()">
+                            <option value="no">No</option>
+                            <option value="yes">Sì (Torcia / Falò / Magia)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Raggio Luce (px):</label>
+                        <input type="number" id="selected-poly-light-radius" step="25" style="width: 80px;" oninput="R20.updateSelectedPolygonProps()">
+                        <label style="margin-left: 8px;">Colore:</label>
+                        <input type="color" id="selected-poly-light-color" oninput="R20.updateSelectedPolygonProps()">
+                    </div>
+                </div>
+
+                <button class="btn btn-block" style="background:#444; margin-top: 8px;" onclick="R20.deselectPolygon()">Chiudi Modifica</button>
+            </div>
+
+            <!-- Disegna Nuovo Poligono -->
+            <div class="section-box">
+                <div class="section-title">Disegna Nuovo Poligono</div>
+                <div style="font-size: 11px; color: #888; margin-bottom: 6px;">
+                    Clicca sulla mappa per tracciare i vertici (snap a 25px).
+                </div>
+                
+                <div class="form-row">
+                    <label>Tipo predefinito:</label>
+                    <select id="new-poly-layer" style="flex: 2;">
+                        <option value="Muro">Muro</option>
+                        <option value="Base">Base</option>
+                        <option value="Tetto">Tetto</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Colore & Texture:</label>
+                    <input type="color" id="new-poly-color" value="#2c3e50">
+                    <select id="new-poly-texture" style="flex: 1.5;">
+                        <option value="none">Piatto</option>
+                        <option value="mattoni">🧱 Mattoni</option>
+                        <option value="pietra">🪨 Pietra</option>
+                        <option value="legno">🪵 Legno</option>
+                        <option value="erba">🌿 Erba</option>
+                        <option value="acqua">🌊 Acqua</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Emette Luce subito:</label>
+                    <input type="checkbox" id="new-poly-light">
+                </div>
+
+                <div style="display: flex; gap: 6px; margin-top: 8px;">
+                    <button class="btn btn-success" style="flex: 1;" onclick="R20.completeCurrentPolygon()">
+                        ✔ Salva Poligono
+                    </button>
+                    <button class="btn btn-danger" onclick="R20.cancelCurrentPolygon()">
+                        ✖ Annulla
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-box" style="flex: 1; overflow-y: auto;">
+                <div class="section-title">Poligoni Esistenti</div>
+                <div id="polygons-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+        </div>
+
+        <!-- 3. TAB INIZIATIVA -->
+        <div id="init-tab" class="tab-content">
+            <div class="section-box">
+                <div class="section-title">
+                    <span>Round: <b id="lbl-round" style="color: #00c3ff;">1</b></span>
+                    <button class="btn btn-success" style="padding: 2px 8px; font-size: 11px;" onclick="R20.nextTurn()">Turno Succ. ⏩</button>
+                </div>
+                <div style="display: flex; gap: 6px; margin-top: 8px;">
+                    <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.addSelectedToInit()">+ Selezionato</button>
+                    <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.rollAllInitiative()">🎲 Tira x Tutti</button>
+                    <button class="btn btn-danger" style="font-size: 11px;" onclick="R20.clearInitiative()">Pulisci</button>
+                </div>
+                <div style="font-size: 11px; color: #888; margin-top: 6px;">
+                    💡 Trascina le righe per riordinarle. Clicca su un personaggio per selezionarlo sulla mappa.
+                </div>
+            </div>
+            <div id="initiative-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
+        </div>
+
+        <!-- 4. TAB CHAT & DADI -->
+        <div id="chat-tab" class="tab-content">
+            <div id="chat-log"></div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+                <input type="text" id="dice-input" placeholder="es. 1d20+5, 2d6+3" value="1d20+5" 
+                       style="flex: 1; background: #111; border: 1px solid #444; color: #fff; padding: 6px; border-radius: 4px;">
+                <button class="btn" onclick="R20.rollCustomDice()">Tira</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE WEBRTC P2P TEMPO REALE -->
+    <div id="p2p-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="section-title">
+                <span>📡 Stanza Live P2P (WebRTC 30-50ms)</span>
+                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px;" onclick="R20.closeP2PModal()">✖</button>
+            </div>
+            <p style="font-size: 12px; color: #bbb; margin-bottom: 12px; line-height: 1.4;">
+                Connetti 2 o più dispositivi in tempo reale a costo zero. Lo stato viene <b>salvato automaticamente in locale dall'Host</b> ad ogni movimento.
+            </p>
+
+            <div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 10px;">
+                <div style="font-size: 12px; font-weight: bold; color: #00c3ff; margin-bottom: 6px;">Opzione 1: Fai da Host (Master)</div>
+                <div class="form-row">
+                    <label>Codice Stanza:</label>
+                    <input type="text" id="p2p-host-room" placeholder="es. tavolo-dnd-1" style="flex: 1.5;">
+                    <button class="btn btn-success" style="padding: 4px 8px; font-size: 11px;" onclick="R20.startHostP2P()">Crea Stanza</button>
+                </div>
+            </div>
+
+            <div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333;">
+                <div style="font-size: 12px; font-weight: bold; color: #f39c12; margin-bottom: 6px;">Opzione 2: Entra come Giocatore / 2° Schermo</div>
+                <div class="form-row">
+                    <label>Codice Stanza Host:</label>
+                    <input type="text" id="p2p-join-room" placeholder="es. tavolo-dnd-1" style="flex: 1.5;">
+                    <button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px;" onclick="R20.joinClientP2P()">Unisciti</button>
+                </div>
+            </div>
+
+            <div id="p2p-status-msg" style="font-size: 12px; margin-top: 10px; text-align: center; color: #aaa;"></div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DEI 7 MODULI -->
+    <script src="js/1-math-geom.js"></script>
+    <script src="js/2-lighting-vision.js"></script>
+    <script src="js/3-dice-combat.js"></script>
+    <script src="js/4-tokens.js"></script>
+    <script src="js/5-polygons.js"></script>
+    <script src="js/6-initiative.js"></script>
+    <script src="js/7-app-storage.js"></script>
+</body>
+</html>
