@@ -5,7 +5,17 @@ R20.rollCustomDice = function() {
     const val = input.value.trim();
     if (!val) return;
     const res = R20.evaluateDiceFormula(val);
-    R20.addChatMessage(`🎲 Tiro Libero: ${val}`, res.breakdown, res.total);
+    const title = `🎲 Tiro Libero: ${val}`;
+    const detail = res.breakdown;
+    const total = res.total;
+
+    // Disegna in locale
+    R20.addChatMessage(title, detail, total);
+
+    // Invia all'altro dispositivo SOLO su azione dell'utente
+    if (R20.broadcast) {
+        R20.broadcast({ type: 'CHAT_MSG', title, detail, total });
+    }
     R20.switchTab('chat-tab');
 };
 
@@ -44,6 +54,7 @@ R20.evaluateDiceFormula = function(formula) {
     return { total, breakdown: breakdownParts.join(' ') };
 };
 
+// Funzione grafica pura: NON fa broadcast per evitare loop infiniti!
 R20.addChatMessage = function(title, detail, total = null) {
     const chatLog = document.getElementById('chat-log');
     if (!chatLog) return;
@@ -56,52 +67,4 @@ R20.addChatMessage = function(title, detail, total = null) {
     `;
     chatLog.appendChild(entry);
     chatLog.scrollTop = chatLog.scrollHeight;
-	R20.broadcast({ type: 'CHAT_MSG', title, detail, total });
-};
-
-R20.executeSpecificAttack = function(tokId, atkId) {
-    const tok = R20.tokens.find(t => t.id === tokId);
-    if (!tok) return;
-
-    const atk = tok.attacks.find(a => a.id === atkId);
-    if (!atk) return;
-
-    atk.count = (atk.count || 0) + 1;
-    R20.renderTokenAttacksList(tok);
-
-    let detail = '';
-    let mainTotal = null;
-
-    if (atk.hitFormula && atk.hitFormula.trim() !== '') {
-        let formula = atk.hitFormula.trim();
-        if (!formula.toLowerCase().includes('d')) {
-            formula = formula.startsWith('+') || formula.startsWith('-') ? `1d20${formula}` : `1d20+${formula}`;
-        }
-        const hitRes = R20.evaluateDiceFormula(formula);
-        detail += `<div>Tiro TxC (${formula}): ${hitRes.breakdown} = <b>${hitRes.total}</b></div>`;
-        mainTotal = hitRes.total;
-    }
-
-    if (atk.damageFormula && atk.damageFormula.trim() !== '') {
-        const dmgRes = R20.evaluateDiceFormula(atk.damageFormula.trim());
-        detail += `<div>Tiro Danni (${atk.damageFormula}): ${dmgRes.breakdown} = <b>${dmgRes.total}</b></div>`;
-        if (mainTotal === null) mainTotal = dmgRes.total;
-    }
-
-    detail += `<div style="font-size:10px; color:#888; margin-top:2px;">Esecuzioni totali: <b>${atk.count}</b></div>`;
-    R20.addChatMessage(`⚔️ ${tok.name} usa ${atk.name || 'Attacco'}`, detail, mainTotal);
-    R20.switchTab('chat-tab');
-};
-
-R20.resetAttackCounter = function(e, tokId, atkId) {
-    e.stopPropagation();
-    const tok = R20.tokens.find(t => t.id === tokId);
-    if (!tok) return;
-
-    const atk = tok.attacks.find(a => a.id === atkId);
-    if (!atk) return;
-
-    atk.count = 0;
-    R20.renderTokenAttacksList(tok);
-    R20.addChatMessage("Contatore Azzerato", `Il contatore di <b>${atk.name}</b> (${tok.name}) è stato riportato a <b>0</b>.`);
 };
