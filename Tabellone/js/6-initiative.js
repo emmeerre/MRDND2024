@@ -25,6 +25,22 @@ R20.rollCurrentTokenInitiative = function() {
     R20.sortInitiative();
     R20.renderInitiative();
     R20.addChatMessage("Iniziativa", `🎲 <b>${tok.name}</b> tira iniziativa (${formula}): ${res.breakdown} = <b>${res.total}</b>`, res.total);
+    
+    // Invia solo su azione del giocatore
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'INIT_SYNC',
+            list: R20.initiativeList,
+            currentTurnIndex: R20.currentTurnIndex,
+            currentRound: R20.currentRound
+        });
+        R20.broadcast({
+            type: 'CHAT_MSG',
+            title: "Iniziativa",
+            detail: `🎲 <b>${tok.name}</b> tira iniziativa (${formula}): ${res.breakdown} = <b>${res.total}</b>`,
+            total: res.total
+        });
+    }
     R20.switchTab('init-tab');
 };
 
@@ -43,6 +59,15 @@ R20.addSelectedToInit = function() {
     R20.sortInitiative();
     R20.renderInitiative();
     R20.addChatMessage("Iniziativa", `<b>${tok.name}</b> entra in iniziativa con <b>${res.total}</b>`);
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'INIT_SYNC',
+            list: R20.initiativeList,
+            currentTurnIndex: R20.currentTurnIndex,
+            currentRound: R20.currentRound
+        });
+    }
 };
 
 R20.rollAllInitiative = function() {
@@ -59,7 +84,20 @@ R20.rollAllInitiative = function() {
     R20.currentRound = 1;
     R20.renderInitiative();
     R20.addChatMessage("Iniziativa", "Tiro iniziativa completato per tutti!");
-	R20.broadcast({ type: 'INIT_SYNC', list: R20.initiativeList, currentTurnIndex: R20.currentTurnIndex, currentRound: R20.currentRound });
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'INIT_SYNC',
+            list: R20.initiativeList,
+            currentTurnIndex: R20.currentTurnIndex,
+            currentRound: R20.currentRound
+        });
+        R20.broadcast({
+            type: 'CHAT_MSG',
+            title: "Iniziativa",
+            detail: "Tiro iniziativa completato per tutti!"
+        });
+    }
 };
 
 R20.sortInitiative = function() {
@@ -77,7 +115,15 @@ R20.nextTurn = function() {
 
     const current = R20.initiativeList[R20.currentTurnIndex];
     if (current) R20.selectToken(current.tokenId);
-	R20.broadcast({ type: 'INIT_SYNC', list: R20.initiativeList, currentTurnIndex: R20.currentTurnIndex, currentRound: R20.currentRound });
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'INIT_SYNC',
+            list: R20.initiativeList,
+            currentTurnIndex: R20.currentTurnIndex,
+            currentRound: R20.currentRound
+        });
+    }
 };
 
 R20.clearInitiative = function() {
@@ -85,14 +131,32 @@ R20.clearInitiative = function() {
     R20.currentTurnIndex = 0;
     R20.currentRound = 1;
     R20.renderInitiative();
-	R20.broadcast({ type: 'INIT_SYNC', list: R20.initiativeList, currentTurnIndex: R20.currentTurnIndex, currentRound: R20.currentRound });
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'INIT_SYNC',
+            list: R20.initiativeList,
+            currentTurnIndex: R20.currentTurnIndex,
+            currentRound: R20.currentRound
+        });
+    }
 };
 
 R20.removeFromInit = function(tokenId) {
     R20.initiativeList = R20.initiativeList.filter(i => i.tokenId !== tokenId);
     R20.renderInitiative();
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'INIT_SYNC',
+            list: R20.initiativeList,
+            currentTurnIndex: R20.currentTurnIndex,
+            currentRound: R20.currentRound
+        });
+    }
 };
 
+// Funzione grafica pura: ZERO broadcast all'interno!
 R20.renderInitiative = function() {
     const roundEl = document.getElementById('lbl-round');
     if (roundEl) roundEl.innerText = R20.currentRound;
@@ -126,14 +190,13 @@ R20.renderInitiative = function() {
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <input type="number" value="${item.value}" 
                            onclick="event.stopPropagation()"
-                           onchange="event.stopPropagation(); item.value = parseInt(this.value); R20.renderInitiative();" />
+                           onchange="event.stopPropagation(); item.value = parseInt(this.value); R20.renderInitiative(); if(R20.broadcast) R20.broadcast({type:'INIT_SYNC', list:R20.initiativeList, currentTurnIndex:R20.currentTurnIndex, currentRound:R20.currentRound});" />
                     <button class="btn btn-danger" style="padding:2px 6px; font-size:11px;" 
                             onclick="event.stopPropagation(); R20.removeFromInit(${tok.id})">✖</button>
                 </div>
             </div>
         `;
     }).join('');
-	R20.broadcast({ type: 'INIT_SYNC', list: R20.initiativeList, currentTurnIndex: R20.currentTurnIndex, currentRound: R20.currentRound });
 };
 
 R20.handleInitRowClick = function(e, tokenId) {
@@ -173,17 +236,21 @@ R20.handleInitDrop = function(e, targetIndex) {
         R20.initiativeList.splice(targetIndex, 0, movedItem);
 
         if (currentActiveTokId) {
-            R20.currentTurnIndex = R20.initiativeList.findIndex(i => i.tokenId === currentActiveTokId);
-            if (R20.currentTurnIndex === -1) R20.currentTurnIndex = 0;
+            currentTurnIndex = R20.initiativeList.findIndex(i => i.tokenId === currentActiveTokId);
+            if (currentTurnIndex === -1) currentTurnIndex = 0;
         }
 
         R20.renderInitiative();
+
+        if (R20.broadcast) {
+            R20.broadcast({
+                type: 'INIT_SYNC',
+                list: R20.initiativeList,
+                currentTurnIndex: R20.currentTurnIndex,
+                currentRound: R20.currentRound
+            });
+        }
     }
 };
 
 R20.handleInitDragEnd = function() {
-    R20.draggedInitIndex = null;
-    document.querySelectorAll('.init-row').forEach(r => {
-        r.classList.remove('init-dragging', 'init-drag-over');
-    });
-};
