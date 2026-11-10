@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roll20 Web Clone - Modular VTT Live</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- Libreria WebRTC P2P Gratuita senza registrazione -->
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <!-- Libreria MQTT per sincronizzazione live ad alta affidabilità su WebSocket -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
 
-    <div id="edit-banner">🛠️ MODALITÀ EDIT: Visione disabilitata (Tutto visibile). Clicca per selezionare o tracciare poligoni.</div>
+    <!-- Banner Modalità Edit (nascosto di default) -->
+    <div id="edit-banner" style="display: none;">🛠️ MODALITÀ EDIT: Visione disabilitata (Tutto visibile). Clicca per selezionare o tracciare poligoni.</div>
 
     <!-- VIEWPORT / MAPPA -->
     <div id="viewport">
@@ -29,11 +30,14 @@
             <span id="zoom-label" onclick="R20.setZoom(1.0)" title="Ripristina 100%">100%</span>
             <button class="zoom-btn" onclick="R20.changeZoom(0.1)" title="Ingrandisci">+</button>
         </div>
+
+        <!-- BARRA GIOCATORI COLLEGATI (STILE ROLL20 IN BASSO A SINISTRA) -->
+        <div id="players-bottom-dock"></div>
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR DESTRA -->
     <div id="sidebar">
-        <!-- Barra Superiore con Indicatore Live P2P -->
+        <!-- Barra Superiore con Stato Connessione e Backup -->
         <div class="global-scene-bar">
             <button class="btn" id="btn-scene-light" onclick="R20.toggleSceneLight()" style="padding: 3px 6px; font-size: 11px;">
                 🌙 Buio
@@ -42,26 +46,28 @@
                 <button class="btn" id="btn-p2p-status" style="padding: 3px 6px; font-size: 11px; background: #e67e22;" onclick="R20.openP2PModal()" title="Connetti dispositivi in tempo reale">
                     📡 Live P2P
                 </button>
-                <button class="btn btn-success" style="padding: 3px 6px; font-size: 11px;" onclick="R20.exportGameData()" title="Scarica file JSON">
+                <button class="btn btn-success" style="padding: 3px 6px; font-size: 11px;" onclick="R20.exportGameData()" title="Scarica file JSON di backup">
                     💾 Backup
                 </button>
-                <button class="btn" style="padding: 3px 6px; font-size: 11px; background:#444;" onclick="R20.triggerImportGameData()" title="Carica file JSON">
+                <button class="btn" style="padding: 3px 6px; font-size: 11px; background:#444;" onclick="R20.triggerImportGameData()" title="Carica scenario da file JSON">
                     📂 Carica
                 </button>
                 <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="R20.importGameDataFile(event)">
             </div>
         </div>
 
+        <!-- LINGUETTE SCHEDE -->
         <div class="tabs-header">
             <button class="tab-btn active" onclick="R20.switchTab('token-tab')">🧙 Pedina</button>
             <button class="tab-btn" onclick="R20.switchTab('edit-tab')">📐 Mappa</button>
             <button class="tab-btn" onclick="R20.switchTab('init-tab')">⏱️ Iniziativa</button>
+            <button class="tab-btn" onclick="R20.switchTab('players-tab')">👥 Giocatori</button>
             <button class="tab-btn" onclick="R20.switchTab('chat-tab')">💬 Dadi</button>
         </div>
 
         <!-- 1. TAB PEDINA -->
         <div id="token-tab" class="tab-content active">
-            <!-- A. LISTA COMPLETA PEDINE -->
+            <!-- A. LISTA COMPLETA PEDINE (Quando nessuna è selezionata) -->
             <div id="token-list-view">
                 <div class="section-box">
                     <div class="section-title">
@@ -69,13 +75,13 @@
                         <button class="btn" style="padding: 2px 6px; font-size: 11px;" onclick="R20.spawnToken()">+ Nuova</button>
                     </div>
                     <div style="font-size: 11px; color: #888; margin-bottom: 8px;">
-                        Clicca su una pedina per selezionarla e aprirne la scheda.
+                        Clicca su una pedina per selezionarla e visualizzarne i dettagli.
                     </div>
                     <div id="tokens-roster" style="display: flex; flex-direction: column; gap: 6px;"></div>
                 </div>
             </div>
 
-            <!-- B. SCHEDA EDITING PEDINA SELEZIONATA -->
+            <!-- B. SCHEDA PEDINA SELEZIONATA -->
             <div id="token-editor-body" style="display: none;">
                 <div class="section-box">
                     <div class="section-title">
@@ -90,10 +96,10 @@
                         <label>Nome:</label>
                         <input type="text" id="edit-name" style="flex: 2;" oninput="R20.updateCurrentTokenProps()">
                         <input type="text" id="edit-symbol" maxlength="2" title="Lettera / Simbolo" style="width: 36px; text-align: center;" oninput="R20.updateCurrentTokenProps()">
-                        <input type="color" id="edit-color" title="Colore Bordo/Sfondo" oninput="R20.updateCurrentTokenProps()">
+                        <input type="color" id="edit-color" title="Colore Tinta / Bordo" oninput="R20.updateCurrentTokenProps()">
                     </div>
 
-                    <!-- Dimensioni Token & Caricamento Immagine Avatar -->
+                    <!-- Taglia Caselle e Immagine Avatar -->
                     <div class="form-row">
                         <label>Taglia (Caselle):</label>
                         <select id="edit-size" style="flex: 1.2;" onchange="R20.updateCurrentTokenProps()">
@@ -102,14 +108,14 @@
                             <option value="3">Enorme (3x3)</option>
                             <option value="4">Mastodontica (4x4)</option>
                         </select>
-                        <button class="btn" style="padding: 3px 6px; font-size: 11px; background:#34495e;" onclick="document.getElementById('edit-token-img-file').click()" title="Carica immagine PNG/JPG">
+                        <button class="btn" style="padding: 3px 6px; font-size: 11px; background:#34495e;" onclick="document.getElementById('edit-token-img-file').click()" title="Carica immagine da computer">
                             🖼️ Immagine
                         </button>
                         <button class="btn btn-danger" style="padding: 3px 6px; font-size: 10px;" onclick="R20.removeTokenImage()" title="Rimuovi immagine">✖</button>
                         <input type="file" id="edit-token-img-file" accept="image/*" style="display:none;" onchange="R20.handleTokenImageUpload(event)">
                     </div>
 
-                    <!-- RIGA COMPATTA STATS (HP, CA, INIZIATIVA) -->
+                    <!-- Fila HP, CA e Iniziativa a tutta larghezza -->
                     <div class="compact-stat-row">
                         <div style="display: flex; align-items: center; gap: 2px;">
                             <span>HP:</span>
@@ -130,7 +136,7 @@
                         </div>
                     </div>
 
-                    <!-- Attacchi Multipli con Formula TxC Generica -->
+                    <!-- Lista Attacchi Multipli con TxC e Danni Generici -->
                     <div style="margin-top: 6px; border-top: 1px solid #3c3e4a; padding-top: 6px;">
                         <div class="section-title">
                             <span>⚔️ Attacchi & Azioni</span>
@@ -144,7 +150,7 @@
                         </div>
                     </div>
 
-                    <!-- Visione Collassabile -->
+                    <!-- Vista e Scurovisione (Chiusa di default) -->
                     <div class="accordion-header" onclick="R20.toggleVisionAccordion()">
                         <span>👁️ Vista & Scurovisione</span>
                         <span id="vision-accordion-arrow">▼</span>
@@ -167,6 +173,7 @@
                         </div>
                     </div>
 
+                    <!-- Condizioni / Status -->
                     <div style="font-size: 11px; color: #888; margin: 10px 0 4px;">CONDIZIONI / STATUS:</div>
                     <div class="status-picker" id="status-picker"></div>
 
@@ -258,7 +265,7 @@
                     <div class="form-row">
                         <label>Raggio Luce (px):</label>
                         <input type="number" id="selected-poly-light-radius" step="25" style="width: 80px;" oninput="R20.updateSelectedPolygonProps()">
-                        <label style="margin-left: 8px;">Colore:</label>
+                        <label style="margin-left: 8px;">Colore Luce:</label>
                         <input type="color" id="selected-poly-light-color" oninput="R20.updateSelectedPolygonProps()">
                     </div>
                 </div>
@@ -315,7 +322,25 @@
         </div>
 
         <!-- 3. TAB INIZIATIVA -->
-        <!-- NUOVA TAB: GESTIONE GIOCATORI E PERMESSI -->
+        <div id="init-tab" class="tab-content">
+            <div class="section-box">
+                <div class="section-title">
+                    <span>Round: <b id="lbl-round" style="color: #00c3ff;">1</b></span>
+                    <button class="btn btn-success" style="padding: 2px 8px; font-size: 11px;" onclick="R20.nextTurn()">Turno Succ. ⏩</button>
+                </div>
+                <div style="display: flex; gap: 6px; margin-top: 8px;">
+                    <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.addSelectedToInit()">+ Selezionato</button>
+                    <button class="btn" style="flex: 1; font-size: 11px;" onclick="R20.rollAllInitiative()">🎲 Tira x Tutti</button>
+                    <button class="btn btn-danger" style="font-size: 11px;" onclick="R20.clearInitiative()">Pulisci</button>
+                </div>
+                <div style="font-size: 11px; color: #888; margin-top: 6px;">
+                    💡 Trascina le righe per riordinarle. Clicca su un personaggio per selezionarlo sulla mappa.
+                </div>
+            </div>
+            <div id="initiative-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
+        </div>
+
+        <!-- 4. TAB GIOCATORI E GESTIONE PERMESSI -->
         <div id="players-tab" class="tab-content">
             <div class="section-box">
                 <div class="section-title">
@@ -325,13 +350,11 @@
                 <div id="players-my-role-badge" style="background:#16171d; padding:6px 8px; border-radius:4px; font-size:11px; margin-bottom:8px; border-left:3px solid #00c3ff;">
                     Ruolo: <b>Inizializzazione...</b>
                 </div>
-                <div id="players-manager-list" style="display:flex; flex-direction:column; gap:6px;">
-                    <!-- Popolato dinamicamente da 7-app-storage.js -->
-                </div>
+                <div id="players-manager-list" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
         </div>
 
-        <!-- 4. TAB CHAT & DADI -->
+        <!-- 5. TAB CHAT & DADI -->
         <div id="chat-tab" class="tab-content">
             <div id="chat-log"></div>
             <div style="display: flex; gap: 6px; margin-top: 8px;">
@@ -342,46 +365,41 @@
         </div>
     </div>
 
-    <!-- MODALE WEBRTC P2P TEMPO REALE -->
-    <!-- MODALE P2P AGGIORNATA CON GESTIONE PERMESSI -->
-	<div id="p2p-modal" class="modal-overlay" style="display: none;">
-		<div class="modal-card" style="width: 480px;">
-			<div class="section-title">
-				<span>📡 Connessione & Permessi Giocatori</span>
-				<button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px;" onclick="R20.closeP2PModal()">✖</button>
-			</div>
+    <!-- MODALE CONNESSIONE LIVE P2P -->
+    <div id="p2p-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card" style="width: 480px;">
+            <div class="section-title">
+                <span>📡 Connessione Stanza Live</span>
+                <button class="btn btn-danger" style="padding: 2px 6px; font-size: 11px;" onclick="R20.closeP2PModal()">✖</button>
+            </div>
+            <p style="font-size: 12px; color: #bbb; margin-bottom: 12px; line-height: 1.4;">
+                Connetti computer e cellulari in tempo reale a costo zero. Lo scenario viene <b>salvato automaticamente in locale dall'Host</b> ad ogni modifica.
+            </p>
 
-			<div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px;">
-				<div style="font-size: 12px; font-weight: bold; color: #00c3ff; margin-bottom: 6px;">Crea Stanza (Host / Master)</div>
-				<div class="form-row">
-					<input type="text" id="p2p-host-room" placeholder="es. tavolo1" style="flex: 1.5;">
-					<button class="btn btn-success" style="padding: 4px 8px; font-size: 11px;" onclick="R20.startHostP2P()">Crea Stanza</button>
-				</div>
-				<button class="btn btn-block" id="btn-copy-invite" style="background:#2980b9; display:none; margin-top:6px;" onclick="R20.copyInviteLink()">
-					📋 Copia Link Invito per Giocatori
-				</button>
-			</div>
+            <div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px;">
+                <div style="font-size: 12px; font-weight: bold; color: #00c3ff; margin-bottom: 6px;">Crea Stanza (Host / Master)</div>
+                <div class="form-row">
+                    <input type="text" id="p2p-host-room" placeholder="es. tavolo1" style="flex: 1.5;">
+                    <button class="btn btn-success" style="padding: 4px 8px; font-size: 11px;" onclick="R20.startHostP2P()">Crea Stanza</button>
+                </div>
+                <button class="btn btn-block" id="btn-copy-invite" style="background:#2980b9; display:none; margin-top:6px;" onclick="R20.copyInviteLink()">
+                    📋 Copia Link Invito per Giocatori
+                </button>
+            </div>
 
-			<div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px;">
-				<div style="font-size: 12px; font-weight: bold; color: #f39c12; margin-bottom: 6px;">Entra come Giocatore</div>
-				<div class="form-row">
-					<input type="text" id="p2p-join-room" placeholder="es. tavolo1" style="flex: 1.5;">
-					<button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px;" onclick="R20.joinClientP2P()">Unisciti</button>
-				</div>
-			</div>
+            <div style="background: #181920; padding: 10px; border-radius: 6px; border: 1px solid #333; margin-bottom: 8px;">
+                <div style="font-size: 12px; font-weight: bold; color: #f39c12; margin-bottom: 6px;">Entra come Giocatore</div>
+                <div class="form-row">
+                    <input type="text" id="p2p-join-room" placeholder="es. tavolo1" style="flex: 1.5;">
+                    <button class="btn btn-warning" style="padding: 4px 8px; font-size: 11px;" onclick="R20.joinClientP2P()">Unisciti</button>
+                </div>
+            </div>
 
-			<!-- LISTA PERMESSI GIOCATORI CONNESSI (VISIBILE ALL'HOST) -->
-			<div id="p2p-host-clients-panel" style="display: none; background: #14151a; padding: 8px; border-radius: 6px; border: 1px solid #2ecc71;">
-				<div style="font-size: 11px; font-weight: bold; color: #2ecc71; margin-bottom: 6px;">👥 Dispositivi Collegati (Gestione Permessi):</div>
-				<div id="p2p-connected-players-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto;"></div>
-			</div>
+            <div id="p2p-status-msg" style="font-size: 11px; margin-top: 8px; text-align: center; color: #aaa;"></div>
+        </div>
+    </div>
 
-			<div id="p2p-status-msg" style="font-size: 11px; margin-top: 8px; text-align: center; color: #aaa;"></div>
-		</div>
-	</div>
-	<!-- BARRA GIOCATORI IN BASSO A SINISTRA (STILE ROLL20) -->
-    <div id="players-bottom-dock"></div>
-    <!-- SCRIPT DEI 7 MODULI -->
+    <!-- CARICAMENTO DEI 7 MODULI -->
     <script src="js/1-math-geom.js"></script>
     <script src="js/2-lighting-vision.js"></script>
     <script src="js/3-dice-combat.js"></script>
