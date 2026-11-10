@@ -5,13 +5,32 @@ R20.selectedTokenId = null;
 
 R20.STATUSES = ['💀', '🩸', '🔥', '🛡️', '⚡', '💤', '🏹', '👁️', '❄️', '☣️', '⭐', '🔗', '⏳', '❌'];
 
-// Fallback di sicurezza per la verifica permessi se non ancora definita
-R20.canIControlToken = R20.canIControlToken || function(tokenId) {
+// Controllo permessi
+R20.canIControlToken = function(tokenId) {
     if (!R20.myRole) return true;
+    if (R20.p2p && R20.p2p.isHost) return true;
     if (R20.myRole.isHost) return true;
     if (R20.myRole.tokenControl === 'all') return true;
     if (R20.myRole.tokenControl === 'none') return false;
     return R20.myRole.tokenControl == tokenId;
+};
+
+// Pedine iniziali di default
+R20.getDefaultTokens = function() {
+    return [
+        R20.makeToken(1, 'Guerriero', 'G', 32, 32, 16, '#c0392b', 150, 250, [
+            { id: 101, name: 'Spada Lunga', hitFormula: '1d20+6', damageFormula: '1d8+4', count: 0 },
+            { id: 102, name: 'Giavellotto', hitFormula: '1d20+5', damageFormula: '1d6+3', count: 0 }
+        ], '1d20+2', 350, false, 0, 1, ''),
+        R20.makeToken(2, 'Mago', 'M', 18, 18, 12, '#8e44ad', 350, 300, [
+            { id: 201, name: 'Dardo di Fuoco', hitFormula: '1d20+5', damageFormula: '1d10', count: 0 },
+            { id: 202, name: 'Pugnale', hitFormula: '1d20+3', damageFormula: '1d4+1', count: 0 }
+        ], '1d20+3', 350, true, 320, 1, ''),
+        R20.makeToken(3, 'Goblin', 'g', 12, 12, 13, '#27ae60', 425, 120, [
+            { id: 301, name: 'Scimitarra', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 },
+            { id: 302, name: 'Arco Corto', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 }
+        ], '1d20+2', 300, true, 250, 1, '')
+    ];
 };
 
 /**
@@ -20,11 +39,11 @@ R20.canIControlToken = R20.canIControlToken || function(tokenId) {
 R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, initBonus = '1d20+2', visionRadius = 350, hasDarkvision = false, darkvisionRange = 300, size = 1, imgUrl = '') {
     return {
         id, name, symbol, hp, maxHp, ac, color, x, y,
-        size: Math.max(1, parseInt(size) || 1), // 1=Media(1x1), 2=Grande(2x2), 3=Enorme(3x3), 4=Mastodontica(4x4)
-        imgUrl: imgUrl || '',                   // Immagine avatar personalizzata (base64 o URL)
+        size: Math.max(1, parseInt(size) || 1),
+        imgUrl: imgUrl || '',
         initBonus,
         attacks: attacks || [
-            { id: Date.now(), name: 'Spada Lunga', hitFormula: '1d20+5', damageFormula: '1d8+3', count: 0 }
+            { id: Date.now(), name: 'Attacco', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 }
         ],
         visionRadius, hasDarkvision, darkvisionRange,
         statuses: new Set(),
@@ -136,7 +155,7 @@ R20.setupTokenEvents = function(tok) {
         hpBubble.addEventListener('click', (e) => {
             e.stopPropagation();
             if (!R20.canIControlToken(tok.id)) {
-                alert("Non puoi modificare i punti ferita di una pedina che non controlli!");
+                alert("Non puoi modificare i punti ferita di questa pedina!");
                 return;
             }
             R20.selectToken(tok.id);
@@ -162,9 +181,7 @@ R20.setupTokenEvents = function(tok) {
         if (R20.isEditMode) return;
         if (e.target.closest('.bubble') || e.target.closest('.hp-popover')) return;
 
-        // VERIFICA PERMESSI: se non ho il controllo di questa pedina, blocco il tocco
         if (!R20.canIControlToken(tok.id)) {
-            if (R20.addChatMessage) R20.addChatMessage("Permesso Negato", `Non hai il controllo di <b>${tok.name}</b>.`);
             return;
         }
 
@@ -198,7 +215,6 @@ R20.setupTokenEvents = function(tok) {
         el.classList.remove('dragging');
         el.releasePointerCapture(e.pointerId);
 
-        // Snap alla griglia
         const targetX = Math.max(0, Math.round(tok.x / R20.GRID_SIZE) * R20.GRID_SIZE);
         const targetY = Math.max(0, Math.round(tok.y / R20.GRID_SIZE) * R20.GRID_SIZE);
 
@@ -214,7 +230,6 @@ R20.setupTokenEvents = function(tok) {
         R20.updateTokenVisuals(tok);
         if (R20.updateVision) R20.updateVision();
 
-        // Invia movimento in tempo reale via WebSocket
         if (R20.broadcast) {
             R20.broadcast({ type: 'TOKEN_MOVE', id: tok.id, x: tok.x, y: tok.y });
         }
@@ -229,9 +244,6 @@ R20.triggerCollisionAlert = function(tok) {
     }
 };
 
-/**
- * Seleziona una pedina o torna alla lista completa
- */
 R20.selectToken = function(id) {
     R20.selectedTokenId = id;
     R20.tokens.forEach(t => R20.updateTokenVisuals(t));
@@ -329,9 +341,6 @@ R20.fillTokenEditor = function(tok) {
     }
 };
 
-/**
- * Salva le modifiche dai campi input
- */
 R20.updateCurrentTokenProps = function() {
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
     if (!tok) return;
@@ -359,7 +368,6 @@ R20.updateCurrentTokenProps = function() {
     if (R20.renderInitiative) R20.renderInitiative();
     if (R20.updateVision) R20.updateVision();
 
-    // Sincronizza i dati completi con gli altri browser
     if (R20.broadcast) {
         R20.broadcast({
             type: 'TOKEN_UPDATE_ALL',
@@ -377,17 +385,13 @@ R20.handleTokenImageUpload = function(e) {
     if (!file) return;
 
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-    if (!tok || !R20.canIControlToken(tok.id)) {
-        alert("Non hai i permessi per modificare l'immagine di questa pedina!");
-        return;
-    }
+    if (!tok || !R20.canIControlToken(tok.id)) return;
 
     const reader = new FileReader();
     reader.onload = function(evt) {
         tok.imgUrl = evt.target.result;
         R20.updateTokenVisuals(tok);
         R20.renderTokenListView();
-        if (R20.addChatMessage) R20.addChatMessage("Avatar", `Immagine caricata per <b>${tok.name}</b>.`);
         if (R20.broadcast) {
             R20.broadcast({
                 type: 'TOKEN_UPDATE_ALL',
@@ -414,14 +418,8 @@ R20.removeTokenImage = function() {
     }
 };
 
-/**
- * Matematica HP (+ / - / valore) stile Roll20
- */
 R20.applyHpMath = function(tok, str) {
-    if (!R20.canIControlToken(tok.id)) {
-        alert("Non puoi modificare i punti ferita di una pedina che non controlli!");
-        return;
-    }
+    if (!R20.canIControlToken(tok.id)) return;
 
     str = str.trim();
     if (!str) return;
@@ -448,9 +446,6 @@ R20.applyHpMath = function(tok, str) {
     }
 };
 
-/**
- * Rendering lista attacchi
- */
 R20.renderTokenAttacksList = function(tok) {
     const container = document.getElementById('token-attacks-list');
     if (!container) return;
@@ -465,9 +460,9 @@ R20.renderTokenAttacksList = function(tok) {
             <div class="attack-card-inputs">
                 <input type="text" placeholder="Nome" value="${atk.name}" title="Nome Attacco"
                        oninput="R20.updateAttackField(${tok.id}, ${atk.id}, 'name', this.value)">
-                <input type="text" placeholder="1d20+4" value="${atk.hitFormula || ''}" title="Tiro per Colpire / TxC (es. 1d20+4)"
+                <input type="text" placeholder="1d20+4" value="${atk.hitFormula || ''}" title="Tiro per Colpire / TxC"
                        style="text-align:center;" oninput="R20.updateAttackField(${tok.id}, ${atk.id}, 'hitFormula', this.value)">
-                <input type="text" placeholder="1d8+3" value="${atk.damageFormula || ''}" title="Tiro Danni (es. 1d8+3)"
+                <input type="text" placeholder="1d8+3" value="${atk.damageFormula || ''}" title="Tiro Danni"
                        style="text-align:center;" oninput="R20.updateAttackField(${tok.id}, ${atk.id}, 'damageFormula', this.value)">
                 <button class="btn btn-danger" style="padding:2px 4px; font-size:11px;" title="Rimuovi attacco"
                         onclick="R20.removeAttackFromToken(${tok.id}, ${atk.id})">✖</button>
@@ -540,12 +535,7 @@ R20.updateAttackField = function(tokId, atkId, field, value) {
 
 R20.executeSpecificAttack = function(tokId, atkId) {
     const tok = R20.tokens.find(t => t.id === tokId);
-    if (!tok) return;
-
-    if (!R20.canIControlToken(tokId)) {
-        alert("Non puoi eseguire attacchi con una pedina che non controlli!");
-        return;
-    }
+    if (!tok || !R20.canIControlToken(tokId)) return;
 
     const atk = tok.attacks.find(a => a.id === atkId);
     if (!atk) return;
@@ -572,11 +562,10 @@ R20.executeSpecificAttack = function(tokId, atkId) {
         if (mainTotal === null) mainTotal = dmgRes.total;
     }
 
-    detail += `<div style="font-size:10px; color:#888; margin-top:2px;">Esecuzioni totali: <b>${atk.count}</b></div>`;
+    detail += `<div style="font-size:10px; color:#888; margin-top:2px;">Esecuzioni: <b>${atk.count}</b></div>`;
     if (R20.addChatMessage) R20.addChatMessage(`⚔️ ${tok.name} usa ${atk.name || 'Attacco'}`, detail, mainTotal);
     if (R20.switchTab) R20.switchTab('chat-tab');
 
-    // Sincronizza il contatore attacchi con gli altri browser
     if (R20.broadcast) {
         R20.broadcast({
             type: 'TOKEN_UPDATE_ALL',
@@ -626,10 +615,7 @@ R20.toggleStatus = function(icon) {
 R20.deleteCurrentToken = function() {
     if (!R20.selectedTokenId) return;
     const tok = R20.tokens.find(t => t.id === R20.selectedTokenId);
-    if (!tok || !R20.canIControlToken(tok.id)) {
-        alert("Non hai i permessi per eliminare questa pedina!");
-        return;
-    }
+    if (!tok || !R20.canIControlToken(tok.id)) return;
 
     const delId = R20.selectedTokenId;
     const idx = R20.tokens.findIndex(t => t.id === delId);
@@ -645,8 +631,11 @@ R20.deleteCurrentToken = function() {
     }
 };
 
+/**
+ * Aggiunta pedina: sbloccata e funzionante al 100%
+ */
 R20.spawnToken = function() {
-    if (!R20.net.isHost && R20.myRole.tokenControl === 'none') {
+    if (R20.myRole && !R20.myRole.isHost && R20.myRole.tokenControl === 'none') {
         alert("Non hai i permessi per aggiungere nuove pedine al tavolo!");
         return;
     }
