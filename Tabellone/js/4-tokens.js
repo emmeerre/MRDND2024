@@ -119,17 +119,14 @@ R20.setupTokenEvents = function(tok) {
 
     hpInput.addEventListener('blur', () => { hpPopover.style.display = 'none'; });
 
-    el.addEventListener('pointerdown', (e) => {
-		el.addEventListener('pointerdown', (e) => {
+el.addEventListener('pointerdown', (e) => {
         if (R20.isEditMode) return;
         if (e.target.closest('.bubble') || e.target.closest('.hp-popover')) return;
 
-        // CONTROLLO PERMESSI: Se il giocatore ha una pedina assegnata specifica e prova a toccarne un'altra
-        if (R20.myRole && R20.myRole.tokenControl !== 'all') {
-            if (R20.myRole.tokenControl === 'none' || R20.myRole.tokenControl !== tok.id) {
-                // Non hai il permesso di muovere questa pedina!
-                return;
-            }
+        // Se non ho il permesso di muovere questa pedina, blocco l'interazione
+        if (!R20.canIControlToken(tok.id)) {
+            R20.addChatMessage("Permesso Negato", `Non hai il controllo di <b>${tok.name}</b>.`);
+            return;
         }
 
         R20.selectToken(tok.id);
@@ -316,6 +313,11 @@ R20.removeTokenImage = function() {
 };
 
 R20.applyHpMath = function(tok, str) {
+    if (!R20.canIControlToken(tok.id)) {
+        alert("Non puoi modificare i punti ferita di questa pedina!");
+        return;
+    }
+    // ... resto di applyHpMath invariato ...
     str = str.trim();
     if (!str) return;
 
