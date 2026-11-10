@@ -27,6 +27,7 @@ body {
 }
 
 /* --- VIEWPORT & MAPPA (GRIGLIA SINCRONIZZATA CON LO ZOOM) --- */
+/* --- VIEWPORT & MAPPA (GRIGLIA SINCRONIZZATA CON LO ZOOM) --- */
 #viewport {
     flex: 1;
     position: relative;
