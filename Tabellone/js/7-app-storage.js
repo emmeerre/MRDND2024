@@ -632,13 +632,14 @@ R20.loadGameState = function(state, shouldBroadcast = true) {
 // ============================================================================
 
 R20.setZoom = function(val) {
-    R20.zoom = Math.max(0.3, Math.min(2.5, Math.round(val * 100) / 100));
+    R20.zoom = Math.max(0.2, Math.min(2.5, Math.round(val * 100) / 100));
     const board = document.getElementById('board');
     const boardWrapper = document.getElementById('board-wrapper');
+    const mapSize = R20.MAP_SIZE || 6000;
     if (board && boardWrapper) {
         board.style.transform = `scale(${R20.zoom})`;
-        boardWrapper.style.width = `${2600 * R20.zoom}px`;
-        boardWrapper.style.height = `${2600 * R20.zoom}px`;
+        boardWrapper.style.width = `${mapSize * R20.zoom}px`;
+        boardWrapper.style.height = `${mapSize * R20.zoom}px`;
     }
     const lbl = document.getElementById('zoom-label');
     if (lbl) lbl.innerText = `${Math.round(R20.zoom * 100)}%`;
