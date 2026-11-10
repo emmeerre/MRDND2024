@@ -28,7 +28,7 @@ R20.toggleEditMode = function() {
         R20.deselectPolygon();
     }
 
-    R20.updateVision();
+    if (R20.updateVision) R20.updateVision();
     R20.renderPolygons();
 };
 
@@ -84,7 +84,11 @@ R20.updateSelectedPolygonProps = function() {
 
     R20.renderPolygons();
     R20.updatePolygonsSidebar();
-    R20.updateVision();
+    if (R20.updateVision) R20.updateVision();
+
+    if (R20.broadcast) {
+        R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
+    }
 };
 
 R20.handlePolygonTextureUpload = function(e) {
@@ -98,7 +102,9 @@ R20.handlePolygonTextureUpload = function(e) {
             p.customTextureUrl = evt.target.result;
             R20.renderPolygons();
             R20.updatePolygonsSidebar();
-            R20.addChatMessage("Texture", `Texture applicata a <b>${p.name}</b>.`);
+            if (R20.broadcast) {
+                R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
+            }
         }
     };
     reader.readAsDataURL(file);
@@ -108,8 +114,11 @@ R20.deleteSelectedPolygon = function() {
     if (!R20.selectedPolygonId) return;
     R20.polygons = R20.polygons.filter(p => p.id !== R20.selectedPolygonId);
     R20.deselectPolygon();
-    R20.updateVision();
-	R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
+    if (R20.updateVision) R20.updateVision();
+
+    if (R20.broadcast) {
+        R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
+    }
 };
 
 R20.completeCurrentPolygon = function() {
@@ -137,14 +146,16 @@ R20.completeCurrentPolygon = function() {
         lightRadius: emitsLight ? 250 : 0,
         lightColor: '#f39c12',
         points: [...R20.currentDrawPoints]
-		
     });
 
-    R20.currentDrawPoints = [];
+    currentDrawPoints = [];
     document.getElementById('new-poly-light').checked = false;
     R20.selectPolygon(newId);
-    R20.updateVision();
-	R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
+    if (R20.updateVision) R20.updateVision();
+
+    if (R20.broadcast) {
+        R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
+    }
 };
 
 R20.cancelCurrentPolygon = function() {
@@ -190,6 +201,7 @@ R20.generateSvgPattern = function(p) {
     return '';
 };
 
+// Funzione grafica pura: nessun broadcast all'interno
 R20.renderPolygons = function() {
     const mapSvg = document.getElementById('map-svg');
     const lightIconsContainer = document.getElementById('light-icons-container');
@@ -199,36 +211,41 @@ R20.renderPolygons = function() {
     let defsHtml = '<defs>';
     let iconsHtml = '';
 
-    R20.polygons.forEach(p => {
-        if (p.texture && p.texture !== 'none') {
-            defsHtml += R20.generateSvgPattern(p);
-        }
-    });
+    if (R20.polygons) {
+        R20.polygons.forEach(p => {
+            if (p.texture && p.texture !== 'none') {
+                defsHtml += R20.generateSvgPattern(p);
+            }
+        });
+    }
     defsHtml += '</defs>';
     svgHtml += defsHtml;
 
-    R20.polygons.forEach(p => {
-        const pts = p.points.map(pt => `${pt[0]},${pt[1]}`).join(' ');
-        let cls = 'poly-shape';
+    if (R20.polygons) {
+        R20.polygons.forEach(p => {
+            if (!p.points || p.points.length < 3) return;
+            const pts = p.points.map(pt => `${pt[0]},${pt[1]}`).join(' ');
+            let cls = 'poly-shape';
 
-        if (p.id === R20.selectedPolygonId) cls += ' poly-selected';
+            if (p.id === R20.selectedPolygonId) cls += ' poly-selected';
 
-        let fillStyle = p.color || '#2c3e50';
-        if (p.texture && p.texture !== 'none') {
-            fillStyle = `url(#pat-poly-${p.id})`;
-        }
+            let fillStyle = p.color || '#2c3e50';
+            if (p.texture && p.texture !== 'none') {
+                fillStyle = `url(#pat-poly-${p.id})`;
+            }
 
-        let fillOpacity = p.layer === 'Base' ? '0.75' : '1';
-        const pointerStyle = R20.isEditMode ? 'cursor: pointer; pointer-events: all;' : 'pointer-events: none;';
-        svgHtml += `<polygon points="${pts}" class="${cls}" fill="${fillStyle}" fill-opacity="${fillOpacity}" stroke="#111" stroke-width="2" style="${pointerStyle}" onclick="R20.handlePolygonClick(event, ${p.id})" />`;
+            let fillOpacity = p.layer === 'Base' ? '0.75' : '1';
+            const pointerStyle = R20.isEditMode ? 'cursor: pointer; pointer-events: all;' : 'pointer-events: none;';
+            svgHtml += `<polygon points="${pts}" class="${cls}" fill="${fillStyle}" fill-opacity="${fillOpacity}" stroke="#111" stroke-width="2" style="${pointerStyle}" onclick="R20.handlePolygonClick(event, ${p.id})" />`;
 
-        if (p.emitsLight && p.lightRadius > 0) {
-            const [cx, cy] = R20.getPolygonCentroid(p.points);
-            iconsHtml += `<div class="light-source-icon" style="left:${cx}px; top:${cy}px;">🔥</div>`;
-        }
-    });
+            if (p.emitsLight && p.lightRadius > 0) {
+                const [cx, cy] = R20.getPolygonCentroid(p.points);
+                iconsHtml += `<div class="light-source-icon" style="left:${cx}px; top:${cy}px;">🔥</div>`;
+            }
+        });
+    }
 
-    if (R20.currentDrawPoints.length > 0) {
+    if (R20.currentDrawPoints && R20.currentDrawPoints.length > 0) {
         const pts = R20.currentDrawPoints.map(pt => `${pt[0]},${pt[1]}`).join(' ');
         svgHtml += `<polyline points="${pts}" class="poly-preview" style="pointer-events:none;" />`;
         R20.currentDrawPoints.forEach(pt => {
@@ -248,7 +265,7 @@ R20.handlePolygonClick = function(e, id) {
 
 R20.updatePolygonsSidebar = function() {
     const container = document.getElementById('polygons-list');
-    if (!container) return;
+    if (!container || !R20.polygons) return;
     container.innerHTML = R20.polygons.map(p => `
         <div class="poly-item-row ${p.id === R20.selectedPolygonId ? 'selected' : ''}" onclick="R20.selectPolygon(${p.id})">
             <div>
@@ -265,7 +282,6 @@ R20.updatePolygonsSidebar = function() {
             <button class="btn btn-danger" style="padding:2px 6px; font-size:11px;" onclick="event.stopPropagation(); R20.deletePolygonById(${p.id})">✖</button>
         </div>
     `).join('');
-	R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
 };
 
 R20.deletePolygonById = function(id) {
@@ -274,6 +290,9 @@ R20.deletePolygonById = function(id) {
     else {
         R20.renderPolygons();
         R20.updatePolygonsSidebar();
-        R20.updateVision();
+        if (R20.updateVision) R20.updateVision();
+    }
+    if (R20.broadcast) {
+        R20.broadcast({ type: 'POLY_SYNC', polygons: R20.polygons });
     }
 };
