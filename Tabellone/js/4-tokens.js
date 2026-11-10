@@ -30,8 +30,8 @@ R20.getDefaultTokens = function() {
         ], '1d20+2', 300, true, 250, 1, '')
     ];
 };
-
-R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, initBonus = '1d20+2', visionRadius = 350, hasDarkvision = false, darkvisionRange = 300, size = 1, imgUrl = '') {
+// Nel costruttore makeToken: default visionRadius = 3000
+R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, initBonus = '1d20+2', visionRadius = 3000, hasDarkvision = false, darkvisionRange = 300, size = 1, imgUrl = '') {
     return {
         id, name, symbol, hp, maxHp, ac, color, x, y,
         size: Math.max(1, parseInt(size) || 1),
@@ -40,11 +40,58 @@ R20.makeToken = function(id, name, symbol, hp, maxHp, ac, color, x, y, attacks, 
         attacks: attacks || [
             { id: Date.now(), name: 'Attacco', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 }
         ],
-        visionRadius, hasDarkvision, darkvisionRange,
+        visionRadius: visionRadius || 3000, // Valore normale 3000px
+        hasDarkvision,
+        darkvisionRange,
         statuses: new Set(),
         el: null
     };
 };
+
+// Nelle pedine di default (Guerriero, Mago, Goblin): visionRadius = 3000
+R20.getDefaultTokens = function() {
+    return [
+        R20.makeToken(1, 'Guerriero', 'G', 32, 32, 16, '#c0392b', 150, 250, [
+            { id: 101, name: 'Spada Lunga', hitFormula: '1d20+6', damageFormula: '1d8+4', count: 0 },
+            { id: 102, name: 'Giavellotto', hitFormula: '1d20+5', damageFormula: '1d6+3', count: 0 }
+        ], '1d20+2', 3000, false, 0, 1, ''),
+        R20.makeToken(2, 'Mago', 'M', 18, 18, 12, '#8e44ad', 350, 300, [
+            { id: 201, name: 'Dardo di Fuoco', hitFormula: '1d20+5', damageFormula: '1d10', count: 0 },
+            { id: 202, name: 'Pugnale', hitFormula: '1d20+3', damageFormula: '1d4+1', count: 0 }
+        ], '1d20+3', 3000, true, 320, 1, ''),
+        R20.makeToken(3, 'Goblin', 'g', 12, 12, 13, '#27ae60', 425, 120, [
+            { id: 301, name: 'Scimitarra', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 },
+            { id: 302, name: 'Arco Corto', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 }
+        ], '1d20+2', 3000, true, 250, 1, '')
+    ];
+};
+
+// Nella creazione di nuove pedine (spawnToken): visionRadius = 3000
+R20.spawnToken = function() {
+    if (R20.myRole && !R20.myRole.isHost && R20.myRole.tokenControl === 'none') {
+        alert("Non hai i permessi per aggiungere nuove pedine al tavolo!");
+        return;
+    }
+
+    const id = Date.now();
+    const colors = ['#e67e22', '#16a085', '#2980b9', '#8e44ad', '#d35400'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const tok = R20.makeToken(id, `Personaggio ${R20.tokens.length + 1}`, 'P', 25, 25, 14, color, 200, 350, [
+        { id: Date.now(), name: 'Spada Corta', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 }
+    ], '1d20+2', 3000, false, 0, 1, '');
+
+    R20.tokens.push(tok);
+    R20.initTokens();
+    R20.selectToken(id);
+
+    if (R20.broadcast) {
+        R20.broadcast({
+            type: 'TOKEN_SPAWN',
+            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
+        });
+    }
+};
+
 
 R20.initTokens = function() {
     const container = document.getElementById('tokens-container');
@@ -618,30 +665,5 @@ R20.deleteCurrentToken = function() {
 
     if (R20.broadcast) {
         R20.broadcast({ type: 'TOKEN_DELETE', id: delId });
-    }
-};
-
-R20.spawnToken = function() {
-    if (R20.myRole && !R20.myRole.isHost && R20.myRole.tokenControl === 'none') {
-        alert("Non hai i permessi per aggiungere nuove pedine al tavolo!");
-        return;
-    }
-
-    const id = Date.now();
-    const colors = ['#e67e22', '#16a085', '#2980b9', '#8e44ad', '#d35400'];
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const tok = R20.makeToken(id, `Personaggio ${R20.tokens.length + 1}`, 'P', 25, 25, 14, color, 200, 350, [
-        { id: Date.now(), name: 'Spada Corta', hitFormula: '1d20+4', damageFormula: '1d6+2', count: 0 }
-    ], '1d20+2', 350, false, 0, 1, '');
-
-    R20.tokens.push(tok);
-    R20.initTokens();
-    R20.selectToken(id);
-
-    if (R20.broadcast) {
-        R20.broadcast({
-            type: 'TOKEN_SPAWN',
-            token: { ...tok, statuses: Array.from(tok.statuses), el: null }
-        });
     }
 };
