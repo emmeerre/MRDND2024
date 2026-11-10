@@ -9,11 +9,10 @@ R20.myRole = {
     tokenControl: 'all' // 'all', 'none' oppure id pedina (es. 1)
 };
 
-// Genera un ID e un nome per questo browser
-R20.myClientId = 'usr_' + Math.random().toString(36).substring(2, 8);
+R20.myClientId = 'usr_' + Math.random().toString(36).substring(2, 9);
 R20.myPlayerName = localStorage.getItem('r20_player_name') || 'Giocatore ' + R20.myClientId.substring(4);
 
-// Elenco giocatori collegati { id: { id, name, isHost, canEdit, tokenControl, lastSeen } }
+// Elenco giocatori collegati
 R20.connectedUsers = new Map();
 
 R20.net = {
@@ -35,23 +34,51 @@ R20.canIControlToken = function(tokenId) {
 };
 
 // ============================================================================
-// 2. RETE WEBSOCKET MQTT CON PING/PONG IN TEMPO REALE
+// 2. RETE WEBSOCKET RESILIENTE (DOPPIO BROKER HIVEMQ + EMQX)
 // ============================================================================
 
 R20.openP2PModal = function() {
     document.getElementById('p2p-modal').style.display = 'flex';
     document.getElementById('p2p-host-room').value = localStorage.getItem('r20_last_room') || 'tavolo-dnd-' + Math.floor(100 + Math.random() * 900);
     document.getElementById('p2p-join-room').value = localStorage.getItem('r20_last_room') || '';
+    if (R20.net.isHost) {
+        R20.renderPlayersTabAndDock();
+    }
 };
 
 R20.closeP2PModal = function() {
     document.getElementById('p2p-modal').style.display = 'none';
 };
 
-function connectBroker(roomCode, isHost) {
+// Lista di server broker ridondati ad alta velocità
+const BROKER_SERVERS = [
+    { name: 'HiveMQ Europa', url: 'wss://broker.hivemq.com:8884/mqtt' },
+    { name: 'EMQX Serverless', url: 'wss://broker.emqx.io:8084/mqtt' }
+];
+
+function connectBroker(roomCode, isHost, brokerIndex = 0) {
     const statusMsg = document.getElementById('p2p-status-msg');
+
+    // 1. Verifica che la libreria MQTT sia effettivamente presente nel browser
+    if (typeof mqtt === 'undefined') {
+        if (statusMsg) {
+            statusMsg.innerHTML = "❌ Libreria di rete non caricata!<br>Premi <b>Ctrl + F5</b> per forzare l'aggiornamento di Chrome.";
+            statusMsg.style.color = "#e74c3c";
+        }
+        return;
+    }
+
+    if (brokerIndex >= BROKER_SERVERS.length) {
+        if (statusMsg) {
+            statusMsg.innerText = "❌ Impossibile raggiungere i server di rete. Controlla la connessione.";
+            statusMsg.style.color = "#e74c3c";
+        }
+        return;
+    }
+
+    const currentBroker = BROKER_SERVERS[brokerIndex];
     if (statusMsg) {
-        statusMsg.innerText = "⏳ Connessione al server...";
+        statusMsg.innerText = `⏳ Connessione a ${currentBroker.name}...`;
         statusMsg.style.color = "#f39c12";
     }
 
@@ -69,24 +96,37 @@ function connectBroker(roomCode, isHost) {
 
     localStorage.setItem('r20_last_room', cleanRoom);
 
-    const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+    let isConnected = false;
+
+    // Timeout di 4 secondi: se il server non risponde, prova automaticamente il server successivo
+    const timeoutTimer = setTimeout(() => {
+        if (!isConnected) {
+            console.warn(`Timeout su ${currentBroker.name}, tentativo con il server di riserva...`);
+            try { client.end(true); } catch(e) {}
+            connectBroker(roomCode, isHost, brokerIndex + 1);
+        }
+    }, 4500);
+
+    const client = mqtt.connect(currentBroker.url, {
         clientId: R20.myClientId,
         clean: true,
-        connectTimeout: 8000,
+        connectTimeout: 4000,
         reconnectPeriod: 2500
     });
 
     R20.net.client = client;
 
     client.on('connect', () => {
+        isConnected = true;
+        clearTimeout(timeoutTimer);
+
         client.subscribe(topic, { qos: 0 }, (err) => {
             if (!err) {
                 if (statusMsg) {
-                    statusMsg.innerText = `✔ Connesso alla stanza: ${cleanRoom}`;
+                    statusMsg.innerText = `✔ Connesso con successo (${currentBroker.name})!`;
                     statusMsg.style.color = "#2ecc71";
                 }
 
-                // Registra me stesso
                 R20.connectedUsers.set(R20.myClientId, {
                     id: R20.myClientId,
                     name: isHost ? 'Master (Tu)' : R20.myPlayerName + ' (Tu)',
@@ -106,7 +146,7 @@ function connectBroker(roomCode, isHost) {
                     R20.addChatMessage("Rete Live", `Connesso alla stanza: <b>${cleanRoom}</b>`);
                 }
 
-                // Annuncia subito la propria presenza agli altri
+                // Annuncio di presenza
                 R20.broadcast({
                     type: 'HEARTBEAT',
                     user: {
@@ -116,13 +156,12 @@ function connectBroker(roomCode, isHost) {
                     }
                 });
 
-                // Se sono un client, chiedo lo stato completo all'Host
                 if (!isHost) {
                     R20.broadcast({ type: 'REQUEST_FULL_SYNC', clientId: R20.myClientId });
                 }
 
                 R20.renderPlayersTabAndDock();
-                setTimeout(R20.closeP2PModal, 600);
+                setTimeout(R20.closeP2PModal, 700);
             }
         });
     });
@@ -138,9 +177,9 @@ function connectBroker(roomCode, isHost) {
     });
 
     client.on('error', (err) => {
-        if (statusMsg) {
-            statusMsg.innerText = "❌ Errore rete: " + err.message;
-            statusMsg.style.color = "#e74c3c";
+        if (!isConnected) {
+            clearTimeout(timeoutTimer);
+            connectBroker(roomCode, isHost, brokerIndex + 1);
         }
     });
 }
@@ -148,19 +187,19 @@ function connectBroker(roomCode, isHost) {
 R20.startHostP2P = function() {
     const raw = document.getElementById('p2p-host-room').value.trim();
     if (!raw) return;
-    connectBroker(raw, true);
+    connectBroker(raw, true, 0);
 };
 
 R20.joinClientP2P = function(roomOverride = null) {
     const raw = roomOverride || document.getElementById('p2p-join-room').value.trim();
     if (!raw) return;
-    connectBroker(raw, false);
+    connectBroker(raw, false, 0);
 };
 
 R20.copyInviteLink = function() {
     const url = window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(R20.net.roomCode);
     navigator.clipboard.writeText(url).then(() => {
-        alert("Link copiato! Incollalo sull'altro dispositivo:\n" + url);
+        alert("Link copiato negli appunti!\nCondividilo con il cellulare o un altro browser:\n" + url);
     });
 };
 
@@ -181,7 +220,7 @@ R20.broadcast = function(msg) {
 };
 
 // ============================================================================
-// 3. SMISTAMENTO DEI MESSAGGI LIVE & PRESENZA
+// 3. GESTIONE DEI MESSAGGI LIVE
 // ============================================================================
 
 R20.handleNetworkMessage = function(data) {
@@ -189,7 +228,6 @@ R20.handleNetworkMessage = function(data) {
 
     switch (data.type) {
         case 'HEARTBEAT': {
-            // Aggiorna o registra il dispositivo nella lista utenti
             const u = data.user;
             if (!R20.connectedUsers.has(u.id)) {
                 R20.connectedUsers.set(u.id, {
@@ -211,7 +249,6 @@ R20.handleNetworkMessage = function(data) {
         }
 
         case 'REQUEST_FULL_SYNC': {
-            // L'Host risponde al nuovo client inviando l'intero scenario
             if (R20.net.isHost) {
                 const peerInfo = R20.connectedUsers.get(data.clientId) || { canEdit: false, tokenControl: 'all' };
                 R20.broadcast({
@@ -239,7 +276,6 @@ R20.handleNetworkMessage = function(data) {
             if (data.targetClientId === R20.myClientId) {
                 R20.applyClientPermissions(data.role);
             }
-            // Aggiorna la vista locale dei permessi
             const u = R20.connectedUsers.get(data.targetClientId);
             if (u) {
                 u.canEdit = data.role.canEdit;
@@ -325,23 +361,17 @@ R20.handleNetworkMessage = function(data) {
             }
             R20.updateVision();
             break;
-
-        case 'USER_LEFT':
-            R20.connectedUsers.delete(data.clientId);
-            R20.renderPlayersTabAndDock();
-            break;
     }
 };
 
 // ============================================================================
-// 4. RENDERING PANNELLO GIOCATORI & DOCK STILE ROLL20
+// 4. GESTIONE PERMESSI & DOCK ROLL20
 // ============================================================================
 
 R20.applyClientPermissions = function(role) {
     R20.myRole.canEdit = role.canEdit;
     R20.myRole.tokenControl = role.tokenControl;
 
-    // Disabilita la scheda Mappa se il giocatore non ha i permessi di edit
     const editTabBtn = document.querySelector(".tab-btn[onclick*='edit-tab']");
     if (editTabBtn) {
         editTabBtn.style.display = role.canEdit ? 'block' : 'none';
@@ -354,7 +384,6 @@ R20.applyClientPermissions = function(role) {
 };
 
 R20.renderPlayersTabAndDock = function() {
-    // 1. Aggiorna badge stato ruolo corrente
     const roleBadge = document.getElementById('players-my-role-badge');
     if (roleBadge) {
         if (R20.net.isHost) {
@@ -372,11 +401,9 @@ R20.renderPlayersTabAndDock = function() {
         }
     }
 
-    // 2. Aggiorna contatore
     const countEl = document.getElementById('players-online-count');
     if (countEl) countEl.innerText = `${R20.connectedUsers.size} connessi`;
 
-    // 3. Renderizza la lista nella scheda "👥 Giocatori"
     const listContainer = document.getElementById('players-manager-list');
     if (listContainer) {
         const users = Array.from(R20.connectedUsers.values());
@@ -384,7 +411,6 @@ R20.renderPlayersTabAndDock = function() {
         listContainer.innerHTML = users.map(u => {
             const isMe = u.id === R20.myClientId;
 
-            // Opzioni di assegnazione pedina
             const tokenOpts = `
                 <option value="all" ${u.tokenControl === 'all' ? 'selected' : ''}>Tutte le pedine</option>
                 <option value="none" ${u.tokenControl === 'none' ? 'selected' : ''}>Nessuna (Spettatore)</option>
@@ -399,7 +425,6 @@ R20.renderPlayersTabAndDock = function() {
                     </div>
 
                     ${R20.net.isHost && !isMe ? `
-                        <!-- CONTROLLI MASTER SUI GIOCATORI COLLEGATI -->
                         <div style="display:flex; gap:6px; align-items:center; font-size:11px; margin-top:4px;">
                             <label>Pedina:</label>
                             <select onchange="R20.changeUserTokenControl('${u.id}', this.value)" style="background:#111; color:#fff; border:1px solid #555; padding:2px; font-size:11px; flex:1;">
@@ -413,7 +438,6 @@ R20.renderPlayersTabAndDock = function() {
                             </button>
                         </div>
                     ` : `
-                        <!-- VISTA INFO IN SOLA LETTURA PER I GIOCATORI -->
                         <div style="font-size:11px; color:#aaa;">
                             Controllo: <b>${u.tokenControl === 'all' ? 'Tutte' : (u.tokenControl === 'none' ? 'Spettatore' : 'Pedina specifica')}</b>
                             | Mappa: <b>${u.canEdit ? 'Sì' : 'No'}</b>
@@ -424,7 +448,6 @@ R20.renderPlayersTabAndDock = function() {
         }).join('');
     }
 
-    // 4. Renderizza la barra dock in basso a sinistra (Stile Roll20)
     const dock = document.getElementById('players-bottom-dock');
     if (dock) {
         dock.innerHTML = Array.from(R20.connectedUsers.values()).map(u => {
@@ -446,7 +469,6 @@ R20.renderPlayersTabAndDock = function() {
     }
 };
 
-// Funzioni del Master per aggiornare i permessi
 R20.changeUserTokenControl = function(targetClientId, tokenControlValue) {
     const u = R20.connectedUsers.get(targetClientId);
     if (!u) return;
@@ -479,7 +501,7 @@ R20.toggleUserMapEdit = function(targetClientId) {
     R20.renderPlayersTabAndDock();
 };
 
-// Heartbeat periodico ogni 3 secondi per mantenere attiva la presenza online
+// Heartbeat di presenza ogni 3 secondi
 setInterval(() => {
     if (R20.net.client && R20.net.client.connected) {
         R20.broadcast({
@@ -491,7 +513,6 @@ setInterval(() => {
             }
         });
 
-        // Rimuove gli utenti che non hanno inviato segnali negli ultimi 9 secondi
         const now = Date.now();
         let changed = false;
         R20.connectedUsers.forEach((u, id) => {
@@ -717,7 +738,6 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Movimento da tastiera con verifica permessi
     window.addEventListener('keydown', (e) => {
         if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
         if (!R20.selectedTokenId) return;
@@ -750,7 +770,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Ricarica sessione precedente salvata
+    // Ricarica sessione salvata
     const saved = localStorage.getItem('roll20_scenario_save');
     if (saved) {
         try {
@@ -765,19 +785,11 @@ window.addEventListener('DOMContentLoaded', () => {
     R20.setZoom(1.0);
     R20.renderPlayersTabAndDock();
 
-    // Riconoscimento automatico stanza da link (?room=...)
+    // Connessione automatica con link ?room=...
     const urlParams = new URLSearchParams(window.location.search);
     const roomParam = urlParams.get('room');
     if (roomParam) {
         R20.addChatMessage("Rete Live", `Connessione automatica alla stanza: <b>${roomParam}</b>...`);
         R20.joinClientP2P(roomParam);
-    }
-});
-
-// Messaggio di uscita prima di chiudere la scheda
-window.addEventListener('beforeunload', () => {
-    if (R20.net && R20.net.client) {
-        R20.broadcast({ type: 'USER_LEFT', clientId: R20.myClientId });
-        try { R20.net.client.end(true); } catch(e) {}
     }
 });
