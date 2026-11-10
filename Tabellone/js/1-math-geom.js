@@ -1,6 +1,5 @@
 window.R20 = window.R20 || {};
 
-// Costanti Globali
 R20.GRID_SIZE = 50;
 
 /**
@@ -22,7 +21,7 @@ R20.getRayIntersection = function(ox, oy, rdx, rdy, p1, p2) {
 };
 
 /**
- * Calcola il poligono di visibilità raycasting
+ * Calcola il poligono di visibilità raycasting 2D e i muri intercettati
  */
 R20.computeVisibilityPolygon = function(ox, oy, radius) {
     const segments = [];
@@ -37,15 +36,17 @@ R20.computeVisibilityPolygon = function(ox, oy, radius) {
         ]);
     }
 
-    R20.polygons.forEach(p => {
-        if (p.blocksVision) {
-            for (let i = 0; i < p.points.length; i++) {
-                const ptA = p.points[i];
-                const ptB = p.points[(i + 1) % p.points.length];
-                segments.push([ptA, ptB, p]);
+    if (R20.polygons) {
+        R20.polygons.forEach(p => {
+            if (p.blocksVision && p.points && p.points.length > 2) {
+                for (let i = 0; i < p.points.length; i++) {
+                    const ptA = p.points[i];
+                    const ptB = p.points[(i + 1) % p.points.length];
+                    segments.push([ptA, ptB, p]);
+                }
             }
-        }
-    });
+        });
+    }
 
     const angles = new Set();
     segments.forEach(seg => {
@@ -94,6 +95,7 @@ R20.computeVisibilityPolygon = function(ox, oy, radius) {
  * Algoritmo Point-in-Polygon (Raycasting test)
  */
 R20.isPointInsidePolygon = function(point, vs) {
+    if (!vs || vs.length < 3) return false;
     const x = point[0], y = point[1];
     let inside = false;
     for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
@@ -117,10 +119,12 @@ R20.canTokenMoveTo = function(x, y, size = 1) {
         [x + 8, y + span - 8],
         [x + span - 8, y + span - 8]
     ];
-    for (const poly of R20.polygons) {
-        if (!poly.passable) {
-            for (const pt of testPoints) {
-                if (R20.isPointInsidePolygon(pt, poly.points)) return false;
+    if (R20.polygons) {
+        for (const poly of R20.polygons) {
+            if (!poly.passable && poly.points && poly.points.length > 2) {
+                for (const pt of testPoints) {
+                    if (R20.isPointInsidePolygon(pt, poly.points)) return false;
+                }
             }
         }
     }
@@ -128,6 +132,7 @@ R20.canTokenMoveTo = function(x, y, size = 1) {
 };
 
 R20.getPolygonCentroid = function(pts) {
+    if (!pts || pts.length === 0) return [0, 0];
     let sx = 0, sy = 0;
     pts.forEach(p => { sx += p[0]; sy += p[1]; });
     return [sx / pts.length, sy / pts.length];
