@@ -511,3 +511,45 @@ body {
     max-width: 90vw;
     box-shadow: 0 8px 30px rgba(0,0,0,0.9);
 }
+/* --- BARRA GIOCATORI IN BASSO (ROLL20 DOCK) --- */
+#players-bottom-dock {
+    position: absolute;
+    bottom: 12px;
+    left: 120px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+    pointer-events: none;
+}
+.player-dock-chip {
+    background: rgba(20, 21, 26, 0.9);
+    border: 1px solid #444;
+    border-radius: 20px;
+    padding: 3px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #eee;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    pointer-events: all;
+}
+.player-dock-chip.is-master { border-color: #f1c40f; }
+
+/* SCHEDA GESTIONE GIOCATORI */
+.player-manage-card {
+    background: #1c1d24;
+    border: 1px solid #3d4050;
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.player-manage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}
