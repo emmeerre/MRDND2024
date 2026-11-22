@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>D&D Grid Overlay — Mappa & Griglia Tattica</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --panel-bg: rgba(18, 21, 30, 0.9);
+      --panel-border: rgba(255, 255, 255, 0.14);
+      --text: #eef1f7;
+      --muted: #9aa3b2;
+      --accent: #e09f3e;
+      --accent-hover: #f2b454;
+      --btn-bg: rgba(255, 255, 255, 0.08);
+      --btn-hover: rgba(255, 255, 255, 0.16);
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 13px;
+    }
+
+    /* Viewport & Layer Mappa (<img> supporta GIF animate fluide) */
+    #viewport {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+      background: var(--bg);
+    }
+    #viewport.dragging { cursor: grabbing; }
+    #viewport.locked { cursor: default; }
+
+    #mapImg {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-origin: center center;
+      max-width: none;
+      max-height: none;
+      pointer-events: none;
+      display: block;
+    }
+
+    #gridCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* Drag & Drop Overlay */
+    #dropOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(15, 17, 23, 0.82);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 3px dashed var(--accent);
+      margin: 14px;
+      border-radius: 16px;
+      pointer-events: none;
+    }
+    #dropOverlay.active { display: flex; }
+    #dropOverlay span {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Toast Notifiche */
+    #toast {
+      position: fixed;
+      left: 50%;
+      top: 18px;
+      transform: translateX(-50%) translateY(-20px);
+      z-index: 60;
+      background: rgba(20, 24, 34, 0.94);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Floating Top Buttons (sempre in vista) */
+    #topControls {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 30;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill-btn {
+      background: var(--panel-bg);
+      color: var(--text);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+    .pill-btn:hover { background: rgba(35, 40, 56, 0.96); }
+    .pill-btn:active { transform: scale(0.97); }
+    .pill-btn.locked-active {
+      background: rgba(185, 48, 48, 0.92);
+      border-color: #ff8585;
+      color: #ffffff;
+    }
+    .pill-btn.locked-active:hover { background: rgba(205, 58, 58, 0.98); }
+
+    /* Collapsible Side Menu */
+    #menuPanel {
+      position: fixed;
+      top: 60px;
+      right: 14px;
+      bottom: 14px;
+      width: 350px;
+      max-width: calc(100vw - 28px);
+      z-index: 25;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+    }
+    #menuPanel.hidden {
+      transform: translateX(calc(100% + 28px));
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #lockBanner {
+      display: none;
+      background: rgba(185, 48, 48, 0.25);
+      border-bottom: 1px solid rgba(255, 120, 120, 0.35);
+      color: #ffb4b4;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+    #menuPanel.is-locked #lockBanner { display: block; }
+    #menuPanel.is-locked .menu-scroll {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    .menu-scroll {
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: opacity 0.2s;
+    }
+    .menu-scroll::-webkit-scrollbar { width: 6px; }
+    .menu-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius);
+      padding: 11px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Lista Mappe Caricate */
+    .map-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 170px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .map-list::-webkit-scrollbar { width: 5px; }
+    .map-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    .map-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 6px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .map-item:hover { background: rgba(255, 255, 255, 0.1); }
+    .map-item.active {
+      background: rgba(224, 159, 62, 0.2);
+      border-color: var(--accent);
+    }
+    .map-thumb {
+      width: 38px;
+      height: 28px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #090b10;
+      flex-shrink: 0;
+    }
+    .map-meta {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .map-name {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .map-badge {
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .map-del {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 5px;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .map-del:hover {
+      background: rgba(255, 77, 77, 0.22);
+      color: #ff8a8a;
+    }
+
+    .row { display: flex; align-items: center; gap: 8px; }
+    .col { display: flex; flex-direction: column; gap: 4px; }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    button.btn {
+      background: var(--btn-bg);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    button.btn:hover { background: var(--btn-hover); }
+    button.btn.primary {
+      background: var(--accent);
+      color: #111;
+      border-color: transparent;
+    }
+    button.btn.primary:hover { background: var(--accent-hover); }
+    button.btn.active {
+      background: rgba(224, 159, 62, 0.22);
+      border-color: var(--accent);
+      color: #ffd38a;
+    }
+    button.btn.flex1 { flex: 1; }
+
+    .seg-group { display: grid; gap: 6px; }
+    .seg-4 { grid-template-columns: repeat(2, 1fr); }
+    .seg-3 { grid-template-columns: repeat(3, 1fr); }
+    .seg-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .grid-choice {
+      flex-direction: column;
+      padding: 8px 4px !important;
+      font-size: 11px !important;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+      outline: none;
+      flex: 1;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2px solid #151822;
+    }
+
+    input[type="number"], select {
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      padding: 5px 7px;
+      font-size: 12px;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    input[type="number"]:focus, select:focus { border-color: var(--accent); }
+    .num-small { width: 66px; text-align: right; }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      width: 34px;
+      height: 28px;
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+    input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: none; }
+
+    .swatch-row { display: flex; gap: 6px; align-items: center; }
+    .swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: transform 0.12s;
+    }
+    .swatch:hover { transform: scale(1.12); }
+
+    .pan-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 28px);
+      grid-template-rows: repeat(3, 26px);
+      gap: 3px;
+    }
+    .dpad button { padding: 0; font-size: 12px; }
+
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    /* Cartographic Scale Bar Widget */
+    #scaleWidget {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      z-index: 20;
+      background: rgba(15, 17, 23, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 10px;
+      padding: 10px 14px;
+      pointer-events: none;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+    }
+    #scaleWidget.hidden { display: none; }
+    .scale-header {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #c5ccd9;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .scale-labels {
+      position: relative;
+      height: 15px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+    .scale-tick-label {
+      position: absolute;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    }
+    .scale-tick-label.first { transform: translateX(0); }
+    .scale-tick-label.last { transform: translateX(-100%); }
+
+    .scale-bar {
+      display: flex;
+      height: 8px;
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+      margin: 3px 0;
+      overflow: hidden;
+    }
+    .scale-seg { flex: 1; height: 100%; }
+    .scale-seg.dark { background: #14161d; }
+    .scale-seg.light { background: #f4f6fa; }
+
+    .scale-labels.imperial { color: #ffd38a; font-size: 10.5px; }
+  </style>
+</head>
+<body>
+
+  <!-- Viewport -->
+  <div id="viewport">
+    <img id="mapImg" alt="" draggable="false" />
+    <canvas id="gridCanvas"></canvas>
+  </div>
+
+  <!-- Drag & Drop Overlay -->
+  <div id="dropOverlay">
+    <span id="dropText">Rilascia qui una o più mappe (anche GIF animate)</span>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- Floating Top Controls (sempre in vista) -->
+  <div id="topControls">
+    <button class="pill-btn" id="btnLock" title="Blocca o sblocca tutte le modifiche (L)">
+      <svg id="lockIconOpen" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+      </svg>
+      <svg id="lockIconClosed" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:none;">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <span id="lockLabel">Blocca</span>
+    </button>
+
+    <button class="pill-btn" id="btnFullscreen" title="Schermo intero (F)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+      </svg>
+      <span id="fsLabel">Schermo Intero</span>
+    </button>
+
+    <button class="pill-btn" id="btnMenu" title="Apri/Chiudi menu (M)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+      <span>Menu</span>
+    </button>
+  </div>
+
+  <!-- Cartographic Scale Bar -->
+  <div id="scaleWidget">
+    <div class="scale-header">
+      <span id="scaleTitle">1 quadretto = 1.5 m / 5 ft</span>
+    </div>
+    <div class="scale-labels" id="scaleTopLabels"></div>
+    <div class="scale-bar" id="scaleBarSegments"></div>
+    <div class="scale-labels imperial" id="scaleBottomLabels"></div>
+  </div>
+
+  <!-- Collapsible Menu -->
+  <aside id="menuPanel">
+    <div id="lockBanner">Modifiche bloccate — premi "Bloccato" (L) per modificare</div>
+    <div class="menu-scroll">
+
+      <!-- 0. Lista Mappe Caricate -->
+      <div class="section">
+        <div class="section-title">
+          <span>Mappe Caricate</span>
+          <span id="mapCountBadge" style="color:var(--muted);font-size:10px;text-transform:none;">0</span>
+        </div>
+
+        <input type="file" id="fileInput" accept="image/*" multiple hidden />
+        <button class="btn primary" id="btnUpload" style="width:100%;">+ Aggiungi Immagini o GIF Animate</button>
+
+        <div class="map-list" id="mapList"></div>
+        <div class="hint">Salvate nel browser. Per caricare via link usa <b>?foto=nome.gif</b>.</div>
+      </div>
+
+      <!-- 1. Allineamento Mappa -->
+      <div class="section">
+        <div class="section-title">
+          <span>Allineamento Mappa</span>
+          <button class="btn" id="btnResetTransform" style="padding:3px 7px;font-size:10px;">Centra (0°)</button>
+        </div>
+
+        <div class="row">
+          <button class="btn active flex1" id="btnFit" title="Adatta tutta la mappa allo schermo">Adatta</button>
+          <button class="btn flex1" id="btnCover" title="Riempi tutto lo schermo senza bordi neri">Riempi</button>
+        </div>
+
+        <div class="col">
+          <div class="label-row">
+            <span>Zoom Mappa (%)</span>
+            <input type="number" class="num-small" id="zoomNumber" min="5" max="1000" step="1" />
+          </div>
+          <input type="range" id="zoomRange" min="10" max="500" step="1" />
+        </div>
+
+        <div class="col">
+          <div class="label-row">
+            <span>Tilt / Rotazione (°)</span>
+            <input type="number" class="num-small" id="tiltNumber" min="-180" max="180" step="0.1" />
+          </div>
+          <input type="range" id="tiltRange" min="-180" max="180" step="0.1" />
+          <div class="row">
+            <button class="btn flex1" id="btnTiltM90">-90°</button>
+            <button class="btn flex1" id="btnTilt0">0°</button>
+            <button class="btn flex1" id="btnTiltP90">+90°</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="label-row"><span>Spostamento (Pan px)</span></div>
+          <div class="pan-grid">
+            <div class="col" style="gap:6px;">
+              <div class="row">
+                <span style="width:16px;color:var(--muted);">X</span>
+                <input type="number" id="panXInput" step="1" style="flex:1;width:100%;" />
+              </div>
+              <div class="row">
+                <span style="width:16px;color:var(--muted);">Y</span>
+                <input type="number" id="panYInput" step="1" style="flex:1;width:100%;" />
+              </div>
+            </div>
+            <div class="dpad">
+              <div></div>
+              <button class="btn nudge-btn" data-dx="0" data-dy="-5" title="Su">▲</button>
+              <div></div>
+              <button class="btn nudge-btn" data-dx="-5" data-dy="0" title="Sinistra">◀</button>
+              <button class="btn nudge-btn" data-dx="0" data-dy="0" title="Centra Pan">●</button>
+              <button class="btn nudge-btn" data-dx="5" data-dy="0" title="Destra">▶</button>
+              <div></div>
+              <button class="btn nudge-btn" data-dx="0" data-dy="5" title="Giù">▼</button>
+              <div></div>
+            </div>
+          </div>
+        </div>
+        <div class="hint">Mouse: trascina per spostare · rotella per zoom · <b>Shift + rotella</b> per inclinare.</div>
+      </div>
+
+      <!-- 2. Tipo & Dimensione Griglia -->
+      <div class="section">
+        <div class="section-title"><span>Griglia D&amp;D</span></div>
+
+        <div class="seg-group seg-3">
+          <button class="btn grid-choice active" data-grid="square">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="3" width="18" height="18"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/>
+            </svg>
+            Quadrate
+          </button>
+          <button class="btn grid-choice" data-grid="hex-v">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polygon points="12,2 20,7 20,17 12,22 4,17 4,7"/>
+            </svg>
+            Esagoni Verticali
+          </button>
+          <button class="btn grid-choice" data-grid="hex-h">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polygon points="2,12 7,4 17,4 22,12 17,20 7,20"/>
+            </svg>
+            Esagoni Orizzontali
+          </button>
+        </div>
+
+        <div class="seg-group seg-2">
+          <button class="btn active axis-btn" data-axis="width">In Lunghezza (Largh.)</button>
+          <button class="btn axis-btn" data-axis="height">In Altezza</button>
+        </div>
+
+        <div class="col">
+          <div class="label-row">
+            <span id="countLabel">Numero riquadri in lunghezza</span>
+            <input type="number" class="num-small" id="countNumber" min="1" max="200" step="1" />
+          </div>
+          <input type="range" id="countRange" min="2" max="80" step="1" />
+        </div>
+      </div>
+
+      <!-- 3. Colore, Trasparenza e Contrasto -->
+      <div class="section">
+        <div class="section-title"><span>Colore &amp; Contrasto Righe</span></div>
+
+        <div class="seg-group seg-4">
+          <button class="btn color-mode-btn active" data-mode="halo" style="font-size:11px;padding:6px 4px;">Bordo (Halo)</button>
+          <button class="btn color-mode-btn" data-mode="adaptive" style="font-size:11px;padding:6px 4px;">Contrasto B/N</button>
+          <button class="btn color-mode-btn" data-mode="solid" style="font-size:11px;padding:6px 4px;">Colore Fisso</button>
+          <button class="btn color-mode-btn" data-mode="difference" style="font-size:11px;padding:6px 4px;">Inverso (Neg.)</button>
+        </div>
+
+        <div class="row" id="colorPickerGroup" style="justify-content:space-between;">
+          <div class="row">
+            <input type="color" id="gridColorInput" value="#ffffff" />
+            <span id="colorModeHint" style="font-size:11px;color:var(--muted);">Colore + alone</span>
+          </div>
+          <div class="swatch-row">
+            <div class="swatch" style="background:#ffffff" data-color="#ffffff" title="Bianco"></div>
+            <div class="swatch" style="background:#000000" data-color="#000000" title="Nero"></div>
+            <div class="swatch" style="background:#f5c542" data-color="#f5c542" title="Oro"></div>
+            <div class="swatch" style="background:#ff4d4d" data-color="#ff4d4d" title="Rosso"></div>
+            <div class="swatch" style="background:#38bdf8" data-color="#38bdf8" title="Ciano"></div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="label-row">
+            <span>Opacità / Trasparenza (%)</span>
+            <input type="number" class="num-small" id="opacityNumber" min="5" max="100" step="1" />
+          </div>
+          <input type="range" id="opacityRange" min="5" max="100" step="1" />
+        </div>
+
+        <div class="col">
+          <div class="label-row">
+            <span>Spessore righe (px)</span>
+            <input type="number" class="num-small" id="thicknessNumber" min="0.5" max="8" step="0.5" />
+          </div>
+          <input type="range" id="thicknessRange" min="0.5" max="6" step="0.5" />
+        </div>
+      </div>
+
+      <!-- 4. Scala Cartografica -->
+      <div class="section">
+        <div class="section-title">
+          <span>Scala Cartografica</span>
+          <label class="row" style="cursor:pointer;text-transform:none;letter-spacing:0;color:var(--text);font-size:11px;">
+            <input type="checkbox" id="showScaleCheck" checked /> Mostra
+          </label>
+        </div>
+
+        <select id="scalePreset">
+          <option value="dnd5e">D&amp;D Standard (1.5 m / 5 ft)</option>
+          <option value="1m3ft">Scala Ridotta (1 m / 3 ft)</option>
+          <option value="3m10ft">Dungeon Largo (3 m / 10 ft)</option>
+          <option value="travel">Viaggio Locale (1.5 km / 1 mi)</option>
+          <option value="region">Esplorazione Esagoni (9 km / 6 mi)</option>
+          <option value="custom">Personalizzata</option>
+        </select>
+
+        <div class="seg-group seg-2">
+          <div class="col">
+            <span style="font-size:11px;color:var(--muted);">Metrico / cella</span>
+            <div class="row" style="gap:4px;">
+              <input type="number" id="metricVal" step="0.1" min="0.01" style="width:100%;" />
+              <select id="metricUnit" style="width:54px;">
+                <option value="m">m</option>
+                <option value="km">km</option>
+              </select>
+            </div>
+          </div>
+          <div class="col">
+            <span style="font-size:11px;color:var(--muted);">Imperiale / cella</span>
+            <div class="row" style="gap:4px;">
+              <input type="number" id="imperialVal" step="0.5" min="0.01" style="width:100%;" />
+              <select id="imperialUnit" style="width:54px;">
+                <option value="ft">ft</option>
+                <option value="yd">yd</option>
+                <option value="mi">mi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint" style="text-align:center;padding-bottom:6px;">
+        Scorciatoie: <b>L</b> Blocca · <b>M</b> Menu · <b>F</b> Schermo intero · <b>R</b> Centra
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    (() => {
+      const SETTINGS_KEY = 'dnd_grid_settings_v2';
+      const DB_NAME = 'dnd_grid_maps_db';
+      const DB_STORE = 'maps';
+
+      // ==========================================
+      // Stato dell'applicazione
+      // ==========================================
+      const state = {
+        locked: false,
+        autoFit: 'fit',
+
+        panX: 0,
+        panY: 0,
+        zoom: 1,
+        tilt: 0,
+
+        gridType: 'square',
+        axis: 'width',
+        count: 20,
+
+        colorMode: 'halo',
+        gridColor: '#ffffff',
+        opacity: 0.78,
+        thickness: 1.5,
+
+        showScale: true,
+        scalePreset: 'dnd5e',
+        metricVal: 1.5,
+        metricUnit: 'm',
+        imperialVal: 5,
+        imperialUnit: 'ft',
+
+        menuOpen: true,
+        activeMapId: null
+      };
+
+      // Lista mappe in memoria: [{ id, name, type, source, url, blob, view }]
+      let mapsList = [];
+      let dbInstance = null;
+      let gifAdaptiveTimer = null;
+
+      // DOM
+      const viewport = document.getElementById('viewport');
+      const mapImg = document.getElementById('mapImg');
+      const gridCanvas = document.getElementById('gridCanvas');
+      const gridCtx = gridCanvas.getContext('2d', { willReadFrequently: true });
+
+      const lumCanvas = document.createElement('canvas');
+      const lumCtx = lumCanvas.getContext('2d', { willReadFrequently: true });
+
+      const dropOverlay = document.getElementById('dropOverlay');
+      const dropText = document.getElementById('dropText');
+      const toastEl = document.getElementById('toast');
+      const menuPanel = document.getElementById('menuPanel');
+      const btnMenu = document.getElementById('btnMenu');
+      const btnFullscreen = document.getElementById('btnFullscreen');
+      const fsLabel = document.getElementById('fsLabel');
+      const btnLock = document.getElementById('btnLock');
+      const lockLabel = document.getElementById('lockLabel');
+      const lockIconOpen = document.getElementById('lockIconOpen');
+      const lockIconClosed = document.getElementById('lockIconClosed');
+
+      const mapListEl = document.getElementById('mapList');
+      const mapCountBadge = document.getElementById('mapCountBadge');
+
+      const fileInput = document.getElementById('fileInput');
+      const btnUpload = document.getElementById('btnUpload');
+      const btnFit = document.getElementById('btnFit');
+      const btnCover = document.getElementById('btnCover');
+      const btnResetTransform = document.getElementById('btnResetTransform');
+
+      const zoomRange = document.getElementById('zoomRange');
+      const zoomNumber = document.getElementById('zoomNumber');
+      const tiltRange = document.getElementById('tiltRange');
+      const tiltNumber = document.getElementById('tiltNumber');
+      const panXInput = document.getElementById('panXInput');
+      const panYInput = document.getElementById('panYInput');
+
+      const countRange = document.getElementById('countRange');
+      const countNumber = document.getElementById('countNumber');
+      const countLabel = document.getElementById('countLabel');
+
+      const colorPickerGroup = document.getElementById('colorPickerGroup');
+      const colorModeHint = document.getElementById('colorModeHint');
+      const gridColorInput = document.getElementById('gridColorInput');
+      const opacityRange = document.getElementById('opacityRange');
+      const opacityNumber = document.getElementById('opacityNumber');
+      const thicknessRange = document.getElementById('thicknessRange');
+      const thicknessNumber = document.getElementById('thicknessNumber');
+
+      const showScaleCheck = document.getElementById('showScaleCheck');
+      const scalePreset = document.getElementById('scalePreset');
+      const metricValInput = document.getElementById('metricVal');
+      const metricUnitSelect = document.getElementById('metricUnit');
+      const imperialValInput = document.getElementById('imperialVal');
+      const imperialUnitSelect = document.getElementById('imperialUnit');
+
+      const scaleWidget = document.getElementById('scaleWidget');
+      const scaleTitle = document.getElementById('scaleTitle');
+      const scaleTopLabels = document.getElementById('scaleTopLabels');
+      const scaleBarSegments = document.getElementById('scaleBarSegments');
+      const scaleBottomLabels = document.getElementById('scaleBottomLabels');
+
+      let W = window.innerWidth;
+      let H = window.innerHeight;
+      let prevW = W;
+      let prevH = H;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let imgReady = false;
+      let rafPending = false;
+      let toastTimer = null;
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2800);
+      }
+
+      // ==========================================
+      // Persistenza: localStorage + IndexedDB
+      // ==========================================
+      let saveTimer = null;
+      function scheduleSave() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(persistAll, 200);
+      }
+
+      function snapshotCurrentView() {
+        return {
+          autoFit: state.autoFit,
+          panX: state.panX,
+          panY: state.panY,
+          zoom: state.zoom,
+          tilt: state.tilt,
+          gridType: state.gridType,
+          axis: state.axis,
+          count: state.count
+        };
+      }
+
+      function persistAll() {
+        try {
+          const payload = {
+            colorMode: state.colorMode,
+            gridColor: state.gridColor,
+            opacity: state.opacity,
+            thickness: state.thickness,
+            showScale: state.showScale,
+            scalePreset: state.scalePreset,
+            metricVal: state.metricVal,
+            metricUnit: state.metricUnit,
+            imperialVal: state.imperialVal,
+            imperialUnit: state.imperialUnit,
+            menuOpen: state.menuOpen,
+            activeMapId: state.activeMapId,
+            lastView: snapshotCurrentView()
+          };
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
+        } catch (_) {}
+
+        // Aggiorna la vista della mappa attiva in IndexedDB
+        const active = mapsList.find(m => m.id === state.activeMapId);
+        if (active && active.source !== 'sample') {
+          active.view = snapshotCurrentView();
+          dbPutMap(active);
+        }
+      }
+
+      function loadSavedSettings() {
+        try {
+          const raw = localStorage.getItem(SETTINGS_KEY);
+          if (!raw) return;
+          const s = JSON.parse(raw);
+          const keys = [
+            'colorMode', 'gridColor', 'opacity', 'thickness',
+            'showScale', 'scalePreset', 'metricVal', 'metricUnit',
+            'imperialVal', 'imperialUnit', 'menuOpen', 'activeMapId'
+          ];
+          for (const k of keys) {
+            if (s[k] !== undefined) state[k] = s[k];
+          }
+          if (s.lastView) {
+            Object.assign(state, s.lastView);
+          }
+        } catch (_) {}
+      }
+
+      function openDB() {
+        return new Promise((resolve) => {
+          if (!window.indexedDB) return resolve(null);
+          try {
+            const req = indexedDB.open(DB_NAME, 1);
+            req.onupgradeneeded = () => {
+              const db = req.result;
+              if (!db.objectStoreNames.contains(DB_STORE)) {
+                db.createObjectStore(DB_STORE, { keyPath: 'id' });
+              }
+            };
+            req.onsuccess = () => {
+              dbInstance = req.result;
+              resolve(dbInstance);
+            };
+            req.onerror = () => resolve(null);
+          } catch (_) {
+            resolve(null);
+          }
+        });
+      }
+
+      function dbGetAllMaps() {
+        return new Promise((resolve) => {
+          if (!dbInstance) return resolve([]);
+          try {
+            const tx = dbInstance.transaction(DB_STORE, 'readonly');
+            const req = tx.objectStore(DB_STORE).getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => resolve([]);
+          } catch (_) {
+            resolve([]);
+          }
+        });
+      }
+
+      function dbPutMap(item) {
+        if (!dbInstance || item.source === 'sample') return;
+        try {
+          const tx = dbInstance.transaction(DB_STORE, 'readwrite');
+          tx.objectStore(DB_STORE).put({
+            id: item.id,
+            name: item.name,
+            type: item.type,
+            source: item.source,
+            urlKey: item.urlKey || null,
+            blob: item.blob || null,
+            createdAt: item.createdAt || Date.now(),
+            view: item.view || null
+          });
+        } catch (_) {}
+      }
+
+      function dbDeleteMap(id) {
+        if (!dbInstance) return;
+        try {
+          const tx = dbInstance.transaction(DB_STORE, 'readwrite');
+          tx.objectStore(DB_STORE).delete(id);
+        } catch (_) {}
+      }
+
+      // ==========================================
+      // Mappa Demo Procedurale
+      // ==========================================
+      function createSampleBlob() {
+        return new Promise((resolve) => {
+          const c = document.createElement('canvas');
+          c.width = 1600;
+          c.height = 1000;
+          const ctx = c.getContext('2d');
+
+          const grad = ctx.createLinearGradient(0, 0, 1600, 1000);
+          grad.addColorStop(0, '#263029');
+          grad.addColorStop(0.5, '#685f4e');
+          grad.addColorStop(1, '#dfd2b5');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 1600, 1000);
+
+          ctx.strokeStyle = '#2d5a7b';
+          ctx.lineWidth = 110;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(-50, 780);
+          ctx.bezierCurveTo(450, 620, 950, 880, 1680, 320);
+          ctx.stroke();
+
+          ctx.fillStyle = '#3c3a37';
+          ctx.strokeStyle = '#181715';
+          ctx.lineWidth = 10;
+          ctx.fillRect(240, 200, 420, 300);
+          ctx.strokeRect(240, 200, 420, 300);
+
+          ctx.fillStyle = '#c5b89f';
+          ctx.fillRect(740, 160, 340, 340);
+          ctx.strokeRect(740, 160, 340, 340);
+
+          ctx.fillStyle = '#756e61';
+          ctx.fillRect(660, 310, 80, 90);
+
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.font = 'bold 34px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('Mappa di esempio — Carica immagini o GIF dal Menu', 800, 90);
+
+          c.toBlob((blob) => resolve(blob), 'image/png');
+        });
+      }
+
+      // ==========================================
+      // Gestione Lista Mappe & Selezione
+      // ==========================================
+      function renderMapList() {
+        mapListEl.innerHTML = '';
+        mapCountBadge.textContent = `${mapsList.length}`;
+
+        for (const item of mapsList) {
+          const row = document.createElement('div');
+          row.className = `map-item ${item.id === state.activeMapId ? 'active' : ''}`;
+          row.title = item.name;
+
+          const thumb = document.createElement('img');
+          thumb.className = 'map-thumb';
+          thumb.src = item.url;
+          thumb.alt = '';
+
+          const meta = document.createElement('div');
+          meta.className = 'map-meta';
+
+          const nameEl = document.createElement('div');
+          nameEl.className = 'map-name';
+          nameEl.textContent = item.name;
+
+          const badge = document.createElement('div');
+          badge.className = 'map-badge';
+          const isGif = (item.type || '').includes('gif') || item.name.toLowerCase().endsWith('.gif');
+          badge.textContent = item.source === 'sample'
+            ? 'Esempio'
+            : (isGif ? 'GIF Animata' : (item.source === 'url' ? 'Da URL / Repo' : 'Salvata'));
+
+          meta.appendChild(nameEl);
+          meta.appendChild(badge);
+          row.appendChild(thumb);
+          row.appendChild(meta);
+
+          if (item.source !== 'sample') {
+            const delBtn = document.createElement('button');
+            delBtn.className = 'map-del';
+            delBtn.textContent = '✕';
+            delBtn.title = 'Rimuovi mappa';
+            delBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (!state.locked) removeMap(item.id);
+            });
+            row.appendChild(delBtn);
+          }
+
+          row.addEventListener('click', () => {
+            if (!state.locked) selectMap(item.id);
+          });
+
+          mapListEl.appendChild(row);
+        }
+      }
+
+      function selectMap(id, isInitial = false) {
+        // Salva vista corrente prima di cambiare
+        const prev = mapsList.find(m => m.id === state.activeMapId);
+        if (prev && prev.id !== id && prev.source !== 'sample' && !isInitial) {
+          prev.view = snapshotCurrentView();
+          dbPutMap(prev);
+        }
+
+        const target = mapsList.find(m => m.id === id);
+        if (!target) return;
+
+        state.activeMapId = target.id;
+        imgReady = false;
+
+        mapImg.onload = () => {
+          imgReady = true;
+          if (target.view) {
+            Object.assign(state, target.view);
+            if (state.autoFit === 'fit' || state.autoFit === 'cover') {
+              applyAutoFit(state.autoFit);
+            } else {
+              syncUIFromState();
+            }
+          } else {
+            fitImage('fit', true);
+            target.view = snapshotCurrentView();
+            dbPutMap(target);
+          }
+          updateGifAdaptiveLoop();
+          scheduleRender();
+        };
+
+        mapImg.src = target.url;
+        renderMapList();
+        scheduleSave();
+      }
+
+      async function removeMap(id) {
+        const idx = mapsList.findIndex(m => m.id === id);
+        if (idx === -1) return;
+        const item = mapsList[idx];
+        if (item.blob && item.url && item.url.startsWith('blob:')) {
+          URL.revokeObjectURL(item.url);
+        }
+        mapsList.splice(idx, 1);
+        dbDeleteMap(id);
+
+        if (mapsList.length === 0) {
+          const sampleBlob = await createSampleBlob();
+          const sampleUrl = URL.createObjectURL(sampleBlob);
+          mapsList.push({
+            id: 'sample_map',
+            name: 'Mappa di esempio',
+            type: 'image/png',
+            source: 'sample',
+            url: sampleUrl,
+            blob: sampleBlob,
+            view: null
+          });
+        }
+
+        if (state.activeMapId === id) {
+          const next = mapsList[Math.max(0, idx - 1)];
+          selectMap(next.id, true);
+        } else {
+          renderMapList();
+          scheduleSave();
+        }
+      }
+
+      function addUploadedFiles(files) {
+        if (state.locked) return;
+        const valid = [...files].filter(f => f.type.startsWith('image/'));
+        if (valid.length === 0) return;
+
+        // Rimuovi la mappa di esempio quando si carica una vera immagine
+        const sampleIdx = mapsList.findIndex(m => m.source === 'sample');
+        if (sampleIdx !== -1) {
+          const s = mapsList[sampleIdx];
+          if (s.url.startsWith('blob:')) URL.revokeObjectURL(s.url);
+          mapsList.splice(sampleIdx, 1);
+        }
+
+        let lastAddedId = null;
+        for (const file of valid) {
+          const id = `map_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+          const url = URL.createObjectURL(file);
+          const item = {
+            id,
+            name: file.name || 'Mappa',
+            type: file.type,
+            source: 'local',
+            url,
+            blob: file,
+            createdAt: Date.now(),
+            view: null
+          };
+          mapsList.push(item);
+          dbPutMap(item);
+          lastAddedId = id;
+        }
+
+        if (lastAddedId) {
+          selectMap(lastAddedId);
+          showToast(valid.length > 1 ? `Caricate ${valid.length} mappe` : `Caricata: ${valid[0].name}`);
+        }
+      }
+
+      // Caricamento immagine da parametro URL (?foto= / ?img= / ?mappa= / ?map=)
+      async function loadFromUrlParam(paramVal) {
+        const candidates = [paramVal];
+        if (!paramVal.includes('/') && !paramVal.startsWith('http')) {
+          candidates.push(`maps/${paramVal}`);
+        }
+
+        for (const candidate of candidates) {
+          try {
+            const res = await fetch(candidate);
+            if (res.ok) {
+              const blob = await res.blob();
+              if (blob.type.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(candidate)) {
+                return { blob, url: URL.createObjectURL(blob), name: paramVal.split('/').pop().split('?')[0], type: blob.type || 'image/*' };
+              }
+            }
+          } catch (_) {
+            // Fallback per file:// locale
+            const loaded = await new Promise((resolve) => {
+              const testImg = new Image();
+              testImg.onload = () => resolve(true);
+              testImg.onerror = () => resolve(false);
+              testImg.src = candidate;
+            });
+            if (loaded) {
+              return { blob: null, url: candidate, name: paramVal.split('/').pop().split('?')[0], type: 'image/*' };
+            }
+          }
+        }
+        return null;
+      }
+
+      // ==========================================
+      // Geometria, Transform & Resize Dinamico
+      // ==========================================
+      function getGridCellMetric(w, h) {
+        const n = Math.max(1, state.count);
+        if (state.gridType === 'square') {
+          return state.axis === 'width' ? w / n : h / n;
+        } else if (state.gridType === 'hex-v') {
+          const SQRT3 = Math.sqrt(3);
+          const R = state.axis === 'width' ? (w / n) / SQRT3 : h / (1.5 * n + 0.5);
+          return SQRT3 * R;
+        } else {
+          const SQRT3 = Math.sqrt(3);
+          const R = state.axis === 'width' ? w / (1.5 * n + 0.5) : (h / n) / SQRT3;
+          return SQRT3 * R;
+        }
+      }
+
+      function applyAutoFit(mode) {
+        if (!imgReady || !mapImg.naturalWidth) return;
+        const rad = (state.tilt * Math.PI) / 180;
+        const cos = Math.abs(Math.cos(rad));
+        const sin = Math.abs(Math.sin(rad));
+        const bw = mapImg.naturalWidth * cos + mapImg.naturalHeight * sin;
+        const bh = mapImg.naturalWidth * sin + mapImg.naturalHeight * cos;
+
+        const scaleX = W / bw;
+        const scaleY = H / bh;
+        state.zoom = mode === 'cover' ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
+        state.panX = 0;
+        state.panY = 0;
+        syncUIFromState();
+      }
+
+      function fitImage(mode = 'fit', resetTilt = false) {
+        if (!imgReady) return;
+        if (resetTilt) state.tilt = 0;
+        state.autoFit = mode;
+        applyAutoFit(mode);
+        scheduleRender();
+        scheduleSave();
+      }
+
+      function resizeCanvases() {
+        const newW = window.innerWidth;
+        const newH = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const cw = Math.floor(newW * dpr);
+        const ch = Math.floor(newH * dpr);
+
+        const sizeChanged = (newW !== prevW || newH !== prevH);
+        W = newW;
+        H = newH;
+
+        if (gridCanvas.width !== cw || gridCanvas.height !== ch) {
+          gridCanvas.width = cw;
+          gridCanvas.height = ch;
+        }
+
+        if (sizeChanged && imgReady) {
+          if (state.autoFit === 'fit' || state.autoFit === 'cover') {
+            applyAutoFit(state.autoFit);
+          } else {
+            const oldCell = getGridCellMetric(prevW, prevH);
+            const newCell = getGridCellMetric(newW, newH);
+            if (oldCell > 0 && newCell > 0) {
+              const ratio = newCell / oldCell;
+              state.zoom *= ratio;
+              state.panX *= ratio;
+              state.panY *= ratio;
+              syncUIFromState();
+            }
+          }
+          prevW = newW;
+          prevH = newH;
+        }
+
+        scheduleRender();
+      }
+
+      function scheduleRender() {
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(() => {
+          rafPending = false;
+          renderAll();
+        });
+      }
+
+      function renderAll() {
+        updateMapTransform();
+        const cellPixels = drawGrid();
+        updateScaleBar(cellPixels);
+      }
+
+      function updateMapTransform() {
+        if (!imgReady) {
+          mapImg.style.visibility = 'hidden';
+          return;
+        }
+        mapImg.style.visibility = 'visible';
+        mapImg.style.transform =
+          `translate(calc(-50% + ${state.panX}px), calc(-50% + ${state.panY}px)) rotate(${state.tilt}deg) scale(${state.zoom})`;
+      }
+
+      function getHaloColor(hex) {
+        const clean = hex.replace('#', '');
+        const r = parseInt(clean.slice(0, 2), 16) || 255;
+        const g = parseInt(clean.slice(2, 4), 16) || 255;
+        const b = parseInt(clean.slice(4, 6), 16) || 255;
+        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+        return lum > 128 ? 'rgba(10, 12, 18, 0.88)' : 'rgba(248, 250, 252, 0.88)';
+      }
+
+      function updateGifAdaptiveLoop() {
+        clearInterval(gifAdaptiveTimer);
+        gifAdaptiveTimer = null;
+        const active = mapsList.find(m => m.id === state.activeMapId);
+        const isGif = active && ((active.type || '').includes('gif') || active.name.toLowerCase().endsWith('.gif'));
+        if (isGif && state.colorMode === 'adaptive') {
+          gifAdaptiveTimer = setInterval(() => {
+            if (imgReady && state.colorMode === 'adaptive') drawGrid();
+          }, 180);
+        }
+      }
+
+      function drawGrid() {
+        const cw = gridCanvas.width;
+        const ch = gridCanvas.height;
+
+        gridCtx.save();
+        gridCtx.setTransform(1, 0, 0, 1, 0, 0);
+        gridCtx.clearRect(0, 0, cw, ch);
+        gridCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        gridCanvas.style.mixBlendMode = state.colorMode === 'difference' ? 'difference' : 'normal';
+        gridCanvas.style.opacity = String(state.opacity);
+
+        gridCtx.globalAlpha = 1;
+        gridCtx.lineCap = 'round';
+        gridCtx.lineJoin = 'round';
+
+        const n = Math.max(1, state.count);
+        let cellPixels = 50;
+
+        gridCtx.beginPath();
+
+        if (state.gridType === 'square') {
+          const size = state.axis === 'width' ? W / n : H / n;
+          cellPixels = size;
+          const safeSize = Math.max(4, size);
+
+          for (let x = 0; x <= W + 0.5; x += safeSize) {
+            gridCtx.moveTo(x, 0);
+            gridCtx.lineTo(x, H);
+          }
+          for (let y = 0; y <= H + 0.5; y += safeSize) {
+            gridCtx.moveTo(0, y);
+            gridCtx.lineTo(W, y);
+          }
+        } else if (state.gridType === 'hex-v') {
+          const SQRT3 = Math.sqrt(3);
+          const R = state.axis === 'width'
+            ? (W / n) / SQRT3
+            : H / (1.5 * n + 0.5);
+          const safeR = Math.max(4, R);
+          const hexW = SQRT3 * safeR;
+          const rowStep = 1.5 * safeR;
+          cellPixels = hexW;
+
+          const cols = Math.ceil(W / hexW) + 2;
+          const rows = Math.ceil(H / rowStep) + 2;
+
+          for (let row = -1; row <= rows; row++) {
+            const cy = safeR + row * rowStep;
+            const offsetX = (row & 1) ? hexW / 2 : 0;
+            for (let col = -1; col <= cols; col++) {
+              const cx = hexW / 2 + col * hexW + offsetX;
+              gridCtx.moveTo(cx - hexW / 2, cy + safeR / 2);
+              gridCtx.lineTo(cx - hexW / 2, cy - safeR / 2);
+              gridCtx.lineTo(cx, cy - safeR);
+              gridCtx.lineTo(cx + hexW / 2, cy - safeR / 2);
+            }
+          }
+        } else if (state.gridType === 'hex-h') {
+          const SQRT3 = Math.sqrt(3);
+          const R = state.axis === 'width'
+            ? W / (1.5 * n + 0.5)
+            : (H / n) / SQRT3;
+          const safeR = Math.max(4, R);
+          const hexH = SQRT3 * safeR;
+          const colStep = 1.5 * safeR;
+          cellPixels = hexH;
+
+          const cols = Math.ceil(W / colStep) + 2;
+          const rows = Math.ceil(H / hexH) + 2;
+
+          for (let col = -1; col <= cols; col++) {
+            const cx = safeR + col * colStep;
+            const offsetY = (col & 1) ? hexH / 2 : 0;
+            for (let row = -1; row <= rows; row++) {
+              const cy = hexH / 2 + row * hexH + offsetY;
+              gridCtx.moveTo(cx - safeR / 2, cy + hexH / 2);
+              gridCtx.lineTo(cx - safeR, cy);
+              gridCtx.lineTo(cx - safeR / 2, cy - hexH / 2);
+              gridCtx.lineTo(cx + safeR / 2, cy - hexH / 2);
+            }
+          }
+        }
+
+        if (state.colorMode === 'halo') {
+          gridCtx.strokeStyle = getHaloColor(state.gridColor);
+          gridCtx.lineWidth = state.thickness + 2.2;
+          gridCtx.stroke();
+          gridCtx.strokeStyle = state.gridColor;
+          gridCtx.lineWidth = state.thickness;
+          gridCtx.stroke();
+        } else if (state.colorMode === 'adaptive') {
+          gridCtx.strokeStyle = '#ffffff';
+          gridCtx.lineWidth = state.thickness;
+          gridCtx.stroke();
+        } else {
+          gridCtx.strokeStyle = state.gridColor;
+          gridCtx.lineWidth = state.thickness;
+          gridCtx.stroke();
+        }
+
+        gridCtx.restore();
+
+        if (state.colorMode === 'adaptive' && imgReady) {
+          try {
+            const lw = Math.max(16, Math.round(W / 6));
+            const lh = Math.max(16, Math.round(H / 6));
+            if (lumCanvas.width !== lw || lumCanvas.height !== lh) {
+              lumCanvas.width = lw;
+              lumCanvas.height = lh;
+            }
+            lumCtx.save();
+            lumCtx.setTransform(1, 0, 0, 1, 0, 0);
+            lumCtx.fillStyle = '#0f1117';
+            lumCtx.fillRect(0, 0, lw, lh);
+            lumCtx.scale(lw / W, lh / H);
+            lumCtx.translate(W / 2 + state.panX, H / 2 + state.panY);
+            lumCtx.rotate((state.tilt * Math.PI) / 180);
+            lumCtx.scale(state.zoom, state.zoom);
+            lumCtx.drawImage(mapImg, -mapImg.naturalWidth / 2, -mapImg.naturalHeight / 2);
+            lumCtx.restore();
+
+            const lData = lumCtx.getImageData(0, 0, lw, lh).data;
+            const gridImg = gridCtx.getImageData(0, 0, cw, ch);
+            const gData = gridImg.data;
+            const g32 = new Uint32Array(gridImg.data.buffer);
+
+            for (let y = 0; y < ch; y++) {
+              const rowOffset = y * cw;
+              const ly = Math.min(lh - 1, ((y * lh) / ch) | 0);
+              const lumRowOffset = ly * lw;
+              for (let x = 0; x < cw; x++) {
+                const p = rowOffset + x;
+                if (g32[p] === 0) continue;
+                const lx = Math.min(lw - 1, ((x * lw) / cw) | 0);
+                const li = (lumRowOffset + lx) << 2;
+                const lum = 0.299 * lData[li] + 0.587 * lData[li + 1] + 0.114 * lData[li + 2];
+                const val = lum > 132 ? 14 : 246;
+                const gi = p << 2;
+                gData[gi] = val;
+                gData[gi + 1] = val;
+                gData[gi + 2] = val;
+              }
+            }
+            gridCtx.putImageData(gridImg, 0, 0);
+          } catch (_) {
+            // Immagine esterna protetta da CORS: usa fallback halo pulito
+          }
+        }
+
+        return cellPixels;
+      }
+
+      // ==========================================
+      // Scala Cartografica D&D
+      // ==========================================
+      function fmt(num) {
+        return Number(num.toFixed(2)).toString();
+      }
+
+      function updateScaleBar(cellPixels) {
+        if (!state.showScale || !cellPixels || cellPixels <= 0) {
+          scaleWidget.classList.add('hidden');
+          return;
+        }
+        scaleWidget.classList.remove('hidden');
+
+        const shapeName = state.gridType === 'square' ? '1 quadretto' : '1 esagono';
+        scaleTitle.textContent =
+          `${shapeName} = ${fmt(state.metricVal)} ${state.metricUnit} / ${fmt(state.imperialVal)} ${state.imperialUnit}`;
+
+        const candidates = [0.5, 1, 2, 4, 5, 8, 10, 20, 25, 40, 50, 100];
+        let bestCells = 4;
+        let bestDiff = Infinity;
+        const targetPx = Math.min(220, W * 0.35);
+
+        for (const c of candidates) {
+          const px = c * cellPixels;
+          if (px >= 90 && px <= Math.min(300, W * 0.6)) {
+            const diff = Math.abs(px - targetPx);
+            if (diff < bestDiff) {
+              bestDiff = diff;
+              bestCells = c;
+            }
+          }
+        }
+        if (bestDiff === Infinity) {
+          bestCells = Math.max(0.25, Math.round(targetPx / cellPixels));
+        }
+
+        const barWidthPx = Math.max(60, Math.min(W - 60, bestCells * cellPixels));
+        const segments = 4;
+
+        scaleBarSegments.style.width = `${barWidthPx}px`;
+        scaleTopLabels.style.width = `${barWidthPx}px`;
+        scaleBottomLabels.style.width = `${barWidthPx}px`;
+
+        scaleBarSegments.innerHTML = '';
+        for (let i = 0; i < segments; i++) {
+          const seg = document.createElement('div');
+          seg.className = `scale-seg ${i % 2 === 0 ? 'dark' : 'light'}`;
+          scaleBarSegments.appendChild(seg);
+        }
+
+        const totalMetric = bestCells * state.metricVal;
+        const totalImp = bestCells * state.imperialVal;
+        const stepIndices = barWidthPx >= 170 ? [0, 1, 2, 3, 4] : [0, 2, 4];
+
+        scaleTopLabels.innerHTML = '';
+        scaleBottomLabels.innerHTML = '';
+
+        for (const idx of stepIndices) {
+          const frac = idx / segments;
+          const posPct = frac * 100;
+          const cls = idx === 0 ? 'first' : idx === segments ? 'last' : '';
+
+          const mSpan = document.createElement('span');
+          mSpan.className = `scale-tick-label ${cls}`;
+          mSpan.style.left = `${posPct}%`;
+          mSpan.textContent = idx === 0 ? '0' : `${fmt(totalMetric * frac)} ${state.metricUnit}`;
+          scaleTopLabels.appendChild(mSpan);
+
+          const iSpan = document.createElement('span');
+          iSpan.className = `scale-tick-label ${cls}`;
+          iSpan.style.left = `${posPct}%`;
+          iSpan.textContent = idx === 0 ? '0' : `${fmt(totalImp * frac)} ${state.imperialUnit}`;
+          scaleBottomLabels.appendChild(iSpan);
+        }
+      }
+
+      // ==========================================
+      // Stato Blocco & Sincronizzazione UI
+      // ==========================================
+      function setLocked(val) {
+        state.locked = val;
+        viewport.classList.toggle('locked', state.locked);
+        menuPanel.classList.toggle('is-locked', state.locked);
+        btnLock.classList.toggle('locked-active', state.locked);
+        lockLabel.textContent = state.locked ? 'Bloccato' : 'Blocca';
+        lockIconOpen.style.display = state.locked ? 'none' : 'block';
+        lockIconClosed.style.display = state.locked ? 'block' : 'none';
+      }
+
+      function syncUIFromState() {
+        btnFit.classList.toggle('active', state.autoFit === 'fit');
+        btnCover.classList.toggle('active', state.autoFit === 'cover');
+
+        const zoomPct = Math.round(state.zoom * 100);
+        zoomRange.value = Math.min(500, Math.max(10, zoomPct));
+        zoomNumber.value = zoomPct;
+
+        tiltRange.value = state.tilt;
+        tiltNumber.value = Number(state.tilt.toFixed(1));
+
+        panXInput.value = Math.round(state.panX);
+        panYInput.value = Math.round(state.panY);
+
+        document.querySelectorAll('.grid-choice').forEach(b => {
+          b.classList.toggle('active', b.dataset.grid === state.gridType);
+        });
+        document.querySelectorAll('.axis-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.axis === state.axis);
+        });
+
+        const shapeWord = state.gridType === 'square' ? 'riquadri' : 'esagoni';
+        const axisWord = state.axis === 'width' ? 'lunghezza' : 'altezza';
+        countLabel.textContent = `Numero ${shapeWord} in ${axisWord}`;
+        countRange.value = Math.min(80, Math.max(2, state.count));
+        countNumber.value = state.count;
+
+        document.querySelectorAll('.color-mode-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.mode === state.colorMode);
+        });
+
+        gridColorInput.value = state.gridColor;
+        if (state.colorMode === 'adaptive') {
+          colorPickerGroup.style.opacity = '0.35';
+          colorPickerGroup.style.pointerEvents = 'none';
+          colorModeHint.textContent = 'Automatico B/N';
+        } else if (state.colorMode === 'halo') {
+          colorPickerGroup.style.opacity = '1';
+          colorPickerGroup.style.pointerEvents = 'auto';
+          colorModeHint.textContent = 'Colore + alone';
+        } else if (state.colorMode === 'difference') {
+          colorPickerGroup.style.opacity = '1';
+          colorPickerGroup.style.pointerEvents = 'auto';
+          colorModeHint.textContent = 'Tinta inversione';
+        } else {
+          colorPickerGroup.style.opacity = '1';
+          colorPickerGroup.style.pointerEvents = 'auto';
+          colorModeHint.textContent = 'Colore righe';
+        }
+
+        const opPct = Math.round(state.opacity * 100);
+        opacityRange.value = opPct;
+        opacityNumber.value = opPct;
+
+        thicknessRange.value = state.thickness;
+        thicknessNumber.value = state.thickness;
+
+        showScaleCheck.checked = state.showScale;
+        scalePreset.value = state.scalePreset;
+        metricValInput.value = state.metricVal;
+        metricUnitSelect.value = state.metricUnit;
+        imperialValInput.value = state.imperialVal;
+        imperialUnitSelect.value = state.imperialUnit;
+      }
+
+      // ==========================================
+      // Eventi Mouse & Touch sul Viewport
+      // ==========================================
+      let activePointers = new Map();
+      let lastPanPoint = null;
+      let lastPinchDist = null;
+
+      viewport.addEventListener('pointerdown', (e) => {
+        if (state.locked) return;
+        viewport.setPointerCapture(e.pointerId);
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        viewport.classList.add('dragging');
+
+        if (activePointers.size === 1) {
+          lastPanPoint = { x: e.clientX, y: e.clientY };
+          lastPinchDist = null;
+        } else if (activePointers.size === 2) {
+          const pts = [...activePointers.values()];
+          lastPinchDist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+          lastPanPoint = {
+            x: (pts[0].x + pts[1].x) / 2,
+            y: (pts[0].y + pts[1].y) / 2
+          };
+        }
+      });
+
+      viewport.addEventListener('pointermove', (e) => {
+        if (state.locked || !activePointers.has(e.pointerId)) return;
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (activePointers.size === 1 && lastPanPoint) {
+          state.autoFit = null;
+          state.panX += e.clientX - lastPanPoint.x;
+          state.panY += e.clientY - lastPanPoint.y;
+          lastPanPoint = { x: e.clientX, y: e.clientY };
+          syncUIFromState();
+          scheduleRender();
+          scheduleSave();
+        } else if (activePointers.size === 2) {
+          const pts = [...activePointers.values()];
+          const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+          const mid = {
+            x: (pts[0].x + pts[1].x) / 2,
+            y: (pts[0].y + pts[1].y) / 2
+          };
+
+          state.autoFit = null;
+          if (lastPanPoint) {
+            state.panX += mid.x - lastPanPoint.x;
+            state.panY += mid.y - lastPanPoint.y;
+          }
+          if (lastPinchDist && dist > 10) {
+            zoomAtPoint(mid.x, mid.y, state.zoom * (dist / lastPinchDist));
+          }
+
+          lastPinchDist = dist;
+          lastPanPoint = mid;
+          syncUIFromState();
+          scheduleRender();
+          scheduleSave();
+        }
+      });
+
+      function endPointer(e) {
+        activePointers.delete(e.pointerId);
+        if (activePointers.size === 0) {
+          viewport.classList.remove('dragging');
+          lastPanPoint = null;
+          lastPinchDist = null;
+        }
+      }
+      viewport.addEventListener('pointerup', endPointer);
+      viewport.addEventListener('pointercancel', endPointer);
+
+      function zoomAtPoint(screenX, screenY, targetZoom) {
+        const clamped = Math.min(10, Math.max(0.05, targetZoom));
+        const ratio = clamped / state.zoom;
+        const dx = screenX - W / 2;
+        const dy = screenY - H / 2;
+        state.panX = dx - (dx - state.panX) * ratio;
+        state.panY = dy - (dy - state.panY) * ratio;
+        state.zoom = clamped;
+      }
+
+      viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (state.locked) return;
+
+        state.autoFit = null;
+        if (e.shiftKey) {
+          let t = state.tilt + Math.sign(e.deltaY) * 1.5;
+          if (t > 180) t -= 360;
+          if (t < -180) t += 360;
+          state.tilt = t;
+        } else {
+          const factor = e.deltaY < 0 ? 1.09 : 1 / 1.09;
+          zoomAtPoint(e.clientX, e.clientY, state.zoom * factor);
+        }
+        syncUIFromState();
+        scheduleRender();
+        scheduleSave();
+      }, { passive: false });
+
+      // Drag & Drop File
+      window.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropText.textContent = state.locked
+          ? 'Sblocca le modifiche per aggiungere mappe'
+          : 'Rilascia qui una o più mappe (anche GIF animate)';
+        dropOverlay.classList.add('active');
+      });
+      window.addEventListener('dragleave', (e) => {
+        if (e.relatedTarget === null) {
+          dropOverlay.classList.remove('active');
+        }
+      });
+      window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropOverlay.classList.remove('active');
+        if (!state.locked && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          addUploadedFiles(e.dataTransfer.files);
+        }
+      });
+
+      // ==========================================
+      // Eventi Menu & Pulsanti Principali
+      // ==========================================
+      function toggleMenu(force) {
+        state.menuOpen = typeof force === 'boolean' ? force : !state.menuOpen;
+        menuPanel.classList.toggle('hidden', !state.menuOpen);
+        scheduleSave();
+      }
+
+      btnLock.addEventListener('click', () => setLocked(!state.locked));
+      btnMenu.addEventListener('click', () => toggleMenu());
+
+      btnFullscreen.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        fsLabel.textContent = document.fullscreenElement ? 'Esci' : 'Schermo Intero';
+        resizeCanvases();
+        setTimeout(resizeCanvases, 100);
+        setTimeout(resizeCanvases, 300);
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+        const k = e.key.toLowerCase();
+        if (k === 'l') setLocked(!state.locked);
+        if (k === 'm') toggleMenu();
+        if (k === 'f') btnFullscreen.click();
+        if (k === 'r' && !state.locked) fitImage('fit', true);
+      });
+
+      // Upload & Fit
+      btnUpload.addEventListener('click', () => !state.locked && fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) addUploadedFiles(e.target.files);
+        fileInput.value = '';
+      });
+      btnFit.addEventListener('click', () => !state.locked && fitImage('fit', false));
+      btnCover.addEventListener('click', () => !state.locked && fitImage('cover', false));
+      btnResetTransform.addEventListener('click', () => !state.locked && fitImage('fit', true));
+
+      // Zoom
+      zoomRange.addEventListener('input', () => {
+        state.autoFit = null;
+        state.zoom = Math.max(0.05, Number(zoomRange.value) / 100);
+        syncUIFromState();
+        scheduleRender();
+        scheduleSave();
+      });
+      zoomNumber.addEventListener('input', () => {
+        const v = Number(zoomNumber.value);
+        if (v > 0) {
+          state.autoFit = null;
+          state.zoom = Math.min(10, Math.max(0.05, v / 100));
+          zoomRange.value = Math.min(500, Math.max(10, v));
+          btnFit.classList.remove('active');
+          btnCover.classList.remove('active');
+          scheduleRender();
+          scheduleSave();
+        }
+      });
+
+      // Tilt
+      tiltRange.addEventListener('input', () => {
+        state.tilt = Number(tiltRange.value);
+        if (state.autoFit) applyAutoFit(state.autoFit);
+        else syncUIFromState();
+        scheduleRender();
+        scheduleSave();
+      });
+      tiltNumber.addEventListener('input', () => {
+        const v = Number(tiltNumber.value);
+        if (!isNaN(v)) {
+          state.tilt = Math.max(-180, Math.min(180, v));
+          tiltRange.value = state.tilt;
+          if (state.autoFit) applyAutoFit(state.autoFit);
+          scheduleRender();
+          scheduleSave();
+        }
+      });
+      document.getElementById('btnTiltM90').addEventListener('click', () => {
+        state.tilt = Math.max(-180, state.tilt - 90);
+        if (state.autoFit) applyAutoFit(state.autoFit);
+        else syncUIFromState();
+        scheduleRender();
+        scheduleSave();
+      });
+      document.getElementById('btnTilt0').addEventListener('click', () => {
+        state.tilt = 0;
+        if (state.autoFit) applyAutoFit(state.autoFit);
+        else syncUIFromState();
+        scheduleRender();
+        scheduleSave();
+      });
+      document.getElementById('btnTiltP90').addEventListener('click', () => {
+        state.tilt = Math.min(180, state.tilt + 90);
+        if (state.autoFit) applyAutoFit(state.autoFit);
+        else syncUIFromState();
+        scheduleRender();
+        scheduleSave();
+      });
+
+      // Pan inputs & D-Pad
+      panXInput.addEventListener('input', () => {
+        state.autoFit = null;
+        state.panX = Number(panXInput.value) || 0;
+        btnFit.classList.remove('active');
+        btnCover.classList.remove('active');
+        scheduleRender();
+        scheduleSave();
+      });
+      panYInput.addEventListener('input', () => {
+        state.autoFit = null;
+        state.panY = Number(panYInput.value) || 0;
+        btnFit.classList.remove('active');
+        btnCover.classList.remove('active');
+        scheduleRender();
+        scheduleSave();
+      });
+      document.querySelectorAll('.nudge-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const dx = Number(btn.dataset.dx);
+          const dy = Number(btn.dataset.dy);
+          if (dx === 0 && dy === 0) {
+            state.panX = 0; state.panY = 0;
+          } else {
+            state.autoFit = null;
+            state.panX += dx; state.panY += dy;
+          }
+          syncUIFromState();
+          scheduleRender();
+          scheduleSave();
+        });
+      });
+
+      // Griglia tipo & asse & conteggio
+      document.querySelectorAll('.grid-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.gridType = btn.dataset.grid;
+          syncUIFromState();
+          scheduleRender();
+          scheduleSave();
+        });
+      });
+      document.querySelectorAll('.axis-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.axis = btn.dataset.axis;
+          syncUIFromState();
+          scheduleRender();
+          scheduleSave();
+        });
+      });
+
+      countRange.addEventListener('input', () => {
+        state.count = Number(countRange.value);
+        countNumber.value = state.count;
+        scheduleRender();
+        scheduleSave();
+      });
+      countNumber.addEventListener('input', () => {
+        const v = Number(countNumber.value);
+        if (v >= 1) {
+          state.count = Math.min(200, v);
+          countRange.value = Math.min(80, Math.max(2, v));
+          scheduleRender();
+          scheduleSave();
+        }
+      });
+
+      // Colore, modalità contrasto, opacità, spessore
+      document.querySelectorAll('.color-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.colorMode = btn.dataset.mode;
+          if (state.colorMode === 'difference') {
+            state.gridColor = '#ffffff';
+          }
+          updateGifAdaptiveLoop();
+          syncUIFromState();
+          scheduleRender();
+          scheduleSave();
+        });
+      });
+
+      gridColorInput.addEventListener('input', () => {
+        state.gridColor = gridColorInput.value;
+        scheduleRender();
+        scheduleSave();
+      });
+      document.querySelectorAll('.swatch').forEach(sw => {
+        sw.addEventListener('click', () => {
+          state.gridColor = sw.dataset.color;
+          gridColorInput.value = state.gridColor;
+          scheduleRender();
+          scheduleSave();
+        });
+      });
+
+      opacityRange.addEventListener('input', () => {
+        state.opacity = Number(opacityRange.value) / 100;
+        opacityNumber.value = opacityRange.value;
+        scheduleRender();
+        scheduleSave();
+      });
+      opacityNumber.addEventListener('input', () => {
+        const v = Number(opacityNumber.value);
+        if (v >= 1 && v <= 100) {
+          state.opacity = v / 100;
+          opacityRange.value = v;
+          scheduleRender();
+          scheduleSave();
+        }
+      });
+
+      thicknessRange.addEventListener('input', () => {
+        state.thickness = Number(thicknessRange.value);
+        thicknessNumber.value = state.thickness;
+        scheduleRender();
+        scheduleSave();
+      });
+      thicknessNumber.addEventListener('input', () => {
+        const v = Number(thicknessNumber.value);
+        if (v >= 0.5 && v <= 10) {
+          state.thickness = v;
+          thicknessRange.value = Math.min(6, v);
+          scheduleRender();
+          scheduleSave();
+        }
+      });
+
+      // Scala cartografica
+      showScaleCheck.addEventListener('change', () => {
+        state.showScale = showScaleCheck.checked;
+        scheduleRender();
+        scheduleSave();
+      });
+
+      const presets = {
+        dnd5e:  { m: 1.5, mu: 'm',  i: 5,  iu: 'ft' },
+        '1m3ft':{ m: 1,   mu: 'm',  i: 3,  iu: 'ft' },
+        '3m10ft':{m: 3,   mu: 'm',  i: 10, iu: 'ft' },
+        travel: { m: 1.5, mu: 'km', i: 1,  iu: 'mi' },
+        region: { m: 9,   mu: 'km', i: 6,  iu: 'mi' }
+      };
+
+      scalePreset.addEventListener('change', () => {
+        state.scalePreset = scalePreset.value;
+        const p = presets[state.scalePreset];
+        if (p) {
+          state.metricVal = p.m;
+          state.metricUnit = p.mu;
+          state.imperialVal = p.i;
+          state.imperialUnit = p.iu;
+          syncUIFromState();
+          scheduleRender();
+          scheduleSave();
+        }
+      });
+
+      function onCustomScaleEdit() {
+        state.scalePreset = 'custom';
+        scalePreset.value = 'custom';
+        state.metricVal = Math.max(0.01, Number(metricValInput.value) || 1);
+        state.metricUnit = metricUnitSelect.value;
+        state.imperialVal = Math.max(0.01, Number(imperialValInput.value) || 1);
+        state.imperialUnit = imperialUnitSelect.value;
+        scheduleRender();
+        scheduleSave();
+      }
+      metricValInput.addEventListener('input', onCustomScaleEdit);
+      metricUnitSelect.addEventListener('change', onCustomScaleEdit);
+      imperialValInput.addEventListener('input', onCustomScaleEdit);
+      imperialUnitSelect.addEventListener('change', onCustomScaleEdit);
+
+      // ==========================================
+      // Avvio App
+      // ==========================================
+      async function init() {
+        window.addEventListener('resize', resizeCanvases);
+        loadSavedSettings();
+        menuPanel.classList.toggle('hidden', !state.menuOpen);
+        syncUIFromState();
+        resizeCanvases();
+
+        await openDB();
+        const savedMaps = await dbGetAllMaps();
+        savedMaps.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+        for (const m of savedMaps) {
+          if (m.blob) {
+            mapsList.push({
+              ...m,
+              url: URL.createObjectURL(m.blob)
+            });
+          }
+        }
+
+        // Controlla parametro URL (?foto= / ?img= / ?mappa= / ?map=)
+        const params = new URLSearchParams(window.location.search);
+        const paramImg = params.get('foto') || params.get('img') || params.get('mappa') || params.get('map');
+        let urlTargetId = null;
+
+        if (paramImg) {
+          const existing = mapsList.find(m => m.urlKey === paramImg || m.name === paramImg);
+          const loaded = await loadFromUrlParam(paramImg);
+          if (loaded) {
+            if (existing) {
+              if (loaded.blob) {
+                if (existing.url && existing.url.startsWith('blob:')) URL.revokeObjectURL(existing.url);
+                existing.blob = loaded.blob;
+                existing.url = loaded.url;
+                dbPutMap(existing);
+              }
+              urlTargetId = existing.id;
+            } else {
+              const id = `url_${Date.now()}`;
+              const item = {
+                id,
+                name: loaded.name,
+                type: loaded.type,
+                source: 'url',
+                urlKey: paramImg,
+                url: loaded.url,
+                blob: loaded.blob,
+                createdAt: Date.now(),
+                view: null
+              };
+              mapsList.push(item);
+              if (item.blob) dbPutMap(item);
+              urlTargetId = id;
+            }
+            showToast(`Caricata da URL: ${loaded.name}`);
+          } else if (existing) {
+            urlTargetId = existing.id;
+          } else {
+            showToast(`Immagine "${paramImg}" non trovata`);
+          }
+        }
+
+        if (mapsList.length === 0) {
+          const sampleBlob = await createSampleBlob();
+          mapsList.push({
+            id: 'sample_map',
+            name: 'Mappa di esempio',
+            type: 'image/png',
+            source: 'sample',
+            url: URL.createObjectURL(sampleBlob),
+            blob: sampleBlob,
+            view: null
+          });
+        }
+
+        const initialId = urlTargetId
+          || (mapsList.some(m => m.id === state.activeMapId) ? state.activeMapId : mapsList[0].id);
+
+        selectMap(initialId, true);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
